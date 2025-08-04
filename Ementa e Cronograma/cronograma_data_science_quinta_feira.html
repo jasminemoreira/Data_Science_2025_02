@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronograma - Data Science</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1 {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            font-size: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #003366;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+            font-size: 16px;
+        }
+
+        .data {
+            background-color: #e8f4f8;
+            text-align: center;
+            font-weight: bold;
+            width: 120px;
+        }
+
+        .unidade-i {
+            background-color: #e3f2fd;
+        }
+
+        .unidade-ii {
+            background-color: #e8f5e8;
+        }
+
+        .unidade-iii {
+            background-color: #fff3e0;
+        }
+
+        .unidade-iv {
+            background-color: #fce4ec;
+        }
+
+        .unidade-v {
+            background-color: #f3e5f5;
+        }
+
+        .unidade-vi {
+            background-color: #e0f7fa;
+        }
+
+        .sem-aula {
+            background-color: #f5f5f5;
+            color: #666;
+            font-style: italic;
+        }
+
+        .avaliacao {
+            background-color: #ffebee;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            th, td {
+                font-size: 15px;
+                padding: 10px;
+            }
+            
+            .data {
+                width: 80px;
+            }
+            
+            h1 {
+                font-size: 20px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Science</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Conteúdo Programático</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="data">31/07</td>
+                    <td class="unidade-i">Definições do projeto da disciplina<br><strong>Unidade I:</strong> Extração, Transformação e carga de dados. Governança de dados e LGPD.</td>
+                </tr>
+                <tr>
+                    <td class="data">07/08</td>
+                    <td class="unidade-i"><strong>Unidade I:</strong> Transformações, tabelas de dimensão e tabelas fato.</td>
+                </tr>
+                <tr>
+                    <td class="data">14/08</td>
+                    <td class="unidade-i"><strong>Unidade I:</strong> Aplicações práticas e exercícios<br><strong>Checkpoint 1 do Projeto</strong></td>
+                </tr>
+                <tr>
+                    <td class="data">21/08</td>
+                    <td class="unidade-ii"><strong>Unidade II:</strong> Aplicar métodos quantitativos para descrição de eventos ou características. Amostragem, distribuição de dados.</td>
+                </tr>
+                <tr>
+                    <td class="data">28/08</td>
+                    <td class="unidade-ii"><strong>Unidade II:</strong> Medidas de tendência central, medidas de dispersão, correlação, covariância.</td>
+                </tr>
+                <tr>
+                    <td class="data">04/09</td>
+                    <td class="unidade-ii"><strong>Unidade II:</strong> Testes de hipótese e aplicações práticas<br><strong>Checkpoint 2 do Projeto</strong></td>
+                </tr>
+                <tr>
+                    <td class="data">11/09</td>
+                    <td class="unidade-iii"><strong>Unidade III:</strong> Métodos de aprendizado de máquina não supervisionados. Análise de agrupamentos com K-Means.</td>
+                </tr>
+                <tr>
+                    <td class="data">18/09</td>
+                    <td class="unidade-iii"><strong>Unidade III:</strong> Expectation-Maximization e Clusters Hierárquicos<br><strong>Checkpoint 3 do Projeto</strong></td>
+                </tr>
+                <tr>
+                    <td class="data">25/09</td>
+                    <td class="sem-aula">Semana Acadêmica - Sem aulas</td>
+                </tr>
+                <tr>
+                    <td class="data">02/10</td>
+                    <td class="unidade-iv"><strong>Unidade IV:</strong> Desenvolver painéis para visualização de informações. Gráficos e técnicas de visualização de dados.</td>
+                </tr>
+                <tr>
+                    <td class="data">09/10</td>
+                    <td class="unidade-iv"><strong>Unidade IV:</strong> MatplotLib, PyPlot e Seaborn. Gráficos de probabilidades e gráficos SHAP.</td>
+                </tr>
+                <tr>
+                    <td class="data">16/10</td>
+                    <td class="unidade-v"><strong>Unidade V:</strong> Métodos de aprendizado supervisionado. Regressão Logística e Regressão Linear.</td>
+                </tr>
+                <tr>
+                    <td class="data">23/10</td>
+                    <td class="unidade-v"><strong>Unidade V:</strong> Árvores de Decisão e Redes Neurais.</td>
+                </tr>
+                <tr>
+                    <td class="data">30/10</td>
+                    <td class="unidade-vi"><strong>Unidade VI:</strong> Métricas de Avaliação de desempenho. Matriz de Confusão, Acurácia, Precisão, Revocação.</td>
+                </tr>
+                <tr>
+                    <td class="data">06/11</td>
+                    <td class="unidade-vi"><strong>Unidade VI:</strong> AUC-ROC, AUC-PR, Brier Score, MSE, RMSE, MAE e otimização de hiperparâmetros<br><strong>Apresentação Final do Projeto</strong></td>
+                </tr>
+                <tr>
+                    <td class="data">13-19/11</td>
+                    <td class="avaliacao">Avaliação A1 - Semana de Provas</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

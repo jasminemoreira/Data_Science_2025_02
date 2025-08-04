@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science - Aula 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: #1d1d1f;
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 90%;
+            max-width: 1200px;
+            height: 85vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 60px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .slide-number {
+            color: #0052cc;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .slide-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .slide-subtitle {
+            font-size: 1.4rem;
+            color: #86868b;
+            font-weight: 400;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        .content-section {
+            margin-bottom: 40px;
+        }
+
+        .content-section h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #0052cc;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .content-section h3 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 20px;
+        }
+
+        .content-section p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #424245;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(0, 82, 204, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0052cc, #003d99);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 82, 204, 0.1);
+        }
+
+        .card h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0052cc;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 1rem;
+            color: #424245;
+        }
+
+        .timeline {
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #0052cc, #003d99);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 35px;
+            padding-left: 80px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 10px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0052cc;
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 82, 204, 0.1);
+        }
+
+        .timeline-content h4 {
+            color: #0052cc;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .timeline-content p {
+            color: #424245;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .highlight-box h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .highlight-box p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .discussion-box {
+            background: rgba(0, 82, 204, 0.05);
+            border: 2px solid rgba(0, 82, 204, 0.2);
+            border-radius: 16px;
+            padding: 35px;
+            margin: 30px 0;
+        }
+
+        .discussion-box h4 {
+            color: #0052cc;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .discussion-question {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border-left: 4px solid #0052cc;
+        }
+
+        .discussion-question p {
+            color: #1d1d1f;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .objectives-list {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 35px;
+            border-radius: 16px;
+            margin: 30px 0;
+            border: 1px solid rgba(0, 82, 204, 0.1);
+        }
+
+        .objectives-list h4 {
+            color: #0052cc;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .objectives-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .objectives-list li {
+            color: #424245;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0, 82, 204, 0.1);
+            position: relative;
+            padding-left: 35px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .objectives-list li:last-child {
+            border-bottom: none;
+        }
+
+        .objectives-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #0052cc;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .professor-info {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            border: 1px solid rgba(0, 82, 204, 0.1);
+        }
+
+        .professor-info h3 {
+            color: #0052cc;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .professor-info p {
+            color: #86868b;
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .process-step {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid rgba(0, 82, 204, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #0052cc, #003d99);
+        }
+
+        .process-step h4 {
+            color: #0052cc;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .process-step p {
+            color: #424245;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: #0052cc;
+            margin: 0 10px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(0, 82, 204, 0.9);
+            backdrop-filter: blur(20px);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            background: #0052cc;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 82, 204, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: rgba(134, 134, 139, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 40px;
+            left: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            color: #0052cc;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(0, 82, 204, 0.2);
+        }
+
+        .logo {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #0052cc;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .case-study {
+            background: rgba(0, 82, 204, 0.05);
+            border-left: 4px solid #0052cc;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+
+        .case-study h4 {
+            color: #0052cc;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .case-study p {
+            color: #424245;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                width: 95%;
+                padding: 30px;
+                height: 90vh;
+            }
+            
+            .slide-title {
+                font-size: 2.5rem;
+            }
+            
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+            }
+            
+            .navigation {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .slide-counter {
+                bottom: 20px;
+                left: 20px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide.active .content-section {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+
+        
+        <!-- Slide 1: Título -->
+        <div class="slide active">
+            <div class="slide-header">
+                <div class="slide-number">Aula 01</div>
+                <h1 class="slide-title">Data Science</h1>
+                <p class="slide-subtitle">Fundamentos e Perspectivas Profissionais</p>
+            </div>
+            
+            <div class="professor-info">
+                <h3>Professora Jasmine Moreira</h3>
+                <p>Superior de Tecnologia em Análise e Desenvolvimento de Sistemas | 3º Semestre</p>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>Bem-vindos à Jornada da Ciência de Dados</h3>
+                <p>Em um mundo onde aproximadamente 2,5 quintilhões de bytes de dados são criados diariamente, a capacidade de transformar informação bruta em conhecimento acionável tornou-se uma competência estratégica fundamental para profissionais e organizações.</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Objetivos -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Objetivos</div>
+                <h1 class="slide-title">O que Vamos Alcançar</h1>
+                <p class="slide-subtitle">Competências essenciais para o cientista de dados moderno</p>
+            </div>
+            
+            <div class="content-section">
+                <div class="objectives-list">
+                    <h4>Objetivos de Aprendizagem</h4>
+                    <ul>
+                        <li>Dominar técnicas de engenharia de dados para extração, transformação e carga (ETL) de datasets estruturados e não-estruturados</li>
+                        <li>Aplicar algoritmos de aprendizado supervisionado e não-supervisionado para análise preditiva e descritiva</li>
+                        <li>Desenvolver competências em visualização de dados e storytelling com dados</li>
+                        <li>Compreender aspectos éticos e legais relacionados à governança de dados, incluindo LGPD</li>
+                        <li>Implementar pipelines completos de ciência de dados, desde a coleta até a apresentação de resultados</li>
+                    </ul>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Discussão Inicial</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Quais são os principais desafios que vocês identificam no mercado atual relacionados ao volume crescente de dados? Como as organizações podem se preparar para lidar com esses desafios?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Evolução Histórica -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Fundamentos</div>
+                <h1 class="slide-title">Evolução da Ciência de Dados</h1>
+                <p class="slide-subtitle">Da computação estatística à inteligência artificial</p>
+            </div>
+            
+            <div class="content-section">
+                <p>A ciência de dados emergiu como disciplina formal na década de 2000, mas suas raízes remontam à estatística, pesquisa operacional e ciência da computação. O termo "Data Science" foi popularizado por DJ Patil e Jeff Hammerbacher, considerados os primeiros Chief Data Officers de grandes corporações tecnológicas.</p>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>1960-1980: Era da Computação Estatística</h4>
+                            <p>Desenvolvimento de sistemas de banco de dados relacionais e primeiras aplicações de estatística computacional. Surgimento do SQL e sistemas de informação gerencial.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>1990-2000: Business Intelligence</h4>
+                            <p>Consolidação de data warehouses, ferramentas de OLAP e primeiros sistemas de apoio à decisão. Início da mineração de dados comercial.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>2000-2010: Web Analytics e Big Data</h4>
+                            <p>Explosão de dados web, surgimento do Google Analytics, desenvolvimento de frameworks MapReduce e Hadoop. Conceito de Big Data ganha proeminência.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>2010-presente: Machine Learning e AI</h4>
+                            <p>Democratização do machine learning, cloud computing, deep learning e inteligência artificial. Surgimento de ferramentas acessíveis como Python/R ecosystems.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Big Data -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Conceitos</div>
+                <h1 class="slide-title">Os 4 V's do Big Data</h1>
+                <p class="slide-subtitle">Volume, Velocidade, Variedade e Veracidade</p>
+            </div>
+            
+            <div class="content-section">
+                <div class="grid-container">
+                    <div class="card">
+                        <h4>Volume de Dados</h4>
+                        <p>Estima-se que 90% dos dados mundiais foram criados nos últimos dois anos. Organizações lidam com petabytes de informações diariamente, exigindo infraestruturas especializadas para armazenamento e processamento.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Velocidade de Processamento</h4>
+                        <p>Dados são gerados em tempo real através de sensores IoT, redes sociais, transações financeiras. A capacidade de processar e responder em tempo real tornou-se vantagem competitiva crucial.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Variedade de Formatos</h4>
+                        <p>Dados estruturados (bancos relacionais), semi-estruturados (JSON, XML) e não-estruturados (textos, imagens, vídeos) requerem abordagens tecnológicas diversificadas para processamento eficiente.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Veracidade dos Dados</h4>
+                        <p>Qualidade, consistência e confiabilidade dos dados são fundamentais. Dados incorretos ou enviesados podem levar a decisões equivocadas com impactos significativos nos negócios.</p>
+                    </div>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Para Reflexão</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Como vocês avaliam o impacto da democratização dos dados nas organizações? Quais são os benefícios e riscos de tornar dados acessíveis para funcionários não-técnicos?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Projeto CRISP-DM -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Projeto</div>
+                <h1 class="slide-title">Metodologia CRISP-DM</h1>
+                <p class="slide-subtitle">Cross-Industry Standard Process for Data Mining</p>
+            </div>
+            
+            <div class="content-section">
+                <p>O projeto da disciplina seguirá a metodologia CRISP-DM, amplamente adotada na indústria para projetos de analytics. Esta abordagem garante uma execução estruturada e profissional.</p>
+
+                <div class="process-flow">
+                    <div class="process-step">
+                        <h4>1. Business Understanding</h4>
+                        <p>Compreensão do problema de negócio, definição de objetivos e critérios de sucesso.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="process-step">
+                        <h4>2. Data Understanding</h4>
+                        <p>Coleta inicial, exploração e identificação de problemas de qualidade nos dados.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="process-step">
+                        <h4>3. Data Preparation</h4>
+                        <p>Limpeza, transformação e construção do dataset final para modelagem.</p>
+                    </div>
+                </div>
+
+                <div class="process-flow">
+                    <div class="process-step">
+                        <h4>4. Modeling</h4>
+                        <p>Seleção e aplicação de técnicas de modelagem, calibração de parâmetros.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="process-step">
+                        <h4>5. Evaluation</h4>
+                        <p>Avaliação do modelo e revisão das etapas para garantir objetivos de negócio.</p>
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="process-step">
+                        <h4>6. Deployment</h4>
+                        <p>Implementação do modelo e monitoramento de performance em produção.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Casos de Estudo -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Aplicações</div>
+                <h1 class="slide-title">Casos de Estudo</h1>
+                <p class="slide-subtitle">Problemas reais que podem ser abordados no projeto</p>
+            </div>
+            
+            <div class="content-section">
+                <div class="case-study">
+                    <h4>Análise de Churn em E-commerce</h4>
+                    <p>Identificação de padrões de comportamento que indicam propensão ao abandono de clientes, desenvolvimento de modelos preditivos e estratégias de retenção personalizadas.</p>
+                </div>
+                
+                <div class="case-study">
+                    <h4>Otimização de Sistemas de Saúde Pública</h4>
+                    <p>Análise de dados epidemiológicos para identificação de padrões de doenças, otimização de recursos hospitalares e desenvolvimento de sistemas de alerta precoce.</p>
+                </div>
+                
+                <div class="case-study">
+                    <h4>Análise de Sentimento em Redes Sociais</h4>
+                    <p>Processamento de linguagem natural para análise de percepção de marca, identificação de tendências e desenvolvimento de estratégias de comunicação.</p>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Estratégia de Projeto</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Que critérios vocês utilizariam para selecionar um problema de negócio adequado para um projeto de ciência de dados? Como balancear complexidade técnica com impacto prático?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: ETL -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Unidade I</div>
+                <h1 class="slide-title">Engenharia de Dados: ETL</h1>
+                <p class="slide-subtitle">Extract, Transform, Load - A fundação da ciência de dados</p>
+            </div>
+            
+            <div class="content-section">
+                <p>A engenharia de dados constitui a fundação sobre a qual toda análise de dados é construída. Tradicionalmente citava-se que 80% do tempo em projetos de ciência de dados era dedicado à preparação de dados, porém pesquisas recentes (Anaconda 2020) indicam entre 45-60%, refletindo melhorias em ferramentas e processos, mas ainda evidenciando a importância crítica desta disciplina.</p>
+
+                <div class="highlight-box">
+                    <h3>ETL vs ELT: Paradigmas Modernos</h3>
+                    <p>Em arquiteturas modernas, observa-se uma transição para ELT (Extract, Load, Transform), onde a transformação ocorre após o carregamento, aproveitando o poder computacional de data warehouses modernos como Snowflake, BigQuery e Redshift.</p>
+                </div>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h4>Extract (Extração)</h4>
+                        <p>Processo de coleta de dados de fontes heterogêneas: APIs REST, bancos de dados relacionais e NoSQL, arquivos CSV/JSON, web scraping, streams de dados em tempo real.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Transform (Transformação)</h4>
+                        <p>Aplicação de regras de negócio, limpeza de dados, normalização, agregações, joins complexos, tratamento de valores ausentes e outliers.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Load (Carregamento)</h4>
+                        <p>Inserção eficiente em sistemas de destino, considerando estratégias de paralelização, particionamento, indexação e mecanismos de recuperação.</p>
+                    </div>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Questão Técnica</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Considerando a crescente adoção de arquiteturas cloud-native, como vocês avaliam o trade-off entre ETL tradicional e abordagens ELT modernas?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Modelagem Dimensional -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Arquitetura</div>
+                <h1 class="slide-title">Modelagem Dimensional</h1>
+                <p class="slide-subtitle">Tabelas Fato e Dimensão</p>
+            </div>
+            
+            <div class="content-section">
+                <p>A modelagem dimensional, desenvolvida por Ralph Kimball, permanece fundamental para data warehousing. Esta abordagem organiza dados em fatos (métricas quantitativas) e dimensões (contexto descritivo), otimizando consultas analíticas.</p>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h4>Tabelas Fato</h4>
+                        <p>Armazenam métricas de negócio quantificáveis (vendas, cliques, transações). Características: granularidade específica, chaves estrangeiras para dimensões, medidas aditivas e não-aditivas.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Tabelas Dimensão</h4>
+                        <p>Fornecem contexto descritivo para análise (cliente, produto, tempo, localização). Implementam hierarquias navegacionais e estratégias de slowly changing dimensions (SCD).</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>Esquema Estrela vs Esquema Floco de Neve</h3>
+                    <p>O esquema estrela oferece simplicidade e performance superior para consultas analíticas, enquanto o esquema floco de neve proporciona normalização mais rigorosa, reduzindo redundância mas aumentando complexidade de consultas.</p>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Desafio Arquitetural</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Como vocês abordariam o desafio de integrar dados em tempo real com dados batch em um ambiente corporativo? Que considerações técnicas seriam prioritárias?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: LGPD -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Compliance</div>
+                <h1 class="slide-title">LGPD e Governança</h1>
+                <p class="slide-subtitle">Lei Geral de Proteção de Dados</p>
+            </div>
+            
+            <div class="content-section">
+                <p>A LGPD estabelece um marco regulatório rigoroso que impacta significativamente práticas de ciência de dados, exigindo implementação de privacy by design e accountability em todos os processos de tratamento de dados pessoais.</p>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h4>Privacy by Design</h4>
+                        <p>Integração de considerações de privacidade desde a concepção de sistemas. Inclui técnicas como differential privacy, federated learning e homomorphic encryption.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Data Subject Rights</h4>
+                        <p>Implementação técnica de direitos do titular: acesso, retificação, portabilidade, eliminação. Requer arquiteturas que suportem manipulação granular de dados pessoais.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Impact Assessment</h4>
+                        <p>Desenvolvimento de frameworks para avaliação de impacto, especialmente para algoritmos de tomada de decisão automatizada.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Data Lineage</h4>
+                        <p>Rastreabilidade completa do ciclo de vida dos dados, desde origem até consumo final. Essencial para auditoria e compliance.</p>
+                    </div>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Dilema Ético</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Como vocês abordariam o dilema entre maximizar valor analítico dos dados e minimizar riscos de privacidade? Que frameworks de decisão utilizariam?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Cronograma -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Cronograma</div>
+                <h1 class="slide-title">Jornada Semestral</h1>
+                <p class="slide-subtitle">Roadmap de aprendizado estruturado</p>
+            </div>
+            
+            <div class="content-section">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>04/08 - Modelagem Dimensional Avançada</h4>
+                            <p>Implementação prática de esquemas estrela e floco de neve. Estratégias para slowly changing dimensions.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>11/08 - Estatística Descritiva | Checkpoint 1</h4>
+                            <p>Técnicas avançadas de amostragem. Testes de hipótese. Análise de correlação e covariância.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>25/08 - 01/09 - Machine Learning Não-Supervisionado</h4>
+                            <p>Algoritmos de clustering: K-means, hierarchical, DBSCAN. Checkpoint 2 do projeto.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>15/09 - 22/09 - Visualização e Storytelling</h4>
+                            <p>Princípios de design de informação. Explicabilidade de modelos com SHAP.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>06/10 - 20/10 - ML Supervisionado | Checkpoint 3</h4>
+                            <p>Regressão linear/logística. Árvores de decisão. Redes neurais.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>27/10 - 10/11 - Avaliação e Deploy</h4>
+                            <p>Métricas de performance. Hyperparameter tuning. Apresentação final.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Próximos Passos -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-number">Preparação</div>
+                <h1 class="slide-title">Próximos Passos</h1>
+                <p class="slide-subtitle">Como se preparar para o sucesso</p>
+            </div>
+            
+            <div class="content-section">
+                <div class="highlight-box">
+                    <h3>Preparação para Próxima Aula (04/08)</h3>
+                    <p><strong>Leitura Obrigatória:</strong> Capítulos 1-3 do livro "Data Science do Zero" (Joel Grus). Foco em conceitos de modelagem dimensional e arquiteturas de data warehouse.</p>
+                </div>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h4>Ambiente Técnico</h4>
+                        <p>Instalação e configuração do ambiente Python com Anaconda. Familiarização com Google Colab. Criação de conta GitHub para versionamento do projeto.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Reflexão Individual</h4>
+                        <p>Identificação de um problema de negócio real que poderia ser abordado através de ciência de dados. Preparar apresentação de 2 minutos para próxima aula.</p>
+                    </div>
+                </div>
+
+                <div class="discussion-box">
+                    <h4>💭 Questão Final</h4>
+                    <div class="discussion-question">
+                        <p><strong>Pergunta:</strong> Considerando todo o conteúdo apresentado hoje, como vocês definem o papel do cientista de dados moderno? Que responsabilidades técnicas, éticas e sociais este profissional deve assumir?</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>Compromisso da Turma</h3>
+                    <p>Vamos fazer desta disciplina uma experiência transformadora. O sucesso depende do engajamento, curiosidade e colaboração de todos. Estamos juntos nesta jornada de descoberta e aprendizado!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegação -->
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">
+                ← Anterior
+            </button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">
+                Próximo →
+            </button>
+        </div>
+
+        <!-- Contador de slides -->
+        <div class="slide-counter">
+            <span id="slideCounter">1 / 11</span>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            // Update counter
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        // Initialize
+        document.getElementById('prevBtn').disabled = true;
+        
+        // Touch support for mobile
+        let startX = 0;
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+            
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    changeSlide(1);
+                } else {
+                    changeSlide(-1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

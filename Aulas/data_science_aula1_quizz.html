@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science Security Protocol - Aula 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #1d1d1f;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(220, 20, 60, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(220, 20, 60, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            box-shadow: 0 20px 60px rgba(220, 20, 60, 0.1);
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #dc143c, #b91c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .game-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #dc143c, #b91c3c);
+            border-radius: 2px;
+        }
+
+        .game-subtitle {
+            font-size: 1.1rem;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .stats-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(220, 20, 60, 0.1);
+        }
+
+        .security-badge {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #dc143c, #b91c3c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(220, 20, 60, 0.3);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(220, 20, 60, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 35px rgba(220, 20, 60, 0.4); }
+        }
+
+        .stat {
+            text-align: center;
+            padding: 0 20px;
+            border-right: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #86868b;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #dc143c;
+        }
+
+        .game-screen {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            min-height: 500px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 20px 60px rgba(220, 20, 60, 0.1);
+            border: 1px solid rgba(220, 20, 60, 0.2);
+        }
+
+        .threat-container {
+            text-align: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .threat-visual {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 2px solid #dc143c;
+            position: relative;
+            overflow: hidden;
+            animation: threatAnimation 2s ease-in-out infinite;
+        }
+
+        @keyframes threatAnimation {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(220, 20, 60, 0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 15px 40px rgba(220, 20, 60, 0.3); }
+        }
+
+        .threat-data-quality {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .threat-privacy-compliance {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+        }
+
+        .threat-big-data-architecture {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+        }
+
+        .threat-pipeline-integrity {
+            background: linear-gradient(135deg, #fab1a0, #e17055);
+        }
+
+        .threat-info {
+            background: rgba(220, 20, 60, 0.05);
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .threat-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #dc143c;
+            margin-bottom: 15px;
+        }
+
+        .threat-progress {
+            background: #e9ecef;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .threat-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #dc143c, #b91c3c);
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+
+        .threat-status {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .question-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .question-header {
+            color: #dc143c;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(220, 20, 60, 0.2);
+            border-radius: 10px;
+            padding: 18px 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #1d1d1f;
+        }
+
+        .option:hover {
+            background: rgba(220, 20, 60, 0.05);
+            border-color: #dc143c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.2);
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            border-color: #00b894;
+            color: white;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option.wrong {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            border-color: #d63031;
+            color: white;
+            animation: wrongShake 0.6s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes wrongShake {
+            0%, 25%, 50%, 75%, 100% { transform: translateX(0); }
+            12.5%, 37.5%, 62.5%, 87.5% { transform: translateX(-3px); }
+        }
+
+        .damage-indicator {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #dc143c;
+            animation: damageFloat 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes damageFloat {
+            0% {
+                transform: translateY(0) scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-60px) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #dc143c, #b91c3c);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.3);
+        }
+
+        .victory-screen, .start-screen {
+            text-align: center;
+        }
+
+        .victory-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .start-description {
+            background: rgba(220, 20, 60, 0.05);
+            border: 1px solid rgba(220, 20, 60, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .start-description h3 {
+            color: #dc143c;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .start-description p {
+            color: #424245;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .final-score {
+            font-size: 1.8rem;
+            color: #dc143c;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        /* Modal de Insight */
+        .insight-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .insight-modal.show {
+            opacity: 1;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            border-radius: 20px;
+            padding: 35px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 60px rgba(0, 82, 204, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .insight-modal.show .insight-card {
+            transform: scale(1);
+        }
+
+        .insight-header {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insight-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .continue-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .continue-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .stat {
+                border-right: none;
+                border-bottom: 1px solid rgba(220, 20, 60, 0.2);
+                padding-bottom: 15px;
+            }
+
+            .stat:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">Data Science Security Assessment</h1>
+            <p class="game-subtitle">Protocolo de Avaliação - Aula 1: Fundamentos</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="security-badge">🛡️</div>
+            <div class="stat">
+                <div class="stat-label">Nível de Competência</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Pontos de Conhecimento</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Ameaças Neutralizadas</div>
+                <div class="stat-value" id="threats">0</div>
+            </div>
+        </div>
+
+        <div class="game-screen">
+            <!-- Tela inicial -->
+            <div id="start-screen" class="start-screen">
+                <h2 style="color: #dc143c; margin-bottom: 20px;">Avaliação de Conhecimentos</h2>
+                
+                <div class="start-description">
+                    <h3>Objetivo da Avaliação</h3>
+                    <p>Este protocolo de segurança avalia seus conhecimentos fundamentais em ciência de dados, baseado no conteúdo da Aula 1.</p>
+                    <p>Você enfrentará cenários que testam seus conhecimentos em:</p>
+                    <ul style="margin: 15px 0; padding-left: 20px;">
+                        <li>Qualidade e tratamento de dados</li>
+                        <li>Conformidade com LGPD</li>
+                        <li>Arquiteturas Big Data</li>
+                        <li>Processos ETL e modelagem dimensional</li>
+                    </ul>
+                </div>
+
+                <div class="start-description">
+                    <h3>Sistema de Pontuação</h3>
+                    <p><strong>Resposta Correta:</strong> +100 pontos + bônus de neutralização</p>
+                    <p><strong>Neutralização Completa:</strong> +200 pontos adicionais</p>
+                    <p><strong>Insight de Conhecimento:</strong> Explicação técnica após cada resposta</p>
+                </div>
+                
+                <button class="control-btn" onclick="initializeAssessment()">
+                    Iniciar Avaliação
+                </button>
+            </div>
+
+            <!-- Tela de avaliação -->
+            <div id="assessment-screen" class="threat-container" style="display: none;">
+                <div id="threat-visual" class="threat-visual">
+                    <span id="threat-icon">🔍</span>
+                </div>
+                
+                <div class="threat-info">
+                    <div id="threat-name" class="threat-name">Analisando cenário...</div>
+                    <div class="threat-progress">
+                        <div id="threat-progress-bar" class="threat-progress-bar" style="width: 100%;"></div>
+                    </div>
+                    <div id="threat-status" class="threat-status">Integridade: 100%</div>
+                </div>
+
+                <div class="question-panel">
+                    <div class="question-header">Cenário de Avaliação</div>
+                    <div id="question" class="question">Carregando pergunta...</div>
+                    <div id="options" class="options"></div>
+                </div>
+            </div>
+
+            <!-- Tela de conclusão -->
+            <div id="completion-screen" class="victory-screen" style="display: none;">
+                <h2 class="victory-title">Avaliação Concluída</h2>
+                <p style="font-size: 1.2rem; margin: 20px 0; color: #424245;">
+                    Parabéns! Você completou com sucesso a avaliação de conhecimentos.
+                </p>
+                <div id="final-score" class="final-score"></div>
+                
+                <div class="start-description">
+                    <h3>Certificação de Competência</h3>
+                    <p>Você demonstrou conhecimento sólido em fundamentos de ciência de dados, incluindo processos ETL, conformidade LGPD, arquiteturas Big Data e qualidade de dados.</p>
+                    <p>Continue desenvolvendo suas habilidades para enfrentar desafios mais complexos nas próximas aulas.</p>
+                </div>
+                
+                <button class="control-btn" onclick="restartAssessment()">
+                    Reiniciar Avaliação
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Insight Técnico -->
+    <div class="insight-modal" id="insight-modal" onclick="closeInsightModal(event)">
+        <div class="insight-card" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeInsightModal()">×</button>
+            <div class="insight-header">
+                <span>💡</span> Insight Técnico
+            </div>
+            <div id="modal-insight-text" class="insight-text"></div>
+            <button class="continue-btn" onclick="closeInsightModal()">
+                Continuar Avaliação
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Estado da avaliação
+        let gameState = {
+            level: 1,
+            score: 0,
+            threats: 0,
+            currentThreat: 0,
+            currentQuestion: 0,
+            threatHealth: 100
+        };
+
+        // Cenários de avaliação
+        const threats = [
+            {
+                name: "Desafio: Qualidade de Dados",
+                icon: "📊",
+                className: "threat-data-quality",
+                questions: [
+                    {
+                        question: "Em um projeto de ciência de dados, você identifica 15% de valores NULL em uma coluna crítica. Qual é a abordagem mais apropriada?",
+                        options: [
+                            "Remover todas as linhas com valores NULL",
+                            "Aplicar técnicas de imputação baseadas no contexto dos dados",
+                            "Substituir todos os NULLs por zero",
+                            "Ignorar a coluna completamente"
+                        ],
+                        correct: 1,
+                        insight: "Técnicas de imputação preservam o tamanho do dataset e podem usar métodos estatísticos (média, mediana) ou algoritmos de ML para estimar valores ausentes de forma contextual."
+                    },
+                    {
+                        question: "Durante a fase de Data Understanding do CRISP-DM, você detecta registros duplicados. Qual estratégia de deduplicação é mais eficaz?",
+                        options: [
+                            "Manter todas as duplicatas para não perder informação",
+                            "Implementar deduplicação baseada em chaves primárias ou business keys",
+                            "Remover aleatoriamente metade dos registros duplicados",
+                            "Aplicar deduplicação apenas nos dados mais recentes"
+                        ],
+                        correct: 1,
+                        insight: "Deduplicação baseada em chaves de negócio garante que registros únicos sejam preservados, mantendo a integridade referencial e qualidade dos dados."
+                    },
+                    {
+                        question: "Para detectar outliers em um dataset financeiro, qual combinação de métodos oferece maior robustez?",
+                        options: [
+                            "Apenas inspeção visual dos dados",
+                            "Combinação de métodos estatísticos (IQR, Z-score) e algoritmos de ML",
+                            "Remoção automática de valores extremos",
+                            "Utilização exclusiva de percentis"
+                        ],
+                        correct: 1,
+                        insight: "A combinação de métodos estatísticos tradicionais com algoritmos de ML (como Isolation Forest) oferece detecção mais robusta e contextual de anomalias."
+                    }
+                ]
+            },
+            {
+                name: "Desafio: Conformidade LGPD",
+                icon: "🔒",
+                className: "threat-privacy-compliance",
+                questions: [
+                    {
+                        question: "No desenvolvimento de um sistema de analytics, qual princípio da LGPD deve ser implementado desde a concepção arquitetural?",
+                        options: [
+                            "Princípio da Finalidade",
+                            "Privacy by Design",
+                            "Princípio da Transparência",
+                            "Princípio da Segurança"
+                        ],
+                        correct: 1,
+                        insight: "Privacy by Design exige que a proteção de dados seja incorporada na arquitetura desde o início, não como uma funcionalidade adicional."
+                    },
+                    {
+                        question: "Um titular de dados solicita portabilidade de seus dados pessoais. Qual é a obrigação técnica da organização?",
+                        options: [
+                            "Fornecer os dados apenas em formato PDF",
+                            "Disponibilizar os dados em formato estruturado e legível por máquina",
+                            "Cobrar taxa administrativa pelo processamento",
+                            "Negar a solicitação por questões de segurança"
+                        ],
+                        correct: 1,
+                        insight: "A LGPD garante o direito à portabilidade, exigindo que os dados sejam fornecidos em formato estruturado, de uso comum e legível por máquina."
+                    },
+                    {
+                        question: "Para implementar accountability em processos de ML, qual documentação é essencial?",
+                        options: [
+                            "Apenas o código fonte dos algoritmos",
+                            "Data lineage completo e registro de decisões automatizadas",
+                            "Documentação de infraestrutura de TI",
+                            "Relatórios financeiros do projeto"
+                        ],
+                        correct: 1,
+                        insight: "Data lineage e registro de decisões automatizadas são fundamentais para demonstrar compliance e possibilitar auditoria de algoritmos."
+                    }
+                ]
+            },
+            {
+                name: "Desafio: Arquitetura Big Data",
+                icon: "🏗️",
+                className: "threat-big-data-architecture",
+                questions: [
+                    {
+                        question: "Qual dos seguintes NÃO é um dos 4 V's tradicionais do Big Data?",
+                        options: [
+                            "Volume - quantidade massiva de dados",
+                            "Velocidade - processamento em tempo real",
+                            "Virtualização - abstração de recursos",
+                            "Veracidade - qualidade e confiabilidade dos dados"
+                        ],
+                        correct: 2,
+                        insight: "Os 4 V's do Big Data são Volume, Velocidade, Variedade e Veracidade. Virtualização refere-se à infraestrutura, não às características dos dados."
+                    },
+                    {
+                        question: "Em um cenário com dados estruturados, semi-estruturados e não-estruturados, qual característica do Big Data está sendo exemplificada?",
+                        options: [
+                            "Volume",
+                            "Velocidade",
+                            "Variedade",
+                            "Veracidade"
+                        ],
+                        correct: 2,
+                        insight: "Variedade refere-se aos diferentes tipos e formatos de dados: estruturados (tabelas), semi-estruturados (JSON, XML) e não-estruturados (texto, imagens)."
+                    },
+                    {
+                        question: "Para processar petabytes de dados históricos com transformações complexas, qual arquitetura é mais adequada?",
+                        options: [
+                            "Processamento em lote (batch) com frameworks distribuídos",
+                            "Processamento exclusivamente em tempo real",
+                            "Banco de dados relacional tradicional",
+                            "Planilhas eletrônicas avançadas"
+                        ],
+                        correct: 0,
+                        insight: "Para volumes massivos de dados históricos, processamento em lote com frameworks como Hadoop/Spark oferece melhor custo-benefício e capacidade de processamento."
+                    }
+                ]
+            },
+            {
+                name: "Desafio: Pipeline ETL e Modelagem",
+                icon: "⚙️",
+                className: "threat-pipeline-integrity",
+                questions: [
+                    {
+                        question: "Na transição para arquiteturas cloud-native modernas, qual tendência tem ganhado predominância?",
+                        options: [
+                            "ETL (Extract, Transform, Load)",
+                            "ELT (Extract, Load, Transform)",
+                            "Manual data processing",
+                            "Eliminação de transformações"
+                        ],
+                        correct: 1,
+                        insight: "ELT aproveita o poder computacional de data warehouses modernos (Snowflake, BigQuery) para realizar transformações após o carregamento, oferecendo maior flexibilidade."
+                    },
+                    {
+                        question: "Na modelagem dimensional, qual é a principal diferença entre tabelas Fato e Dimensão?",
+                        options: [
+                            "Fato armazena contexto, Dimensão armazena métricas",
+                            "Fato armazena métricas quantitativas, Dimensão fornece contexto descritivo",
+                            "Ambas armazenam os mesmos tipos de dados",
+                            "Fato é para dados atuais, Dimensão para dados históricos"
+                        ],
+                        correct: 1,
+                        insight: "Tabelas Fato contêm métricas quantificáveis (vendas, cliques), enquanto Dimensões fornecem contexto descritivo (cliente, produto, tempo) para análise."
+                    },
+                    {
+                        question: "Para consultas analíticas OLAP, qual esquema dimensional oferece melhor performance?",
+                        options: [
+                            "Esquema Floco de Neve (Snowflake)",
+                            "Esquema Estrela (Star)",
+                            "Esquema 3NF normalizado",
+                            "Esquema desnormalizado simples"
+                        ],
+                        correct: 1,
+                        insight: "Esquema Estrela oferece melhor performance para queries analíticas devido à menor necessidade de JOINs, facilitando a navegação e agregação de dados."
+                    }
+                ]
+            }
+        ];
+
+        function updateStats() {
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('threats').textContent = gameState.threats;
+        }
+
+        function updateThreatHealth() {
+            const percentage = gameState.threatHealth;
+            document.getElementById('threat-progress-bar').style.width = percentage + '%';
+            document.getElementById('threat-status').textContent = `Integridade: ${percentage}%`;
+        }
+
+        function showDamage(points) {
+            const indicator = document.createElement('div');
+            indicator.className = 'damage-indicator';
+            indicator.textContent = `+${points}`;
+            indicator.style.left = Math.random() * 100 + 'px';
+            indicator.style.top = Math.random() * 50 + 'px';
+            document.getElementById('threat-visual').appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.remove();
+            }, 1000);
+        }
+
+        function showInsightModal(text) {
+            document.getElementById('modal-insight-text').textContent = text;
+            const modal = document.getElementById('insight-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function closeInsightModal(event) {
+            if (!event || event.target === document.getElementById('insight-modal') || 
+                event.target.classList.contains('close-btn') || 
+                event.target.classList.contains('continue-btn')) {
+                
+                const modal = document.getElementById('insight-modal');
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    continueGame();
+                }, 300);
+            }
+        }
+
+        function continueGame() {
+            if (gameState.threatHealth <= 0) {
+                // Ameaça derrotada
+                gameState.threats++;
+                gameState.level++;
+                gameState.score += 200;
+                gameState.currentThreat++;
+                updateStats();
+                
+                setTimeout(() => {
+                    loadThreat();
+                }, 1000);
+            } else {
+                // Próxima pergunta
+                gameState.currentQuestion++;
+                setTimeout(() => {
+                    loadQuestion();
+                }, 500);
+            }
+        }
+
+        function initializeAssessment() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('assessment-screen').style.display = 'block';
+            gameState.currentThreat = 0;
+            loadThreat();
+        }
+
+        function loadThreat() {
+            if (gameState.currentThreat >= threats.length) {
+                showCompletion();
+                return;
+            }
+
+            const threat = threats[gameState.currentThreat];
+            gameState.threatHealth = 100;
+            gameState.currentQuestion = 0;
+
+            document.getElementById('threat-name').textContent = threat.name;
+            document.getElementById('threat-icon').textContent = threat.icon;
+            document.getElementById('threat-visual').className = `threat-visual ${threat.className}`;
+            
+            updateThreatHealth();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const threat = threats[gameState.currentThreat];
+            
+            if (gameState.currentQuestion >= threat.questions.length) {
+                gameState.threatHealth = 0;
+                updateThreatHealth();
+                gameState.threats++;
+                gameState.level++;
+                gameState.score += 200;
+                gameState.currentThreat++;
+                updateStats();
+                
+                setTimeout(() => {
+                    loadThreat();
+                }, 1000);
+                return;
+            }
+            
+            const question = threat.questions[gameState.currentQuestion];
+            
+            document.getElementById('question').textContent = question.question;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            const threat = threats[gameState.currentThreat];
+            const question = threat.questions[gameState.currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => option.style.pointerEvents = 'none');
+            
+            if (selectedIndex === question.correct) {
+                options[selectedIndex].classList.add('correct');
+                gameState.score += 100;
+                gameState.threatHealth -= 34;
+                showDamage(100);
+                updateStats();
+                updateThreatHealth();
+            } else {
+                options[selectedIndex].classList.add('wrong');
+                options[question.correct].classList.add('correct');
+            }
+            
+            setTimeout(() => {
+                showInsightModal(question.insight);
+            }, 1000);
+        }
+
+        function showCompletion() {
+            document.getElementById('assessment-screen').style.display = 'none';
+            document.getElementById('completion-screen').style.display = 'block';
+            document.getElementById('final-score').textContent = `Pontuação Final: ${gameState.score} pontos`;
+        }
+
+        function restartAssessment() {
+            gameState = {
+                level: 1,
+                score: 0,
+                threats: 0,
+                currentThreat: 0,
+                currentQuestion: 0,
+                threatHealth: 100
+            };
+            
+            updateStats();
+            document.getElementById('completion-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+        }
+
+        // Suporte para ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('insight-modal');
+                if (modal.style.display === 'flex') {
+                    closeInsightModal();
+                }
+            }
+        });
+
+        // Inicializar
+        updateStats();
+    </script>
+</body>
+</html>
