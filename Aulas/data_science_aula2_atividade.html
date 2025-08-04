@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Prático - Transformações e Modelagem Dimensional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 82, 204, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.3);
+        }
+
+        .etl-badge {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .step-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border-left: 6px solid #0052cc;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 82, 204, 0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.3);
+        }
+
+        .step-title {
+            color: #0052cc;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .step-description {
+            color: #444;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .theory-box {
+            background: rgba(75, 192, 192, 0.1);
+            border: 2px solid rgba(75, 192, 192, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .theory-box h4 {
+            color: #4bc0c0;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #0052cc;
+            position: relative;
+        }
+
+        .code-header {
+            background: #2d2d2d;
+            color: #ffffff;
+            padding: 10px 20px;
+            margin: -25px -25px 15px -25px;
+            border-radius: 12px 12px 0 0;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-button {
+            background: #0052cc;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .copy-button:hover {
+            background: #003d99;
+        }
+
+        .output-example {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .output-header {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin: 25px 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 82, 204, 0.3);
+        }
+
+        .highlight-box h4 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-panel {
+            background: rgba(33, 150, 243, 0.1);
+            border: 2px solid rgba(33, 150, 243, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-panel h4 {
+            color: #1976d2;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.3);
+            margin: 10px 10px 10px 0;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 82, 204, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .list {
+            margin: 15px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .list li {
+            color: #444;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .list li::before {
+            content: '▶';
+            color: #0052cc;
+            position: absolute;
+            left: 0;
+            font-size: 14px;
+            top: 2px;
+        }
+
+        .explanation-box {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #0052cc;
+        }
+
+        .explanation-box h5 {
+            color: #0052cc;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .explanation-box p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .step-container {
+                padding: 20px;
+            }
+
+            .code-block {
+                padding: 15px;
+                font-size: 12px;
+            }
+
+            .step-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .step-number {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .step-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        .syntax-keyword { color: #569cd6; }
+        .syntax-string { color: #ce9178; }
+        .syntax-comment { color: #6a9955; }
+        .syntax-number { color: #b5cea8; }
+        .syntax-function { color: #dcdcaa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="badge">📋 Roteiro Prático</div>
+            <h1 class="title">Transformações e Modelagem Dimensional</h1>
+            <p class="subtitle">Guia passo-a-passo com blocos de código para Google Colab</p>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🎯 O que vamos construir</h4>
+            <p>Um sistema completo de ETL e modelagem dimensional para e-commerce, simulando 10.000 transações reais, aplicando transformações de dados e criando um Data Warehouse funcional seguindo os conceitos da aula.</p>
+        </div>
+
+        <div class="info-panel">
+            <h4>📝 Preparação Inicial</h4>
+            <p>Acesse <strong>colab.research.google.com</strong> e crie um novo notebook. Renomeie para "Aula2_Transformacoes_Modelagem". Execute cada bloco de código em sequência, acompanhando as explicações teóricas.</p>
+        </div>
+
+        <!-- Passo 1: Configuração Inicial -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Configuração e Importações</h2>
+            </div>
+            <div class="etl-badge">🔧 Preparação do Ambiente</div>
+            <p class="step-description">Antes de iniciarmos o processo ETL, precisamos preparar nosso ambiente de trabalho. Esta etapa é fundamental para garantir que todas as ferramentas necessárias estejam disponíveis para as transformações que faremos nos dados.</p>
+            
+            <div class="theory-box">
+                <h4>💡 Conceito Teórico</h4>
+                <p>A preparação do ambiente é uma etapa crítica em qualquer projeto de Data Science. Definimos bibliotecas, configurações de visualização e seeds para reprodutibilidade, garantindo que nossos experimentos possam ser replicados com os mesmos resultados.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📦 Importações e Configurações</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># -*- coding: utf-8 -*-</span>
+<span class="syntax-comment">"""
+# Data Science - Aula 2: Transformações e Modelagem Dimensional
+## Exemplo Prático: E-commerce Analytics
+
+**Objetivo:** Implementar transformações de dados e modelagem dimensional na prática
+"""</span>
+
+<span class="syntax-comment"># Importação das bibliotecas necessárias</span>
+<span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+<span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
+<span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
+<span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
+<span class="syntax-keyword">from</span> datetime <span class="syntax-keyword">import</span> datetime, timedelta
+<span class="syntax-keyword">import</span> warnings
+warnings.filterwarnings(<span class="syntax-string">'ignore'</span>)
+
+<span class="syntax-comment"># Configuração do ambiente</span>
+plt.style.use(<span class="syntax-string">'seaborn-v0_8'</span>)
+sns.set_palette(<span class="syntax-string">"husl"</span>)
+np.random.seed(<span class="syntax-number">42</span>)  <span class="syntax-comment"># Para reprodutibilidade</span>
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"✅ Bibliotecas carregadas com sucesso!"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"🔄 Iniciando simulação de dados de e-commerce..."</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 O que este código faz:</h5>
+                <p><strong>Pandas:</strong> Manipulação de dados estruturados | <strong>NumPy:</strong> Operações numéricas | <strong>Matplotlib/Seaborn:</strong> Visualizações | <strong>Datetime:</strong> Manipulação de datas | <strong>Seed(42):</strong> Garante reprodutibilidade dos dados aleatórios</p>
+            </div>
+
+            <div class="output-example">
+                <div class="output-header">📤 Saída esperada:</div>
+                ✅ Bibliotecas carregadas com sucesso!<br>
+                🔄 Iniciando simulação de dados de e-commerce...
+            </div>
+        </div>
+
+        <!-- Passo 2: Simulação de Dados Brutos -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h2 class="step-title">Simulação de Dados Brutos</h2>
+            </div>
+            <div class="etl-badge">📥 EXTRACT - Extração de Dados</div>
+            <p class="step-description">Esta etapa simula a <strong>extração (Extract)</strong> do processo ETL. Em um cenário real, estaríamos extraindo dados de diferentes sistemas operacionais: CRM, ERP, logs de servidor, etc. Aqui, simulamos como os dados chegam de fontes heterogêneas com formatos e estruturas diferentes.</p>
+            
+            <div class="theory-box">
+                <h4>📚 Extração em Sistemas Reais</h4>
+                <p>Em um ambiente corporativo real, dados vêm de múltiplas fontes: bancos transacionais, APIs, arquivos CSV, logs de sistema, etc. Cada fonte tem sua própria estrutura, formato de data, moeda e qualidade de dados. Nossa simulação replica essa heterogeneidade.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🏪 Dados de Vendas (Sistema Transacional)</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># Simulando dados brutos de vendas</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"🔄 Gerando dados brutos de vendas..."</span>)
+
+n_transacoes = <span class="syntax-number">10000</span>
+dados_vendas_brutos = []
+
+<span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(n_transacoes):
+    transacao = {
+        <span class="syntax-string">'transaction_id'</span>: <span class="syntax-string">f'TXN{i+1:06d}'</span>,
+        <span class="syntax-string">'customer_id'</span>: <span class="syntax-string">f'CUST{np.random.randint(1, 2001):05d}'</span>,
+        <span class="syntax-string">'product_code'</span>: <span class="syntax-string">f'PROD{np.random.randint(1, 501):04d}'</span>,
+        <span class="syntax-string">'store_id'</span>: <span class="syntax-string">f'ST{np.random.randint(1, 21):03d}'</span>,
+        <span class="syntax-string">'transaction_date'</span>: (datetime(<span class="syntax-number">2024</span>, <span class="syntax-number">1</span>, <span class="syntax-number">1</span>) + timedelta(days=np.random.randint(<span class="syntax-number">0</span>, <span class="syntax-number">365</span>))).strftime(<span class="syntax-string">'%Y-%m-%d %H:%M:%S'</span>),
+        <span class="syntax-string">'quantity'</span>: np.random.randint(<span class="syntax-number">1</span>, <span class="syntax-number">6</span>),
+        <span class="syntax-string">'unit_price'</span>: np.round(np.random.uniform(<span class="syntax-number">10.0</span>, <span class="syntax-number">500.0</span>), <span class="syntax-number">2</span>),
+        <span class="syntax-string">'discount_percent'</span>: np.random.choice([<span class="syntax-number">0</span>, <span class="syntax-number">5</span>, <span class="syntax-number">10</span>, <span class="syntax-number">15</span>, <span class="syntax-number">20</span>], p=[<span class="syntax-number">0.4</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.15</span>, <span class="syntax-number">0.05</span>]),
+        <span class="syntax-string">'currency'</span>: np.random.choice([<span class="syntax-string">'BRL'</span>, <span class="syntax-string">'USD'</span>, <span class="syntax-string">'EUR'</span>], p=[<span class="syntax-number">0.7</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.1</span>]),
+        <span class="syntax-string">'payment_method'</span>: np.random.choice([<span class="syntax-string">'CREDIT_CARD'</span>, <span class="syntax-string">'DEBIT_CARD'</span>, <span class="syntax-string">'PIX'</span>, <span class="syntax-string">'BOLETO'</span>], p=[<span class="syntax-number">0.4</span>, <span class="syntax-number">0.3</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.1</span>])
+    }
+    dados_vendas_brutos.append(transacao)
+
+df_vendas_bruto = pd.DataFrame(dados_vendas_brutos)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"✅ {len(df_vendas_bruto):,} transações geradas"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📊 Primeiras 5 transações:"</span>)
+<span class="syntax-function">print</span>(df_vendas_bruto.head())</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Dados de Vendas - Sistema Transacional:</h5>
+                <p>Simula dados vindos de um sistema de PDV (Ponto de Venda). Note os <strong>problemas típicos</strong>: múltiplas moedas, datas como string, IDs em formatos diferentes. Isso replica a realidade de sistemas legados que não seguem padrões únicos.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📦 Dados de Produtos</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># Simulando dados de produtos</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n📦 Gerando dados brutos de produtos..."</span>)
+
+categorias = [<span class="syntax-string">'Eletrônicos'</span>, <span class="syntax-string">'Roupas'</span>, <span class="syntax-string">'Casa & Jardim'</span>, <span class="syntax-string">'Livros'</span>, <span class="syntax-string">'Esportes'</span>, <span class="syntax-string">'Beleza'</span>]
+subcategorias = {
+    <span class="syntax-string">'Eletrônicos'</span>: [<span class="syntax-string">'Smartphones'</span>, <span class="syntax-string">'Laptops'</span>, <span class="syntax-string">'Tablets'</span>, <span class="syntax-string">'Acessórios'</span>],
+    <span class="syntax-string">'Roupas'</span>: [<span class="syntax-string">'Masculino'</span>, <span class="syntax-string">'Feminino'</span>, <span class="syntax-string">'Infantil'</span>, <span class="syntax-string">'Calçados'</span>],
+    <span class="syntax-string">'Casa & Jardim'</span>: [<span class="syntax-string">'Móveis'</span>, <span class="syntax-string">'Decoração'</span>, <span class="syntax-string">'Jardim'</span>, <span class="syntax-string">'Cozinha'</span>],
+    <span class="syntax-string">'Livros'</span>: [<span class="syntax-string">'Ficção'</span>, <span class="syntax-string">'Técnicos'</span>, <span class="syntax-string">'Infantis'</span>, <span class="syntax-string">'Biografias'</span>],
+    <span class="syntax-string">'Esportes'</span>: [<span class="syntax-string">'Fitness'</span>, <span class="syntax-string">'Futebol'</span>, <span class="syntax-string">'Basquete'</span>, <span class="syntax-string">'Natação'</span>],
+    <span class="syntax-string">'Beleza'</span>: [<span class="syntax-string">'Skincare'</span>, <span class="syntax-string">'Maquiagem'</span>, <span class="syntax-string">'Perfumes'</span>, <span class="syntax-string">'Cabelo'</span>]
+}
+
+dados_produtos_brutos = []
+<span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(<span class="syntax-number">1</span>, <span class="syntax-number">501</span>):
+    categoria = np.random.choice(categorias)
+    produto = {
+        <span class="syntax-string">'product_code'</span>: <span class="syntax-string">f'PROD{i:04d}'</span>,
+        <span class="syntax-string">'product_name'</span>: <span class="syntax-string">f'Produto {i}'</span>,
+        <span class="syntax-string">'category'</span>: categoria,
+        <span class="syntax-string">'subcategory'</span>: np.random.choice(subcategorias[categoria]),
+        <span class="syntax-string">'brand'</span>: <span class="syntax-string">f'Marca {np.random.randint(1, 21)}'</span>,
+        <span class="syntax-string">'supplier'</span>: <span class="syntax-string">f'Fornecedor {np.random.randint(1, 51)}'</span>,
+        <span class="syntax-string">'cost_price'</span>: np.round(np.random.uniform(<span class="syntax-number">5.0</span>, <span class="syntax-number">300.0</span>), <span class="syntax-number">2</span>),
+        <span class="syntax-string">'status'</span>: np.random.choice([<span class="syntax-string">'ACTIVE'</span>, <span class="syntax-string">'INACTIVE'</span>], p=[<span class="syntax-number">0.9</span>, <span class="syntax-number">0.1</span>])
+    }
+    dados_produtos_brutos.append(produto)
+
+df_produtos_bruto = pd.DataFrame(dados_produtos_brutos)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"✅ {len(df_produtos_bruto):,} produtos gerados"</span>)
+<span class="syntax-function">print</span>(df_produtos_bruto.groupby(<span class="syntax-string">'category'</span>).size())</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Dados de Produtos - Sistema de Catálogo:</h5>
+                <p>Simula dados vindos de um sistema ERP ou de gestão de produtos. Inclui hierarquias (categoria > subcategoria), fornecedores e status que precisarão ser tratados na fase de Transform.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>👥 Dados de Clientes e 🏪 Lojas</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># Dados de clientes</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n👥 Gerando dados brutos de clientes..."</span>)
+
+estados_br = [<span class="syntax-string">'SP'</span>, <span class="syntax-string">'RJ'</span>, <span class="syntax-string">'MG'</span>, <span class="syntax-string">'RS'</span>, <span class="syntax-string">'PR'</span>, <span class="syntax-string">'SC'</span>, <span class="syntax-string">'BA'</span>, <span class="syntax-string">'GO'</span>, <span class="syntax-string">'PE'</span>, <span class="syntax-string">'CE'</span>]
+dados_clientes_brutos = []
+
+<span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(<span class="syntax-number">1</span>, <span class="syntax-number">2001</span>):
+    cliente = {
+        <span class="syntax-string">'customer_id'</span>: <span class="syntax-string">f'CUST{i:05d}'</span>,
+        <span class="syntax-string">'customer_name'</span>: <span class="syntax-string">f'Cliente {i}'</span>,
+        <span class="syntax-string">'email'</span>: <span class="syntax-string">f'cliente{i}@email.com'</span>,
+        <span class="syntax-string">'birth_date'</span>: (datetime(<span class="syntax-number">2024</span>, <span class="syntax-number">1</span>, <span class="syntax-number">1</span>) - timedelta(days=np.random.randint(<span class="syntax-number">6570</span>, <span class="syntax-number">25550</span>))).strftime(<span class="syntax-string">'%Y-%m-%d'</span>),
+        <span class="syntax-string">'gender'</span>: np.random.choice([<span class="syntax-string">'M'</span>, <span class="syntax-string">'F'</span>, <span class="syntax-string">'O'</span>], p=[<span class="syntax-number">0.45</span>, <span class="syntax-number">0.45</span>, <span class="syntax-number">0.1</span>]),
+        <span class="syntax-string">'state'</span>: np.random.choice(estados_br),
+        <span class="syntax-string">'city'</span>: <span class="syntax-string">f'Cidade {np.random.randint(1, 101)}'</span>,
+        <span class="syntax-string">'registration_date'</span>: (datetime(<span class="syntax-number">2023</span>, <span class="syntax-number">1</span>, <span class="syntax-number">1</span>) + timedelta(days=np.random.randint(<span class="syntax-number">0</span>, <span class="syntax-number">365</span>))).strftime(<span class="syntax-string">'%Y-%m-%d'</span>),
+        <span class="syntax-string">'customer_segment'</span>: np.random.choice([<span class="syntax-string">'Bronze'</span>, <span class="syntax-string">'Silver'</span>, <span class="syntax-string">'Gold'</span>, <span class="syntax-string">'Platinum'</span>], p=[<span class="syntax-number">0.4</span>, <span class="syntax-number">0.3</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.1</span>])
+    }
+    dados_clientes_brutos.append(cliente)
+
+df_clientes_bruto = pd.DataFrame(dados_clientes_brutos)
+
+<span class="syntax-comment"># Dados de lojas</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n🏪 Gerando dados brutos de lojas..."</span>)
+
+dados_lojas_brutos = []
+<span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(<span class="syntax-number">1</span>, <span class="syntax-number">21</span>):
+    loja = {
+        <span class="syntax-string">'store_id'</span>: <span class="syntax-string">f'ST{i:03d}'</span>,
+        <span class="syntax-string">'store_name'</span>: <span class="syntax-string">f'Loja {i}'</span>,
+        <span class="syntax-string">'store_type'</span>: np.random.choice([<span class="syntax-string">'Physical'</span>, <span class="syntax-string">'Online'</span>], p=[<span class="syntax-number">0.7</span>, <span class="syntax-number">0.3</span>]),
+        <span class="syntax-string">'state'</span>: np.random.choice(estados_br),
+        <span class="syntax-string">'region'</span>: np.random.choice([<span class="syntax-string">'Norte'</span>, <span class="syntax-string">'Nordeste'</span>, <span class="syntax-string">'Centro-Oeste'</span>, <span class="syntax-string">'Sudeste'</span>, <span class="syntax-string">'Sul'</span>]),
+        <span class="syntax-string">'manager'</span>: <span class="syntax-string">f'Gerente {i}'</span>,
+        <span class="syntax-string">'opening_date'</span>: (datetime(<span class="syntax-number">2020</span>, <span class="syntax-number">1</span>, <span class="syntax-number">1</span>) + timedelta(days=np.random.randint(<span class="syntax-number">0</span>, <span class="syntax-number">1460</span>))).strftime(<span class="syntax-string">'%Y-%m-%d'</span>)
+    }
+    dados_lojas_brutos.append(loja)
+
+df_lojas_bruto = pd.DataFrame(dados_lojas_brutos)
+
+<span class="syntax-comment"># Resumo dos dados gerados</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n✅ DADOS BRUTOS GERADOS:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📊 Vendas: {len(df_vendas_bruto):,} transações"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📦 Produtos: {len(df_produtos_bruto):,} itens"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"👥 Clientes: {len(df_clientes_bruto):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"🏪 Lojas: {len(df_lojas_bruto):,} unidades"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Dados de Clientes e Lojas:</h5>
+                <p><strong>Clientes (CRM):</strong> Dados demográficos com datas de nascimento para calcular idade | <strong>Lojas (Sistema Corporativo):</strong> Informações geográficas para análise regional. Note como cada fonte tem suas próprias convenções de ID.</p>
+            </div>
+
+            <div class="output-example">
+                <div class="output-header">📤 Saída esperada:</div>
+                ✅ DADOS BRUTOS GERADOS:<br>
+                📊 Vendas: 10,000 transações<br>
+                📦 Produtos: 500 itens<br>
+                👥 Clientes: 2,000 registros<br>
+                🏪 Lojas: 20 unidades
+            </div>
+        </div>
+
+        <!-- Passo 3: Transformações ETL -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h2 class="step-title">Transformações ETL</h2>
+            </div>
+            <div class="etl-badge">🔄 TRANSFORM - Transformação de Dados</div>
+            <p class="step-description">Esta é o coração do processo ETL - a etapa de <strong>Transform</strong>. Aqui aplicamos todas as transformações mencionadas na aula: limpeza, padronização, derivações e agregações. É onde os dados brutos se tornam informação útil para análise.</p>
+            
+            <div class="theory-box">
+                <h4>🔄 As 4 Categorias de Transformação</h4>
+                <p><strong>1. Limpeza:</strong> Remove inconsistências e dados inválidos | <strong>2. Padronização:</strong> Uniformiza formatos e unidades | <strong>3. Derivações:</strong> Cria novos campos calculados | <strong>4. Agregações:</strong> Sumariza dados para análise</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🧹 Limpeza e Padronização</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"🔄 INICIANDO TRANSFORMAÇÕES DE DADOS"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># 1. LIMPEZA DE DADOS</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n🧹 LIMPEZA DE DADOS"</span>)
+
+<span class="syntax-comment"># Remover produtos inativos</span>
+df_produtos_limpo = df_produtos_bruto[df_produtos_bruto[<span class="syntax-string">'status'</span>] == <span class="syntax-string">'ACTIVE'</span>].copy()
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Removidos {len(df_produtos_bruto) - len(df_produtos_limpo)} produtos inativos"</span>)
+
+<span class="syntax-comment"># Filtrar transações válidas</span>
+df_vendas_limpo = df_vendas_bruto[df_vendas_bruto[<span class="syntax-string">'quantity'</span>] > <span class="syntax-number">0</span>].copy()
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Mantidas {len(df_vendas_limpo):,} transações válidas"</span>)
+
+<span class="syntax-comment"># 2. PADRONIZAÇÃO</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n💱 PADRONIZAÇÃO"</span>)
+
+<span class="syntax-comment"># Converter moedas para BRL</span>
+taxas_cambio = {<span class="syntax-string">'BRL'</span>: <span class="syntax-number">1.0</span>, <span class="syntax-string">'USD'</span>: <span class="syntax-number">5.2</span>, <span class="syntax-string">'EUR'</span>: <span class="syntax-number">5.8</span>}
+
+df_vendas_limpo[<span class="syntax-string">'unit_price_brl'</span>] = df_vendas_limpo.apply(
+    <span class="syntax-keyword">lambda</span> row: row[<span class="syntax-string">'unit_price'</span>] * taxas_cambio[row[<span class="syntax-string">'currency'</span>]], axis=<span class="syntax-number">1</span>
+)
+
+<span class="syntax-comment"># Padronizar datas</span>
+df_vendas_limpo[<span class="syntax-string">'transaction_date'</span>] = pd.to_datetime(df_vendas_limpo[<span class="syntax-string">'transaction_date'</span>])
+df_clientes_limpo = df_clientes_bruto.copy()
+df_clientes_limpo[<span class="syntax-string">'birth_date'</span>] = pd.to_datetime(df_clientes_limpo[<span class="syntax-string">'birth_date'</span>])
+df_clientes_limpo[<span class="syntax-string">'registration_date'</span>] = pd.to_datetime(df_clientes_limpo[<span class="syntax-string">'registration_date'</span>])
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"   ✅ Moedas convertidas para BRL"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   ✅ Datas padronizadas"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Limpeza e Padronização Aplicadas:</h5>
+                <p><strong>Limpeza:</strong> Removemos produtos inativos (não devem aparecer em análises) e transações com quantidade zero | <strong>Padronização:</strong> Convertemos múltiplas moedas para BRL usando taxas fixas e transformamos strings de data em objetos datetime do Pandas</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🔢 Derivações e Cálculos</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># 3. DERIVAÇÕES</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n🔢 CRIAÇÃO DE CAMPOS DERIVADOS"</span>)
+
+<span class="syntax-comment"># Campos calculados nas vendas</span>
+df_vendas_limpo[<span class="syntax-string">'discount_amount'</span>] = (df_vendas_limpo[<span class="syntax-string">'unit_price_brl'</span>] * 
+                                        df_vendas_limpo[<span class="syntax-string">'discount_percent'</span>] / <span class="syntax-number">100</span>)
+df_vendas_limpo[<span class="syntax-string">'final_unit_price'</span>] = df_vendas_limpo[<span class="syntax-string">'unit_price_brl'</span>] - df_vendas_limpo[<span class="syntax-string">'discount_amount'</span>]
+df_vendas_limpo[<span class="syntax-string">'total_amount'</span>] = df_vendas_limpo[<span class="syntax-string">'final_unit_price'</span>] * df_vendas_limpo[<span class="syntax-string">'quantity'</span>]
+
+<span class="syntax-comment"># Derivar idade dos clientes</span>
+df_clientes_limpo[<span class="syntax-string">'age'</span>] = ((datetime.now() - df_clientes_limpo[<span class="syntax-string">'birth_date'</span>]).dt.days / <span class="syntax-number">365.25</span>).astype(int)
+
+<span class="syntax-comment"># Criar faixas etárias</span>
+<span class="syntax-keyword">def</span> <span class="syntax-function">categorizar_idade</span>(idade):
+    <span class="syntax-keyword">if</span> idade < <span class="syntax-number">25</span>:
+        <span class="syntax-keyword">return</span> <span class="syntax-string">'18-24'</span>
+    <span class="syntax-keyword">elif</span> idade < <span class="syntax-number">35</span>:
+        <span class="syntax-keyword">return</span> <span class="syntax-string">'25-34'</span>
+    <span class="syntax-keyword">elif</span> idade < <span class="syntax-number">45</span>:
+        <span class="syntax-keyword">return</span> <span class="syntax-string">'35-44'</span>
+    <span class="syntax-keyword">elif</span> idade < <span class="syntax-number">55</span>:
+        <span class="syntax-keyword">return</span> <span class="syntax-string">'45-54'</span>
+    <span class="syntax-keyword">else</span>:
+        <span class="syntax-keyword">return</span> <span class="syntax-string">'55+'</span>
+
+df_clientes_limpo[<span class="syntax-string">'age_group'</span>] = df_clientes_limpo[<span class="syntax-string">'age'</span>].apply(categorizar_idade)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"   ✅ Valores calculados: desconto, preço final, total"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   ✅ Idade e faixas etárias derivadas"</span>)
+
+<span class="syntax-comment"># Mostrar exemplo das transformações</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n📊 Exemplo de dados transformados:"</span>)
+<span class="syntax-function">print</span>(df_vendas_limpo[[<span class="syntax-string">'transaction_id'</span>, <span class="syntax-string">'unit_price_brl'</span>, <span class="syntax-string">'discount_amount'</span>, <span class="syntax-string">'total_amount'</span>]].head())</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Derivações Aplicadas:</h5>
+                <p><strong>Campos Financeiros:</strong> Calculamos valor do desconto, preço final e total da venda | <strong>Demografia:</strong> Derivamos idade a partir da data de nascimento | <strong>Segmentação:</strong> Criamos faixas etárias para análise comportamental. Essas derivações evitam cálculos repetitivos em consultas futuras.</p>
+            </div>
+        </div>
+
+        <!-- Passo 4: Criação das Dimensões -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h2 class="step-title">Criação das Tabelas de Dimensão</h2>
+            </div>
+            <div class="etl-badge">🏗️ MODELAGEM DIMENSIONAL - Dimensões</div>
+            <p class="step-description">Agora entramos na <strong>modelagem dimensional</strong>. Criamos as tabelas de dimensão que fornecem contexto aos dados quantitativos. Como visto na aula, dimensões respondem às perguntas: Quem? O quê? Onde? Quando? Elas são desnormalizadas para otimizar consultas analíticas.</p>
+            
+            <div class="theory-box">
+                <h4>📊 Características das Dimensões</h4>
+                <p><strong>Chave Primária Simples:</strong> ID único para cada registro | <strong>Atributos Descritivos:</strong> Textos e categorizações | <strong>Desnormalizadas:</strong> Contrariando 3FN para otimizar consultas | <strong>Relativamente Estáticas:</strong> Mudam menos frequentemente que fatos</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📅 Dimensão Tempo</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📋 CRIANDO TABELAS DE DIMENSÃO"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># DIMENSÃO TEMPO</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n📅 Criando Dimensão Tempo..."</span>)
+
+<span class="syntax-comment"># Gerar todas as datas do período</span>
+start_date = df_vendas_limpo[<span class="syntax-string">'transaction_date'</span>].min().date()
+end_date = df_vendas_limpo[<span class="syntax-string">'transaction_date'</span>].max().date()
+date_range = pd.date_range(start=start_date, end=end_date, freq=<span class="syntax-string">'D'</span>)
+
+dim_tempo = pd.DataFrame({
+    <span class="syntax-string">'date_key'</span>: <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(date_range)),
+    <span class="syntax-string">'date'</span>: date_range,
+    <span class="syntax-string">'year'</span>: date_range.year,
+    <span class="syntax-string">'quarter'</span>: date_range.quarter,
+    <span class="syntax-string">'month'</span>: date_range.month,
+    <span class="syntax-string">'month_name'</span>: date_range.strftime(<span class="syntax-string">'%B'</span>),
+    <span class="syntax-string">'day'</span>: date_range.day,
+    <span class="syntax-string">'day_of_week'</span>: date_range.dayofweek + <span class="syntax-number">1</span>,
+    <span class="syntax-string">'day_name'</span>: date_range.strftime(<span class="syntax-string">'%A'</span>),
+    <span class="syntax-string">'week_of_year'</span>: date_range.isocalendar().week,
+    <span class="syntax-string">'is_weekend'</span>: (date_range.dayofweek >= <span class="syntax-number">5</span>).astype(int),
+    <span class="syntax-string">'is_holiday'</span>: <span class="syntax-number">0</span>  <span class="syntax-comment"># Simplificado</span>
+})
+
+<span class="syntax-comment"># Marcar alguns feriados brasileiros</span>
+feriados = [<span class="syntax-string">'2024-01-01'</span>, <span class="syntax-string">'2024-04-21'</span>, <span class="syntax-string">'2024-09-07'</span>, <span class="syntax-string">'2024-10-12'</span>, <span class="syntax-string">'2024-11-15'</span>, <span class="syntax-string">'2024-12-25'</span>]
+dim_tempo.loc[dim_tempo[<span class="syntax-string">'date'</span>].isin(pd.to_datetime(feriados)), <span class="syntax-string">'is_holiday'</span>] = <span class="syntax-number">1</span>
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Dimensão Tempo criada: {len(dim_tempo)} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   📋 Estrutura da dimensão tempo:"</span>)
+<span class="syntax-function">print</span>(dim_tempo.head())</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Dimensão Tempo - A Mais Importante:</h5>
+                <p>A dimensão tempo é fundamental em Data Warehouses. Pré-calculamos <strong>todas as hierarquias temporais</strong>: ano, trimestre, mês, semana, dia. Incluímos flags como fim de semana e feriados. Isso permite análises temporais complexas com consultas simples (ex: "vendas em feriados do Q4").</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>👥📦🏪 Dimensões Cliente, Produto e Loja</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># DIMENSÃO CLIENTE</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n👥 Criando Dimensão Cliente..."</span>)
+
+dim_cliente = df_clientes_limpo.copy()
+dim_cliente[<span class="syntax-string">'customer_key'</span>] = <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(dim_cliente))
+
+dim_cliente = dim_cliente[[<span class="syntax-string">'customer_key'</span>, <span class="syntax-string">'customer_id'</span>, <span class="syntax-string">'customer_name'</span>, <span class="syntax-string">'email'</span>, 
+                          <span class="syntax-string">'gender'</span>, <span class="syntax-string">'age'</span>, <span class="syntax-string">'age_group'</span>, <span class="syntax-string">'state'</span>, <span class="syntax-string">'city'</span>, 
+                          <span class="syntax-string">'customer_segment'</span>, <span class="syntax-string">'registration_date'</span>]]
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Dimensão Cliente criada: {len(dim_cliente)} registros"</span>)
+
+<span class="syntax-comment"># DIMENSÃO PRODUTO</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n📦 Criando Dimensão Produto..."</span>)
+
+<span class="syntax-comment"># Calcular estatísticas por produto</span>
+produto_stats = df_vendas_limpo.groupby(<span class="syntax-string">'product_code'</span>).agg({
+    <span class="syntax-string">'quantity'</span>: [<span class="syntax-string">'sum'</span>, <span class="syntax-string">'mean'</span>, <span class="syntax-string">'count'</span>],
+    <span class="syntax-string">'total_amount'</span>: [<span class="syntax-string">'sum'</span>, <span class="syntax-string">'mean'</span>],
+    <span class="syntax-string">'customer_id'</span>: <span class="syntax-string">'nunique'</span>
+}).round(<span class="syntax-number">2</span>)
+
+produto_stats.columns = [<span class="syntax-string">'qty_total'</span>, <span class="syntax-string">'qty_media'</span>, <span class="syntax-string">'num_transacoes'</span>, <span class="syntax-string">'revenue_total'</span>, <span class="syntax-string">'revenue_media'</span>, <span class="syntax-string">'clientes_unicos'</span>]
+produto_stats = produto_stats.reset_index()
+
+dim_produto = df_produtos_limpo.copy()
+dim_produto[<span class="syntax-string">'product_key'</span>] = <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(dim_produto))
+
+<span class="syntax-comment"># Merge com estatísticas</span>
+dim_produto = dim_produto.merge(produto_stats, on=<span class="syntax-string">'product_code'</span>, how=<span class="syntax-string">'left'</span>)
+dim_produto = dim_produto.fillna(<span class="syntax-number">0</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Dimensão Produto criada: {len(dim_produto)} registros"</span>)
+
+<span class="syntax-comment"># DIMENSÃO LOJA</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n🏪 Criando Dimensão Loja..."</span>)
+
+dim_loja = df_lojas_bruto.copy()
+dim_loja[<span class="syntax-string">'store_key'</span>] = <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(dim_loja))
+dim_loja[<span class="syntax-string">'opening_date'</span>] = pd.to_datetime(dim_loja[<span class="syntax-string">'opening_date'</span>])
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Dimensão Loja criada: {len(dim_loja)} registros"</span>)
+
+<span class="syntax-comment"># Resumo das dimensões</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n📊 RESUMO DAS DIMENSÕES:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📅 Tempo:    {len(dim_tempo):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"👥 Cliente:  {len(dim_cliente):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📦 Produto:  {len(dim_produto):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"🏪 Loja:     {len(dim_loja):,} registros"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Dimensões Criadas:</h5>
+                <p><strong>Cliente:</strong> Inclui dados demográficos e faixas etárias derivadas | <strong>Produto:</strong> Hierarquia categoria/subcategoria + estatísticas agregadas de vendas | <strong>Loja:</strong> Informações geográficas para análise regional. Cada dimensão tem sua chave surrogate (customer_key, product_key, etc.) independente dos IDs originais.</p>
+            </div>
+        </div>
+
+        <!-- Passo 5: Criação da Tabela Fato -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <h2 class="step-title">Criação da Tabela Fato</h2>
+            </div>
+            <div class="etl-badge">📊 MODELAGEM DIMENSIONAL - Fatos</div>
+            <p class="step-description">Agora criamos a <strong>tabela fato</strong> - o centro do nosso Star Schema. Como visto na aula, a tabela fato contém as medidas numéricas (métricas) e chaves estrangeiras para as dimensões. O grão da nossa tabela fato é "uma linha por item vendido".</p>
+            
+            <div class="theory-box">
+                <h4>📈 Características da Tabela Fato</h4>
+                <p><strong>Grão Bem Definido:</strong> Uma linha por item vendido | <strong>Chaves Estrangeiras:</strong> Conectam às dimensões | <strong>Medidas Numéricas:</strong> Valores que podem ser agregados | <strong>Otimizada para Consultas:</strong> Muitas linhas, poucas colunas</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>💼 Tabela Fato Vendas</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📊 CRIANDO TABELA FATO"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n💼 Criando Fato Vendas..."</span>)
+
+<span class="syntax-comment"># Começar com os dados de vendas limpos</span>
+fato_vendas = df_vendas_limpo.copy()
+
+<span class="syntax-comment"># Adicionar chaves das dimensões através de JOINs</span>
+
+<span class="syntax-comment"># 1. Chave da dimensão tempo</span>
+fato_vendas[<span class="syntax-string">'date_only'</span>] = fato_vendas[<span class="syntax-string">'transaction_date'</span>].dt.date
+fato_vendas[<span class="syntax-string">'date_only'</span>] = pd.to_datetime(fato_vendas[<span class="syntax-string">'date_only'</span>])
+
+fato_vendas = fato_vendas.merge(
+    dim_tempo[[<span class="syntax-string">'date_key'</span>, <span class="syntax-string">'date'</span>]], 
+    left_on=<span class="syntax-string">'date_only'</span>,
+    right_on=<span class="syntax-string">'date'</span>,
+    how=<span class="syntax-string">'left'</span>
+)
+
+<span class="syntax-comment"># Remover colunas temporárias</span>
+fato_vendas = fato_vendas.drop([<span class="syntax-string">'date_only'</span>, <span class="syntax-string">'date'</span>], axis=<span class="syntax-number">1</span>)
+
+<span class="syntax-comment"># 2. Chave da dimensão cliente</span>
+fato_vendas = fato_vendas.merge(
+    dim_cliente[[<span class="syntax-string">'customer_key'</span>, <span class="syntax-string">'customer_id'</span>]], 
+    on=<span class="syntax-string">'customer_id'</span>, 
+    how=<span class="syntax-string">'left'</span>
+)
+
+<span class="syntax-comment"># 3. Chave da dimensão produto</span>
+fato_vendas = fato_vendas.merge(
+    dim_produto[[<span class="syntax-string">'product_key'</span>, <span class="syntax-string">'product_code'</span>]], 
+    on=<span class="syntax-string">'product_code'</span>, 
+    how=<span class="syntax-string">'left'</span>
+)
+
+<span class="syntax-comment"># 4. Chave da dimensão loja</span>
+fato_vendas = fato_vendas.merge(
+    dim_loja[[<span class="syntax-string">'store_key'</span>, <span class="syntax-string">'store_id'</span>]], 
+    on=<span class="syntax-string">'store_id'</span>, 
+    how=<span class="syntax-string">'left'</span>
+)
+
+<span class="syntax-comment"># Criar a tabela fato final com apenas as métricas e chaves</span>
+fato_vendas_final = fato_vendas[[
+    <span class="syntax-string">'transaction_id'</span>,
+    <span class="syntax-string">'date_key'</span>,
+    <span class="syntax-string">'customer_key'</span>, 
+    <span class="syntax-string">'product_key'</span>,
+    <span class="syntax-string">'store_key'</span>,
+    <span class="syntax-string">'quantity'</span>,
+    <span class="syntax-string">'unit_price_brl'</span>,
+    <span class="syntax-string">'discount_percent'</span>,
+    <span class="syntax-string">'discount_amount'</span>,
+    <span class="syntax-string">'final_unit_price'</span>,
+    <span class="syntax-string">'total_amount'</span>,
+    <span class="syntax-string">'currency'</span>,
+    <span class="syntax-string">'payment_method'</span>
+]].copy()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Fato Vendas criada: {len(fato_vendas_final):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📋 Grão: Uma linha por item vendido (transaction_id)"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   🔑 Chaves: {len([col for col in fato_vendas_final.columns if 'key' in col])} dimensões conectadas"</span>)
+
+<span class="syntax-comment"># Verificar integridade referencial</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n🔍 Verificando Integridade Referencial..."</span>)
+
+keys_perdidas = <span class="syntax-number">0</span>
+<span class="syntax-keyword">for</span> dim_name, key_col <span class="syntax-keyword">in</span> [(<span class="syntax-string">'Tempo'</span>, <span class="syntax-string">'date_key'</span>), (<span class="syntax-string">'Cliente'</span>, <span class="syntax-string">'customer_key'</span>), 
+                         (<span class="syntax-string">'Produto'</span>, <span class="syntax-string">'product_key'</span>), (<span class="syntax-string">'Loja'</span>, <span class="syntax-string">'store_key'</span>)]:
+    missing = fato_vendas_final[key_col].isnull().<span class="syntax-function">sum</span>()
+    <span class="syntax-keyword">if</span> missing > <span class="syntax-number">0</span>:
+        <span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚠️  {dim_name}: {missing} chaves ausentes"</span>)
+        keys_perdidas += missing
+    <span class="syntax-keyword">else</span>:
+        <span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ {dim_name}: Integridade OK"</span>)
+
+<span class="syntax-keyword">if</span> keys_perdidas == <span class="syntax-number">0</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n🎉 Schema dimensional íntegro! Todas as chaves estão conectadas."</span>)
+<span class="syntax-keyword">else</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n⚠️  Encontradas {keys_perdidas} inconsistências que precisam ser tratadas."</span>)
+
+<span class="syntax-comment"># Estatísticas finais</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n📊 ESTATÍSTICAS DO MODELO DIMENSIONAL"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"-" * 45</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📅 Dimensão Tempo:    {len(dim_tempo):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"👥 Dimensão Cliente:  {len(dim_cliente):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📦 Dimensão Produto:  {len(dim_produto):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"🏪 Dimensão Loja:     {len(dim_loja):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"💼 Fato Vendas:       {len(fato_vendas_final):,} registros"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"💰 Revenue Total:     R$ {fato_vendas_final['total_amount'].sum():,.2f}"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n📊 Exemplo da tabela fato criada:"</span>)
+<span class="syntax-function">print</span>(fato_vendas_final.head())</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Construção da Tabela Fato:</h5>
+                <p><strong>JOINs com Dimensões:</strong> Conectamos cada transação às suas dimensões através de chaves | <strong>Integridade Referencial:</strong> Verificamos se todas as chaves estão conectadas | <strong>Star Schema:</strong> Temos o centro (fato) conectado diretamente a todas as pontas (dimensões). Resultado: 10.000 fatos conectados a ~2.800 registros dimensionais.</p>
+            </div>
+        </div>
+
+        <!-- Passo 6: Consultas Analíticas -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <h2 class="step-title">Consultas Analíticas</h2>
+            </div>
+            <div class="etl-badge">📈 BUSINESS INTELLIGENCE - Consultas</div>
+            <p class="step-description">Agora vem o grande benefício da modelagem dimensional: <strong>consultas complexas se tornam simples</strong>. Como mencionado na aula, perguntas como "Vendas por categoria no último trimestre" tornam-se JOINs otimizados, não agregações complexas em dados normalizados.</p>
+            
+            <div class="theory-box">
+                <h4>⚡ Poder da Modelagem Dimensional</h4>
+                <p><strong>JOINs Simples:</strong> Fato no centro, dimensões nas pontas | <strong>Agregações Rápidas:</strong> SUM, COUNT, AVG em colunas otimizadas | <strong>Filtros Intuitivos:</strong> WHERE em atributos descritivos | <strong>Performance:</strong> Queries otimizadas para OLAP</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📈 Consultas de Business Intelligence</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📈 CONSULTAS ANALÍTICAS"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># 1. Vendas por categoria e mês</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n1️⃣ VENDAS POR CATEGORIA E MÊS"</span>)
+vendas_categoria_mes = (
+    fato_vendas_final
+    .merge(dim_produto[[<span class="syntax-string">'product_key'</span>, <span class="syntax-string">'category'</span>]], on=<span class="syntax-string">'product_key'</span>)
+    .merge(dim_tempo[[<span class="syntax-string">'date_key'</span>, <span class="syntax-string">'year'</span>, <span class="syntax-string">'month'</span>, <span class="syntax-string">'month_name'</span>]], on=<span class="syntax-string">'date_key'</span>)
+    .groupby([<span class="syntax-string">'category'</span>, <span class="syntax-string">'year'</span>, <span class="syntax-string">'month'</span>, <span class="syntax-string">'month_name'</span>])
+    .agg({
+        <span class="syntax-string">'total_amount'</span>: <span class="syntax-string">'sum'</span>,
+        <span class="syntax-string">'quantity'</span>: <span class="syntax-string">'sum'</span>,
+        <span class="syntax-string">'transaction_id'</span>: <span class="syntax-string">'count'</span>
+    })
+    .round(<span class="syntax-number">2</span>)
+    .reset_index()
+)
+
+<span class="syntax-function">print</span>(vendas_categoria_mes.head(<span class="syntax-number">10</span>))
+
+<span class="syntax-comment"># 2. Top 10 produtos por revenue</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n2️⃣ TOP 10 PRODUTOS POR REVENUE"</span>)
+top_produtos = (
+    fato_vendas_final
+    .merge(dim_produto[[<span class="syntax-string">'product_key'</span>, <span class="syntax-string">'product_name'</span>, <span class="syntax-string">'category'</span>]], on=<span class="syntax-string">'product_key'</span>)
+    .groupby([<span class="syntax-string">'product_name'</span>, <span class="syntax-string">'category'</span>])
+    .agg({
+        <span class="syntax-string">'total_amount'</span>: <span class="syntax-string">'sum'</span>,
+        <span class="syntax-string">'quantity'</span>: <span class="syntax-string">'sum'</span>
+    })
+    .sort_values(<span class="syntax-string">'total_amount'</span>, ascending=<span class="syntax-keyword">False</span>)
+    .head(<span class="syntax-number">10</span>)
+    .round(<span class="syntax-number">2</span>)
+)
+
+<span class="syntax-function">print</span>(top_produtos)
+
+<span class="syntax-comment"># 3. Performance por região</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n3️⃣ PERFORMANCE POR REGIÃO"</span>)
+vendas_regiao = (
+    fato_vendas_final
+    .merge(dim_loja[[<span class="syntax-string">'store_key'</span>, <span class="syntax-string">'region'</span>]], on=<span class="syntax-string">'store_key'</span>)
+    .groupby(<span class="syntax-string">'region'</span>)
+    .agg({
+        <span class="syntax-string">'total_amount'</span>: <span class="syntax-string">'sum'</span>,
+        <span class="syntax-string">'transaction_id'</span>: <span class="syntax-string">'count'</span>,
+        <span class="syntax-string">'customer_key'</span>: <span class="syntax-string">'nunique'</span>
+    })
+    .round(<span class="syntax-number">2</span>)
+    .reset_index()
+)
+vendas_regiao.columns = [<span class="syntax-string">'region'</span>, <span class="syntax-string">'revenue_total'</span>, <span class="syntax-string">'num_transacoes'</span>, <span class="syntax-string">'clientes_unicos'</span>]
+vendas_regiao[<span class="syntax-string">'ticket_medio'</span>] = (vendas_regiao[<span class="syntax-string">'revenue_total'</span>] / vendas_regiao[<span class="syntax-string">'num_transacoes'</span>]).round(<span class="syntax-number">2</span>)
+
+<span class="syntax-function">print</span>(vendas_regiao)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Consultas Analíticas Demonstradas:</h5>
+                <p><strong>Análise Temporal:</strong> Vendas por categoria e mês usando JOINs simples | <strong>Ranking:</strong> Top produtos com agregações diretas | <strong>Análise Geográfica:</strong> Performance regional com múltiplas métricas. Note como cada consulta é um padrão simples de JOIN + GROUP BY + agregação - isso é o poder da modelagem dimensional!</p>
+            </div>
+        </div>
+
+        <!-- Passo 7: Visualizações -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">7</div>
+                <h2 class="step-title">Visualizações e Insights</h2>
+            </div>
+            <div class="etl-badge">📊 LOAD - Apresentação dos Dados</div>
+            <p class="step-description">Esta etapa representa o <strong>"Load"</strong> do processo ETL - carregar os dados transformados em sua forma final para consumo. Aqui, "carregar" significa apresentar os insights através de visualizações. Em ambiente corporativo, esta seria a camada de BI (Business Intelligence).</p>
+            
+            <div class="theory-box">
+                <h4>📊 Visualização = Carregamento para BI</h4>
+                <p><strong>Load Tradicional:</strong> Dados carregados em DW/BI tools | <strong>Load Moderno:</strong> Dashboards, relatórios, APIs | <strong>Nosso Exemplo:</strong> Gráficos que demonstram insights dos dados modelados | <strong>Benefício:</strong> Schema dimensional facilita qualquer tipo de visualização</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📊 Dashboard de Visualizações</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📊 CRIANDO VISUALIZAÇÕES"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># Configurar layout dos gráficos</span>
+plt.figure(figsize=(<span class="syntax-number">15</span>, <span class="syntax-number">12</span>))
+
+<span class="syntax-comment"># 1. Vendas por categoria</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">1</span>)
+categoria_revenue = (
+    fato_vendas_final
+    .merge(dim_produto[[<span class="syntax-string">'product_key'</span>, <span class="syntax-string">'category'</span>]], on=<span class="syntax-string">'product_key'</span>)
+    .groupby(<span class="syntax-string">'category'</span>)[<span class="syntax-string">'total_amount'</span>]
+    .<span class="syntax-function">sum</span>()
+    .sort_values(ascending=<span class="syntax-keyword">True</span>)
+)
+categoria_revenue.plot(kind=<span class="syntax-string">'barh'</span>, color=<span class="syntax-string">'skyblue'</span>)
+plt.title(<span class="syntax-string">'Revenue por Categoria'</span>)
+plt.xlabel(<span class="syntax-string">'Revenue (R$)'</span>)
+
+<span class="syntax-comment"># 2. Vendas ao longo do tempo</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">2</span>)
+vendas_tempo_data = (
+    fato_vendas_final
+    .merge(dim_tempo[[<span class="syntax-string">'date_key'</span>, <span class="syntax-string">'date'</span>]], on=<span class="syntax-string">'date_key'</span>)
+    .groupby(<span class="syntax-string">'date'</span>)[<span class="syntax-string">'total_amount'</span>]
+    .<span class="syntax-function">sum</span>()
+)
+vendas_tempo_data.index = pd.to_datetime(vendas_tempo_data.index)
+vendas_tempo = vendas_tempo_data.resample(<span class="syntax-string">'M'</span>).<span class="syntax-function">sum</span>()
+
+vendas_tempo.plot(kind=<span class="syntax-string">'line'</span>, marker=<span class="syntax-string">'o'</span>, color=<span class="syntax-string">'green'</span>)
+plt.title(<span class="syntax-string">'Vendas ao Longo do Tempo'</span>)
+plt.xlabel(<span class="syntax-string">'Mês'</span>)
+plt.ylabel(<span class="syntax-string">'Revenue (R$)'</span>)
+plt.xticks(rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># 3. Distribuição por faixa etária</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">3</span>)
+vendas_idade = (
+    fato_vendas_final
+    .merge(dim_cliente[[<span class="syntax-string">'customer_key'</span>, <span class="syntax-string">'age_group'</span>]], on=<span class="syntax-string">'customer_key'</span>)
+    .groupby(<span class="syntax-string">'age_group'</span>)[<span class="syntax-string">'total_amount'</span>]
+    .<span class="syntax-function">sum</span>()
+)
+plt.pie(vendas_idade.values, labels=vendas_idade.index, autopct=<span class="syntax-string">'%1.1f%%'</span>)
+plt.title(<span class="syntax-string">'Vendas por Faixa Etária'</span>)
+
+<span class="syntax-comment"># 4. Performance por região</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">4</span>)
+vendas_regiao_plot = (
+    fato_vendas_final
+    .merge(dim_loja[[<span class="syntax-string">'store_key'</span>, <span class="syntax-string">'region'</span>]], on=<span class="syntax-string">'store_key'</span>)
+    .groupby(<span class="syntax-string">'region'</span>)[<span class="syntax-string">'total_amount'</span>]
+    .<span class="syntax-function">sum</span>()
+    .sort_values(ascending=<span class="syntax-keyword">False</span>)
+)
+vendas_regiao_plot.plot(kind=<span class="syntax-string">'bar'</span>, color=<span class="syntax-string">'orange'</span>)
+plt.title(<span class="syntax-string">'Revenue por Região'</span>)
+plt.xlabel(<span class="syntax-string">'Região'</span>)
+plt.ylabel(<span class="syntax-string">'Revenue (R$)'</span>)
+plt.xticks(rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># 5. Métodos de pagamento</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">5</span>)
+pagamento_dist = fato_vendas_final[<span class="syntax-string">'payment_method'</span>].value_counts()
+pagamento_dist.plot(kind=<span class="syntax-string">'bar'</span>, color=<span class="syntax-string">'purple'</span>)
+plt.title(<span class="syntax-string">'Distribuição por Método de Pagamento'</span>)
+plt.xlabel(<span class="syntax-string">'Método'</span>)
+plt.ylabel(<span class="syntax-string">'Número de Transações'</span>)
+plt.xticks(rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># 6. Sazonalidade por dia da semana</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">6</span>)
+vendas_dia_semana = (
+    fato_vendas_final
+    .merge(dim_tempo[[<span class="syntax-string">'date_key'</span>, <span class="syntax-string">'day_name'</span>]], on=<span class="syntax-string">'date_key'</span>)
+    .groupby(<span class="syntax-string">'day_name'</span>)[<span class="syntax-string">'total_amount'</span>]
+    .<span class="syntax-function">sum</span>()
+    .reindex([<span class="syntax-string">'Monday'</span>, <span class="syntax-string">'Tuesday'</span>, <span class="syntax-string">'Wednesday'</span>, <span class="syntax-string">'Thursday'</span>, <span class="syntax-string">'Friday'</span>, <span class="syntax-string">'Saturday'</span>, <span class="syntax-string">'Sunday'</span>])
+)
+vendas_dia_semana.plot(kind=<span class="syntax-string">'bar'</span>, color=<span class="syntax-string">'red'</span>)
+plt.title(<span class="syntax-string">'Vendas por Dia da Semana'</span>)
+plt.xlabel(<span class="syntax-string">'Dia'</span>)
+plt.ylabel(<span class="syntax-string">'Revenue (R$)'</span>)
+plt.xticks(rotation=<span class="syntax-number">45</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n🎉 Visualizações criadas com sucesso!"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Dashboard Multidimensional:</h5>
+                <p><strong>6 Perspectivas Diferentes:</strong> Cada gráfico explora uma dimensão diferente (categoria, tempo, idade, região, pagamento, sazonalidade) | <strong>Facilidade de Criação:</strong> Cada visualização é uma consulta simples no nosso modelo dimensional | <strong>Insights Ricos:</strong> Padrões comportamentais, tendências temporais, performance geográfica - tudo facilmente acessível.</p>
+            </div>
+        </div>
+
+        <!-- Passo 8: Resumo Final -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">8</div>
+                <h2 class="step-title">Resumo e Próximos Passos</h2>
+            </div>
+            <div class="etl-badge">🎯 CONSOLIDAÇÃO - Lições Aprendidas</div>
+            <p class="step-description">Chegamos ao final do nosso pipeline ETL completo! Vamos consolidar tudo que foi demonstrado e conectar com a próxima aula. Este resumo mostra como implementamos na prática todos os conceitos teóricos da aula sobre transformações e modelagem dimensional.</p>
+            
+            <div class="theory-box">
+                <h4>🏗️ Pipeline ETL Completo Implementado</h4>
+                <p><strong>Extract:</strong> Simulamos dados de múltiplas fontes | <strong>Transform:</strong> Aplicamos 4 tipos de transformação | <strong>Load:</strong> Criamos modelo dimensional otimizado | <strong>BI:</strong> Demonstramos consultas e visualizações facilitadas</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🎯 Resumo Final</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"🎯 RESUMO E LIÇÕES APRENDIDAS"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"""
+✅ TRANSFORMAÇÕES APLICADAS:
+   • Limpeza: Remoção de produtos inativos e transações inválidas
+   • Padronização: Conversão de moedas e formatação de datas
+   • Derivações: Cálculo de idade, faixas etárias, valores finais
+   • Agregações: Estatísticas por produto e período
+
+⭐ SCHEMA DIMENSIONAL CRIADO:
+   • 4 Tabelas de Dimensão (Tempo, Cliente, Produto, Loja)
+   • 1 Tabela Fato (Vendas) com granularidade por item
+   • Star Schema implementado com integridade referencial
+   • {len(fato_vendas_final):,} fatos conectados a {len(dim_tempo) + len(dim_cliente) + len(dim_produto) + len(dim_loja):,} registros dimensionais
+
+📊 CONSULTAS ANALÍTICAS FACILITADAS:
+   • Análise temporal: vendas por mês/trimestre/ano
+   • Segmentação: performance por categoria/região/idade
+   • Ranking: top produtos e clientes mais valiosos
+   • Padrões: sazonalidade e tendências de comportamento
+
+💡 BENEFÍCIOS DEMONSTRADOS:
+   • Consultas complexas tornam-se JOINs simples
+   • Performance otimizada para análises
+   • Modelo intuitivo para usuários de negócio
+   • Escalabilidade para grandes volumes de dados
+"""</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"🚀 PRÓXIMOS PASSOS (Aula 11/08):"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Aplicar métodos quantitativos nos dados estruturados"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Estatística descritiva sobre as dimensões e fatos"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Análise de distribuições e amostragem"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Checkpoint 1 do projeto com modelagem dimensional"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"✨ EXEMPLO PRÁTICO CONCLUÍDO COM SUCESSO!"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"="*60</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 O que Aprendemos na Prática:</h5>
+                <p><strong>ETL Real:</strong> Como dados heterogêneos são transformados sistematicamente | <strong>Modelagem Dimensional:</strong> Star Schema na prática com 4 dimensões e 1 fato | <strong>Business Intelligence:</strong> Como consultas complexas se tornam simples | <strong>Preparação:</strong> Dados estruturados prontos para métodos quantitativos da próxima aula</p>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Dicas Importantes</h4>
+            <ul class="list">
+                <li>Execute cada bloco em sequência - não pule passos</li>
+                <li>Se houver erro, volte ao bloco anterior e verifique</li>
+                <li>Os gráficos podem demorar alguns segundos para aparecer</li>
+                <li>Experimente modificar parâmetros para ver resultados diferentes</li>
+                <li>Salve o notebook no seu Google Drive para futuras consultas</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🚀 Parabéns!</h4>
+            <p>Você implementou com sucesso um pipeline completo de ETL e modelagem dimensional! Este exemplo demonstra na prática como dados brutos são transformados em estruturas analíticas otimizadas para Business Intelligence. Os dados estruturados desta forma serão a base perfeita para aplicar métodos quantitativos na próxima aula.</p>
+        </div>
+
+        <div class="info-panel">
+            <h4>📚 Checkpoint 1 do Projeto</h4>
+            <p>Para o Checkpoint 1 da próxima aula, use este exemplo como referência para:</p>
+            <ul class="list">
+                <li>Definir o dataset do seu projeto de grupo</li>
+                <li>Esboçar a modelagem dimensional proposta</li>
+                <li>Identificar que transformações serão necessárias</li>
+                <li>Planejar que perguntas de negócio vocês querem responder</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="https://colab.research.google.com" target="_blank" class="button">🚀 Abrir Google Colab</a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre code').textContent;
+            
+            navigator.clipboard.writeText(code).then(function() {
+                button.textContent = 'Copiado!';
+                button.style.background = '#4caf50';
+                
+                setTimeout(function() {
+                    button.textContent = 'Copiar';
+                    button.style.background = '#0052cc';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Erro ao copiar: ', err);
+                button.textContent = 'Erro';
+                button.style.background = '#f44336';
+                
+                setTimeout(function() {
+                    button.textContent = 'Copiar';
+                    button.style.background = '#0052cc';
+                }, 2000);
+            });
+        }
+
+        // Animação suave dos elementos ao carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.step-container, .highlight-box, .warning-box');
+            
+            elements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    element.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+        });
+    </script>
+</body>
+</html>
