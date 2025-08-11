@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Prático - Métodos Quantitativos e Amostragem</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 82, 204, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.3);
+        }
+
+        .stats-badge {
+            background: linear-gradient(135deg, #e91e63, #ad1457);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 400;
+            margin-bottom: 30px;
+        }
+
+        .step-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border-left: 6px solid #0052cc;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 82, 204, 0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.3);
+        }
+
+        .step-title {
+            color: #0052cc;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .step-description {
+            color: #444;
+            line-height: 1.7;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .theory-box {
+            background: rgba(233, 30, 99, 0.1);
+            border: 2px solid rgba(233, 30, 99, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .theory-box h4 {
+            color: #e91e63;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 25px;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #0052cc;
+            position: relative;
+        }
+
+        .code-header {
+            background: #2d2d2d;
+            color: #ffffff;
+            padding: 10px 20px;
+            margin: -25px -25px 15px -25px;
+            border-radius: 12px 12px 0 0;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-button {
+            background: #0052cc;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .copy-button:hover {
+            background: #003d99;
+        }
+
+        .output-example {
+            background: rgba(76, 175, 80, 0.1);
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .output-header {
+            color: #388e3c;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin: 25px 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 82, 204, 0.3);
+        }
+
+        .highlight-box h4 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-panel {
+            background: rgba(33, 150, 243, 0.1);
+            border: 2px solid rgba(33, 150, 243, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-panel h4 {
+            color: #1976d2;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #0052cc, #003d99);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.3);
+            margin: 10px 10px 10px 0;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 82, 204, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .list {
+            margin: 15px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .list li {
+            color: #444;
+            line-height: 1.7;
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .list li::before {
+            content: '▶';
+            color: #0052cc;
+            position: absolute;
+            left: 0;
+            font-size: 14px;
+            top: 2px;
+        }
+
+        .explanation-box {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #0052cc;
+        }
+
+        .explanation-box h5 {
+            color: #0052cc;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .explanation-box p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .formula-box {
+            background: rgba(248, 249, 250, 0.9);
+            border: 2px solid rgba(0, 82, 204, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .step-container {
+                padding: 20px;
+            }
+
+            .code-block {
+                padding: 15px;
+                font-size: 12px;
+            }
+
+            .step-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .step-number {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+
+            .step-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        .syntax-keyword { color: #569cd6; }
+        .syntax-string { color: #ce9178; }
+        .syntax-comment { color: #6a9955; }
+        .syntax-number { color: #b5cea8; }
+        .syntax-function { color: #dcdcaa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="badge">📊 Roteiro Prático - Aula 3</div>
+            <h1 class="title">Métodos Quantitativos e Amostragem</h1>
+            <p class="subtitle">Aplicando estatística descritiva e técnicas de amostragem em dados estruturados</p>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🎯 O que vamos aprender hoje</h4>
+            <p>Aplicaremos métodos quantitativos aos dados estruturados da aula anterior, explorando diferentes técnicas de amostragem, analisando distribuições de dados e demonstrando o Teorema Central do Limite na prática. Também prepararemos o dataset para o Checkpoint 1 do projeto.</p>
+        </div>
+
+        <div class="info-panel">
+            <h4>📝 Preparação</h4>
+            <p>Acesse <strong>colab.research.google.com</strong> e crie um novo notebook. Renomeie para "Aula3_Metodos_Quantitativos". Este roteiro utiliza os dados estruturados da aula anterior como base para análises estatísticas.</p>
+        </div>
+
+        <!-- Passo 1: Configuração e Carregamento -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Configuração e Preparação dos Dados</h2>
+            </div>
+            <div class="stats-badge">📊 Preparação Estatística</div>
+            <p class="step-description">Começamos configurando o ambiente e carregando os dados estruturados. Vamos simular que já temos os dados da modelagem dimensional da aula anterior e adicionar algumas funcionalidades estatísticas.</p>
+            
+            <div class="theory-box">
+                <h4>🧮 Fundamentos Estatísticos</h4>
+                <p>A estatística descritiva nos permite compreender os dados através de medidas de posição, dispersão e forma. Antes de aplicar modelos complexos, precisamos entender a natureza dos nossos dados através de análises exploratórias quantitativas.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🔧 Configuração do Ambiente Estatístico</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># -*- coding: utf-8 -*-</span>
+<span class="syntax-comment">"""
+# Data Science - Aula 3: Métodos Quantitativos e Amostragem
+## Aplicação prática de estatística em dados estruturados
+
+**Objetivo:** Aplicar técnicas de amostragem e análise quantitativa aos dados
+do e-commerce estruturados na aula anterior
+"""</span>
+
+<span class="syntax-comment"># Importações para análise estatística</span>
+<span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+<span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
+<span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
+<span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
+<span class="syntax-keyword">import</span> scipy.stats <span class="syntax-keyword">as</span> stats
+<span class="syntax-keyword">from</span> datetime <span class="syntax-keyword">import</span> datetime, timedelta
+<span class="syntax-keyword">import</span> warnings
+warnings.filterwarnings(<span class="syntax-string">'ignore'</span>)
+
+<span class="syntax-comment"># Configuração para análise estatística</span>
+plt.style.use(<span class="syntax-string">'seaborn-v0_8'</span>)
+sns.set_palette(<span class="syntax-string">"viridis"</span>)
+np.random.seed(<span class="syntax-number">42</span>)  <span class="syntax-comment"># Reprodutibilidade</span>
+
+<span class="syntax-comment"># Configurações de visualização</span>
+plt.rcParams[<span class="syntax-string">'figure.figsize'</span>] = (<span class="syntax-number">12</span>, <span class="syntax-number">8</span>)
+plt.rcParams[<span class="syntax-string">'font.size'</span>] = <span class="syntax-number">10</span>
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"✅ Ambiente estatístico configurado!"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📊 Iniciando análise quantitativa..."</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"🔢 NumPy versão: {np.__version__}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📈 SciPy disponível para testes estatísticos"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Ferramentas Estatísticas:</h5>
+                <p><strong>SciPy:</strong> Biblioteca para testes estatísticos e distribuições | <strong>Seaborn:</strong> Visualizações estatísticas avançadas | <strong>Configurações:</strong> Tamanho adequado para gráficos estatísticos e paleta de cores científica</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🏪 Recriação Rápida dos Dados Estruturados</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># Recriar dados estruturados rapidamente (baseado na aula anterior)</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"🔄 Recriando dados estruturados do e-commerce..."</span>)
+
+<span class="syntax-comment"># Simular dados de vendas (população completa)</span>
+n_total = <span class="syntax-number">50000</span>  <span class="syntax-comment"># População maior para demonstrar amostragem</span>
+
+<span class="syntax-comment"># Gerar população de transações</span>
+np.random.seed(<span class="syntax-number">42</span>)
+dados_populacao = {
+    <span class="syntax-string">'transaction_id'</span>: [<span class="syntax-string">f'TXN{i+1:06d}'</span> <span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(n_total)],
+    <span class="syntax-string">'customer_id'</span>: np.random.randint(<span class="syntax-number">1</span>, <span class="syntax-number">5001</span>, n_total),
+    <span class="syntax-string">'product_category'</span>: np.random.choice([<span class="syntax-string">'Eletrônicos'</span>, <span class="syntax-string">'Roupas'</span>, <span class="syntax-string">'Casa'</span>, <span class="syntax-string">'Livros'</span>, <span class="syntax-string">'Esportes'</span>], 
+                                        size=n_total, p=[<span class="syntax-number">0.3</span>, <span class="syntax-number">0.25</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.15</span>, <span class="syntax-number">0.1</span>]),
+    <span class="syntax-string">'quantity'</span>: np.random.randint(<span class="syntax-number">1</span>, <span class="syntax-number">6</span>, n_total),
+    <span class="syntax-string">'unit_price'</span>: np.random.lognormal(mean=<span class="syntax-number">4</span>, sigma=<span class="syntax-number">0.8</span>, size=n_total),  <span class="syntax-comment"># Distribuição log-normal</span>
+    <span class="syntax-string">'customer_age'</span>: np.random.normal(loc=<span class="syntax-number">35</span>, scale=<span class="syntax-number">12</span>, size=n_total),  <span class="syntax-comment"># Distribuição normal</span>
+    <span class="syntax-string">'region'</span>: np.random.choice([<span class="syntax-string">'Norte'</span>, <span class="syntax-string">'Nordeste'</span>, <span class="syntax-string">'Centro-Oeste'</span>, <span class="syntax-string">'Sudeste'</span>, <span class="syntax-string">'Sul'</span>], 
+                                size=n_total, p=[<span class="syntax-number">0.1</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.15</span>, <span class="syntax-number">0.35</span>, <span class="syntax-number">0.2</span>]),
+    <span class="syntax-string">'day_of_week'</span>: np.random.choice(<span class="syntax-function">range</span>(<span class="syntax-number">1</span>, <span class="syntax-number">8</span>), n_total),  <span class="syntax-comment"># 1=segunda, 7=domingo</span>
+    <span class="syntax-string">'is_weekend'</span>: np.random.choice([<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], size=n_total, p=[<span class="syntax-number">0.71</span>, <span class="syntax-number">0.29</span>])  <span class="syntax-comment"># 5/7 dias úteis</span>
+}
+
+<span class="syntax-comment"># Calcular campos derivados</span>
+dados_populacao[<span class="syntax-string">'total_amount'</span>] = dados_populacao[<span class="syntax-string">'quantity'</span>] * dados_populacao[<span class="syntax-string">'unit_price'</span>]
+
+<span class="syntax-comment"># Criar DataFrame da população</span>
+df_populacao = pd.DataFrame(dados_populacao)
+
+<span class="syntax-comment"># Limpar valores extremos (simular limpeza de dados)</span>
+df_populacao = df_populacao[
+    (df_populacao[<span class="syntax-string">'customer_age'</span>] >= <span class="syntax-number">18</span>) & 
+    (df_populacao[<span class="syntax-string">'customer_age'</span>] <= <span class="syntax-number">80</span>) &
+    (df_populacao[<span class="syntax-string">'unit_price'</span>] <= <span class="syntax-number">1000</span>)
+].reset_index(drop=<span class="syntax-keyword">True</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"✅ População criada: {len(df_populacao):,} transações"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"💰 Revenue total: R$ {df_populacao['total_amount'].sum():,.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"🛒 Ticket médio: R$ {df_populacao['total_amount'].mean():.2f}"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n📊 Primeiros registros da população:"</span>)
+<span class="syntax-function">print</span>(df_populacao.head())</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 População de Dados:</h5>
+                <p><strong>50.000 transações:</strong> População completa para demonstrar amostragem | <strong>Distribuições Realistas:</strong> Preços seguem log-normal (típico de valores monetários), idades seguem normal | <strong>Limpeza:</strong> Removemos outliers extremos como na prática real</p>
+            </div>
+        </div>
+
+        <!-- Passo 2: Técnicas de Amostragem -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h2 class="step-title">Implementação de Técnicas de Amostragem</h2>
+            </div>
+            <div class="stats-badge">🎲 Amostragem Prática</div>
+            <p class="step-description">Agora vamos implementar os quatro tipos principais de amostragem discutidos na aula teórica. Cada técnica tem suas vantagens e aplicações específicas em Data Science.</p>
+            
+            <div class="theory-box">
+                <h4>🎯 Comparação de Métodos de Amostragem</h4>
+                <p>Implementaremos amostragem aleatória simples, estratificada, sistemática e por conglomerados. Cada método produz amostras diferentes, e veremos como isso afeta as estimativas estatísticas obtidas.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🎲 Amostragem Aleatória Simples</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"🎲 TÉCNICAS DE AMOSTRAGEM"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># Definir tamanho da amostra</span>
+tamanho_amostra = <span class="syntax-number">1000</span>  <span class="syntax-comment"># 2% da população</span>
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n🎯 Tamanho da amostra: {tamanho_amostra:,} ({tamanho_amostra/len(df_populacao)*100:.1f}% da população)"</span>)
+
+<span class="syntax-comment"># 1. AMOSTRAGEM ALEATÓRIA SIMPLES</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n1️⃣ AMOSTRAGEM ALEATÓRIA SIMPLES"</span>)
+
+np.random.seed(<span class="syntax-number">42</span>)
+amostra_aleatoria = df_populacao.sample(n=tamanho_amostra, random_state=<span class="syntax-number">42</span>)
+
+<span class="syntax-comment"># Estatísticas da amostra aleatória</span>
+ticket_medio_pop = df_populacao[<span class="syntax-string">'total_amount'</span>].mean()
+ticket_medio_amostra = amostra_aleatoria[<span class="syntax-string">'total_amount'</span>].mean()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   💰 Ticket médio população: R$ {ticket_medio_pop:.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   💰 Ticket médio amostra:   R$ {ticket_medio_amostra:.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Erro amostral: R$ {abs(ticket_medio_pop - ticket_medio_amostra):.2f} ({abs(ticket_medio_pop - ticket_medio_amostra)/ticket_medio_pop*100:.2f}%)"</span>)
+
+<span class="syntax-comment"># Distribuição por categoria na amostra vs população</span>
+dist_pop = df_populacao[<span class="syntax-string">'product_category'</span>].value_counts(normalize=<span class="syntax-keyword">True</span>).sort_index()
+dist_amostra = amostra_aleatoria[<span class="syntax-string">'product_category'</span>].value_counts(normalize=<span class="syntax-keyword">True</span>).sort_index()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   📦 Distribuição por categoria:"</span>)
+<span class="syntax-keyword">for</span> categoria <span class="syntax-keyword">in</span> dist_pop.index:
+    pop_pct = dist_pop[categoria] * <span class="syntax-number">100</span>
+    amostra_pct = dist_amostra.get(categoria, <span class="syntax-number">0</span>) * <span class="syntax-number">100</span>
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      {categoria}: População {pop_pct:.1f}% | Amostra {amostra_pct:.1f}%"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Amostragem Aleatória Simples:</h5>
+                <p><strong>Princípio:</strong> Cada elemento tem igual probabilidade de seleção | <strong>Vantagem:</strong> Sem viés de seleção | <strong>Observação:</strong> Note como algumas categorias podem ficar sub/sobre-representadas por acaso</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📊 Amostragem Estratificada</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># 2. AMOSTRAGEM ESTRATIFICADA</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n2️⃣ AMOSTRAGEM ESTRATIFICADA (por região)"</span>)
+
+<span class="syntax-comment"># Calcular proporção de cada região</span>
+proporcoes_regiao = df_populacao[<span class="syntax-string">'region'</span>].value_counts(normalize=<span class="syntax-keyword">True</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   🗺️ Proporções por região na população:"</span>)
+<span class="syntax-keyword">for</span> regiao, prop <span class="syntax-keyword">in</span> proporcoes_regiao.items():
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      {regiao}: {prop*100:.1f}%"</span>)
+
+<span class="syntax-comment"># Amostragem estratificada mantendo proporções</span>
+amostras_estratos = []
+<span class="syntax-keyword">for</span> regiao <span class="syntax-keyword">in</span> proporcoes_regiao.index:
+    n_estrato = <span class="syntax-function">int</span>(tamanho_amostra * proporcoes_regiao[regiao])
+    dados_estrato = df_populacao[df_populacao[<span class="syntax-string">'region'</span>] == regiao]
+    amostra_estrato = dados_estrato.sample(n=n_estrato, random_state=<span class="syntax-number">42</span>)
+    amostras_estratos.append(amostra_estrato)
+
+amostra_estratificada = pd.concat(amostras_estratos, ignore_index=<span class="syntax-keyword">True</span>)
+
+<span class="syntax-comment"># Verificar se manteve as proporções</span>
+prop_estratificada = amostra_estratificada[<span class="syntax-string">'region'</span>].value_counts(normalize=<span class="syntax-keyword">True</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   ✅ Proporções mantidas na amostra estratificada:"</span>)
+<span class="syntax-keyword">for</span> regiao <span class="syntax-keyword">in</span> proporcoes_regiao.index:
+    pop_pct = proporcoes_regiao[regiao] * <span class="syntax-number">100</span>
+    estratif_pct = prop_estratificada.get(regiao, <span class="syntax-number">0</span>) * <span class="syntax-number">100</span>
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      {regiao}: População {pop_pct:.1f}% | Estratificada {estratif_pct:.1f}%"</span>)
+
+ticket_medio_estratificada = amostra_estratificada[<span class="syntax-string">'total_amount'</span>].mean()
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   💰 Ticket médio estratificada: R$ {ticket_medio_estratificada:.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Erro amostral: R$ {abs(ticket_medio_pop - ticket_medio_estratificada):.2f} ({abs(ticket_medio_pop - ticket_medio_estratificada)/ticket_medio_pop*100:.2f}%)"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Amostragem Estratificada:</h5>
+                <p><strong>Princípio:</strong> Divide população em estratos e amostra proporcionalmente | <strong>Vantagem:</strong> Garante representação de todos os subgrupos | <strong>Resultado:</strong> Geralmente produz estimativas mais precisas</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>⚙️ Amostragem Sistemática e por Conglomerados</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># 3. AMOSTRAGEM SISTEMÁTICA</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n3️⃣ AMOSTRAGEM SISTEMÁTICA"</span>)
+
+<span class="syntax-comment"># Calcular intervalo k</span>
+k = <span class="syntax-function">len</span>(df_populacao) // tamanho_amostra
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📏 Intervalo k = {k} (cada {k}º elemento)"</span>)
+
+<span class="syntax-comment"># Sortear ponto de partida aleatório</span>
+np.random.seed(<span class="syntax-number">42</span>)
+inicio = np.random.randint(<span class="syntax-number">0</span>, k)
+
+<span class="syntax-comment"># Selecionar elementos sistematicamente</span>
+indices_sistematicos = <span class="syntax-function">list</span>(<span class="syntax-function">range</span>(inicio, <span class="syntax-function">len</span>(df_populacao), k))[:tamanho_amostra]
+amostra_sistematica = df_populacao.iloc[indices_sistematicos]
+
+ticket_medio_sistematica = amostra_sistematica[<span class="syntax-string">'total_amount'</span>].mean()
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   💰 Ticket médio sistemática: R$ {ticket_medio_sistematica:.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Erro amostral: R$ {abs(ticket_medio_pop - ticket_medio_sistematica):.2f} ({abs(ticket_medio_pop - ticket_medio_sistematica)/ticket_medio_pop*100:.2f}%)"</span>)
+
+<span class="syntax-comment"># 4. AMOSTRAGEM POR CONGLOMERADOS</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n4️⃣ AMOSTRAGEM POR CONGLOMERADOS (por região)"</span>)
+
+<span class="syntax-comment"># Selecionar 3 regiões aleatoriamente como conglomerados</span>
+np.random.seed(<span class="syntax-number">42</span>)
+regioes_selecionadas = np.random.choice(df_populacao[<span class="syntax-string">'region'</span>].unique(), size=<span class="syntax-number">3</span>, replace=<span class="syntax-keyword">False</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎯 Regiões selecionadas: {', '.join(regioes_selecionadas)}"</span>)
+
+<span class="syntax-comment"># Amostrar dentro dos conglomerados selecionados</span>
+dados_conglomerados = df_populacao[df_populacao[<span class="syntax-string">'region'</span>].isin(regioes_selecionadas)]
+amostra_conglomerados = dados_conglomerados.sample(n=tamanho_amostra, random_state=<span class="syntax-number">42</span>)
+
+ticket_medio_conglomerados = amostra_conglomerados[<span class="syntax-string">'total_amount'</span>].mean()
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   💰 Ticket médio conglomerados: R$ {ticket_medio_conglomerados:.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Erro amostral: R$ {abs(ticket_medio_pop - ticket_medio_conglomerados):.2f} ({abs(ticket_medio_pop - ticket_medio_conglomerados)/ticket_medio_pop*100:.2f}%)"</span>)
+
+<span class="syntax-comment"># Resumo comparativo</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n📊 RESUMO COMPARATIVO DOS MÉTODOS:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"{'Método':<20} {'Ticket Médio':<15} {'Erro Abs.':<12} {'Erro %':<10}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"-"*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"{'População':<20} R$ {ticket_medio_pop:<11.2f} {'-':<12} {'-':<10}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"{'Aleatória':<20} R$ {ticket_medio_amostra:<11.2f} R$ {abs(ticket_medio_pop - ticket_medio_amostra):<8.2f} {abs(ticket_medio_pop - ticket_medio_amostra)/ticket_medio_pop*100:<6.2f}%"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"{'Estratificada':<20} R$ {ticket_medio_estratificada:<11.2f} R$ {abs(ticket_medio_pop - ticket_medio_estratificada):<8.2f} {abs(ticket_medio_pop - ticket_medio_estratificada)/ticket_medio_pop*100:<6.2f}%"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"{'Sistemática':<20} R$ {ticket_medio_sistematica:<11.2f} R$ {abs(ticket_medio_pop - ticket_medio_sistematica):<8.2f} {abs(ticket_medio_pop - ticket_medio_sistematica)/ticket_medio_pop*100:<6.2f}%"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"{'Conglomerados':<20} R$ {ticket_medio_conglomerados:<11.2f} R$ {abs(ticket_medio_pop - ticket_medio_conglomerados):<8.2f} {abs(ticket_medio_pop - ticket_medio_conglomerados)/ticket_medio_pop*100:<6.2f}%"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Comparação dos Métodos:</h5>
+                <p><strong>Sistemática:</strong> Intervalos regulares, risco de viés se há padrões | <strong>Conglomerados:</strong> Seleciona grupos inteiros, menos precisa mas mais prática | <strong>Observe:</strong> Cada método produz estimativas ligeiramente diferentes - isso é normal!</p>
+            </div>
+        </div>
+
+        <!-- Passo 3: Análise de Distribuições -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h2 class="step-title">Análise de Distribuições de Dados</h2>
+            </div>
+            <div class="stats-badge">📈 Distribuições</div>
+            <p class="step-description">Agora vamos analisar as distribuições dos dados, identificando padrões como normalidade, assimetria e outliers. Esta análise é fundamental para escolher métodos estatísticos apropriados.</p>
+            
+            <div class="theory-box">
+                <h4>📊 Tipos de Distribuições nos Dados</h4>
+                <p>Identificaremos diferentes tipos de distribuições nos nossos dados: normal (idade), log-normal (preços), uniforme (categorias) e poisson (eventos raros). Cada distribuição tem características específicas que afetam as análises.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📈 Análise Exploratória de Distribuições</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📈 ANÁLISE DE DISTRIBUIÇÕES"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># Trabalhar com a amostra estratificada (mais representativa)</span>
+dados_analise = amostra_estratificada.copy()
+
+<span class="syntax-comment"># 1. ANÁLISE DA DISTRIBUIÇÃO DE IDADES</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n1️⃣ DISTRIBUIÇÃO DE IDADES DOS CLIENTES"</span>)
+
+idades = dados_analise[<span class="syntax-string">'customer_age'</span>]
+
+<span class="syntax-comment"># Estatísticas descritivas</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Estatísticas descritivas:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Média: {idades.mean():.1f} anos"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Mediana: {idades.median():.1f} anos"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Moda: {idades.mode()[0]:.1f} anos"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Desvio padrão: {idades.std():.1f} anos"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Assimetria: {idades.skew():.3f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Curtose: {idades.kurtosis():.3f}"</span>)
+
+<span class="syntax-comment"># Teste de normalidade (Shapiro-Wilk para amostras pequenas)</span>
+<span class="syntax-keyword">if</span> <span class="syntax-function">len</span>(idades) <= <span class="syntax-number">5000</span>:
+    stat_shapiro, p_value_shapiro = stats.shapiro(idades)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Teste Shapiro-Wilk: p-value = {p_value_shapiro:.6f}"</span>)
+    <span class="syntax-keyword">if</span> p_value_shapiro > <span class="syntax-number">0.05</span>:
+        <span class="syntax-function">print</span>(<span class="syntax-string">f"      ✅ Distribuição normal (p > 0.05)"</span>)
+    <span class="syntax-keyword">else</span>:
+        <span class="syntax-function">print</span>(<span class="syntax-string">f"      ❌ Distribuição não normal (p ≤ 0.05)"</span>)
+
+<span class="syntax-comment"># 2. ANÁLISE DA DISTRIBUIÇÃO DE PREÇOS</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n2️⃣ DISTRIBUIÇÃO DE PREÇOS UNITÁRIOS"</span>)
+
+precos = dados_analise[<span class="syntax-string">'unit_price'</span>]
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Estatísticas descritivas:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Média: R$ {precos.mean():.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Mediana: R$ {precos.median():.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Desvio padrão: R$ {precos.std():.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Assimetria: {precos.skew():.3f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Curtose: {precos.kurtosis():.3f}"</span>)
+
+<span class="syntax-comment"># Análise de assimetria</span>
+<span class="syntax-keyword">if</span> precos.skew() > <span class="syntax-number">1</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      📈 Fortemente assimétrica à direita"</span>)
+<span class="syntax-keyword">elif</span> precos.skew() > <span class="syntax-number">0.5</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      📈 Moderadamente assimétrica à direita"</span>)
+<span class="syntax-keyword">elif</span> precos.skew() < -<span class="syntax-number">0.5</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      📉 Assimétrica à esquerda"</span>)
+<span class="syntax-keyword">else</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      ⚖️ Aproximadamente simétrica"</span>)
+
+<span class="syntax-comment"># Transformação logarítmica para normalizar</span>
+precos_log = np.log(precos)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      🔄 Após transformação log:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"         Assimetria: {precos_log.skew():.3f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"         Curtose: {precos_log.kurtosis():.3f}"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Análise de Distribuições:</h5>
+                <p><strong>Idades:</strong> Esperamos distribuição aproximadamente normal | <strong>Preços:</strong> Típica distribuição log-normal (assimétrica à direita) | <strong>Transformação Log:</strong> Pode normalizar distribuições assimétricas | <strong>Testes:</strong> Shapiro-Wilk para verificar normalidade</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📊 Visualização das Distribuições</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># Criar visualizações das distribuições</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">15</span>, <span class="syntax-number">10</span>))
+fig.suptitle(<span class="syntax-string">'Análise de Distribuições dos Dados'</span>, fontsize=<span class="syntax-number">16</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+<span class="syntax-comment"># 1. Histograma de idades</span>
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].hist(idades, bins=<span class="syntax-number">30</span>, alpha=<span class="syntax-number">0.7</span>, color=<span class="syntax-string">'skyblue'</span>, edgecolor=<span class="syntax-string">'black'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].axvline(idades.mean(), color=<span class="syntax-string">'red'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">f'Média: {idades.mean():.1f}'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_title(<span class="syntax-string">'Distribuição de Idades'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_xlabel(<span class="syntax-string">'Idade (anos)'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_ylabel(<span class="syntax-string">'Frequência'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].legend()
+
+<span class="syntax-comment"># 2. Q-Q plot para idades (verificar normalidade)</span>
+stats.probplot(idades, dist=<span class="syntax-string">"norm"</span>, plot=axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>])
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>].set_title(<span class="syntax-string">'Q-Q Plot - Idades vs Normal'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>].grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 3. Histograma de preços (original)</span>
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].hist(precos, bins=<span class="syntax-number">50</span>, alpha=<span class="syntax-number">0.7</span>, color=<span class="syntax-string">'lightcoral'</span>, edgecolor=<span class="syntax-string">'black'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].axvline(precos.mean(), color=<span class="syntax-string">'red'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">f'Média: R${precos.mean():.0f}'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].axvline(precos.median(), color=<span class="syntax-string">'blue'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">f'Mediana: R${precos.median():.0f}'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].set_title(<span class="syntax-string">'Distribuição de Preços (Original)'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].set_xlabel(<span class="syntax-string">'Preço (R$)'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].set_ylabel(<span class="syntax-string">'Frequência'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>].legend()
+
+<span class="syntax-comment"># 4. Histograma de preços (log-transformado)</span>
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].hist(precos_log, bins=<span class="syntax-number">30</span>, alpha=<span class="syntax-number">0.7</span>, color=<span class="syntax-string">'lightgreen'</span>, edgecolor=<span class="syntax-string">'black'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].axvline(precos_log.mean(), color=<span class="syntax-string">'red'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">f'Média: {precos_log.mean():.2f}'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].set_title(<span class="syntax-string">'Distribuição de Log(Preços)'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].set_xlabel(<span class="syntax-string">'Log(Preço)'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].set_ylabel(<span class="syntax-string">'Frequência'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].legend()
+
+<span class="syntax-comment"># 5. Boxplot de preços por categoria</span>
+dados_analise.boxplot(column=<span class="syntax-string">'unit_price'</span>, by=<span class="syntax-string">'product_category'</span>, ax=axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>])
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>].set_title(<span class="syntax-string">'Distribuição de Preços por Categoria'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>].set_xlabel(<span class="syntax-string">'Categoria'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>].set_ylabel(<span class="syntax-string">'Preço (R$)'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>].tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># 6. Distribuição do total de vendas por dia da semana</span>
+vendas_dia = dados_analise.groupby(<span class="syntax-string">'day_of_week'</span>)[<span class="syntax-string">'total_amount'</span>].<span class="syntax-function">sum</span>()
+dias_semana = [<span class="syntax-string">'Seg'</span>, <span class="syntax-string">'Ter'</span>, <span class="syntax-string">'Qua'</span>, <span class="syntax-string">'Qui'</span>, <span class="syntax-string">'Sex'</span>, <span class="syntax-string">'Sáb'</span>, <span class="syntax-string">'Dom'</span>]
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].bar(<span class="syntax-function">range</span>(<span class="syntax-number">1</span>, <span class="syntax-number">8</span>), vendas_dia.values, color=<span class="syntax-string">'orange'</span>, alpha=<span class="syntax-number">0.7</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].set_title(<span class="syntax-string">'Vendas por Dia da Semana'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].set_xlabel(<span class="syntax-string">'Dia da Semana'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].set_ylabel(<span class="syntax-string">'Total de Vendas (R$)'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].set_xticks(<span class="syntax-function">range</span>(<span class="syntax-number">1</span>, <span class="syntax-number">8</span>))
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].set_xticklabels(dias_semana)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n📊 Gráficos de distribuição criados!"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   🔍 Observe: Q-Q plot mostra se dados seguem distribuição normal"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   📈 Preços: assimetria típica de dados monetários"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"   📦 Boxplots: identificam outliers e diferenças entre categorias"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Interpretação das Visualizações:</h5>
+                <p><strong>Q-Q Plot:</strong> Pontos próximos à linha diagonal = distribuição normal | <strong>Histogramas:</strong> Forma da distribuição (simétrica, assimétrica, multimodal) | <strong>Boxplots:</strong> Mediana, quartis e outliers por categoria | <strong>Log-Transformação:</strong> Normaliza distribuições assimétricas</p>
+            </div>
+        </div>
+
+        <!-- Passo 4: Teorema Central do Limite -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h2 class="step-title">Demonstração do Teorema Central do Limite</h2>
+            </div>
+            <div class="stats-badge">📊 TCL na Prática</div>
+            <p class="step-description">Vamos demonstrar na prática o <strong>Teorema Central do Limite</strong>, um dos conceitos mais importantes da estatística. Mesmo com dados não-normais, as médias amostrais tendem à normalidade.</p>
+            
+            <div class="theory-box">
+                <h4>🎯 Teorema Central do Limite</h4>
+                <p>Independente da distribuição original dos dados, a distribuição das médias amostrais aproxima-se de uma distribuição normal à medida que o tamanho da amostra aumenta (n ≥ 30). Este é o fundamento de muitos testes estatísticos.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🧪 Simulação do Teorema Central do Limite</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"🧪 DEMONSTRAÇÃO DO TEOREMA CENTRAL DO LIMITE"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># Usar os preços (distribuição não-normal) para demonstrar o TCL</span>
+populacao_precos = df_populacao[<span class="syntax-string">'unit_price'</span>].values
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"📊 População original:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   Tamanho: {len(populacao_precos):,}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   Média: R$ {populacao_precos.mean():.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   Desvio padrão: R$ {populacao_precos.std():.2f}"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   Assimetria: {stats.skew(populacao_precos):.3f}"</span>)
+
+<span class="syntax-comment"># Simulação com diferentes tamanhos de amostra</span>
+tamanhos_amostra = [<span class="syntax-number">5</span>, <span class="syntax-number">10</span>, <span class="syntax-number">30</span>, <span class="syntax-number">100</span>]
+num_amostras = <span class="syntax-number">1000</span>  <span class="syntax-comment"># Número de amostras para cada tamanho</span>
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n🔄 Simulando {num_amostras} amostras para cada tamanho..."</span>)
+
+medias_amostrais = {}
+
+<span class="syntax-keyword">for</span> n <span class="syntax-keyword">in</span> tamanhos_amostra:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n📏 Tamanho da amostra: {n}"</span>)
+    
+    <span class="syntax-comment"># Gerar múltiplas amostras e calcular suas médias</span>
+    medias = []
+    <span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(num_amostras):
+        amostra = np.random.choice(populacao_precos, size=n, replace=<span class="syntax-keyword">False</span>)
+        medias.append(amostra.mean())
+    
+    medias = np.array(medias)
+    medias_amostrais[n] = medias
+    
+    <span class="syntax-comment"># Estatísticas das médias amostrais</span>
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   Média das médias: R$ {medias.mean():.2f}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   Desvio padrão das médias: R$ {medias.std():.2f}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   Erro padrão teórico: R$ {populacao_precos.std()/np.sqrt(n):.2f}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   Assimetria das médias: {stats.skew(medias):.3f}"</span>)
+    
+    <span class="syntax-comment"># Teste de normalidade</span>
+    _, p_value = stats.shapiro(medias[:<span class="syntax-number">5000</span>])  <span class="syntax-comment"># Limite do Shapiro-Wilk</span>
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   Teste normalidade (p-value): {p_value:.6f}"</span>)
+    
+    <span class="syntax-keyword">if</span> p_value > <span class="syntax-number">0.05</span>:
+        <span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Médias seguem distribuição normal"</span>)
+    <span class="syntax-keyword">else</span>:
+        <span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚠️ Médias ainda não são perfeitamente normais"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Observações do TCL:</h5>
+                <p><strong>Média das Médias:</strong> Converge para a média populacional | <strong>Erro Padrão:</strong> σ/√n - diminui com amostra maior | <strong>Assimetria:</strong> Diminui conforme n aumenta | <strong>Normalidade:</strong> Melhora com amostras maiores (n ≥ 30)</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📊 Visualização do Teorema Central do Limite</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-comment"># Visualizar o Teorema Central do Limite</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">15</span>, <span class="syntax-number">10</span>))
+fig.suptitle(<span class="syntax-string">'Demonstração do Teorema Central do Limite'</span>, fontsize=<span class="syntax-number">16</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+<span class="syntax-comment"># População original (subplot 0,0)</span>
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].hist(populacao_precos, bins=<span class="syntax-number">50</span>, alpha=<span class="syntax-number">0.7</span>, color=<span class="syntax-string">'red'</span>, density=<span class="syntax-keyword">True</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_title(<span class="syntax-string">f'População Original\\n(Assimétrica, n={len(populacao_precos):,})'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_xlabel(<span class="syntax-string">'Preço (R$)'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_ylabel(<span class="syntax-string">'Densidade'</span>)
+
+<span class="syntax-comment"># Distribuições das médias amostrais</span>
+cores = [<span class="syntax-string">'orange'</span>, <span class="syntax-string">'yellow'</span>, <span class="syntax-string">'lightgreen'</span>, <span class="syntax-string">'lightblue'</span>]
+posicoes = [(<span class="syntax-number">0</span>,<span class="syntax-number">1</span>), (<span class="syntax-number">0</span>,<span class="syntax-number">2</span>), (<span class="syntax-number">1</span>,<span class="syntax-number">0</span>), (<span class="syntax-number">1</span>,<span class="syntax-number">1</span>)]
+
+<span class="syntax-keyword">for</span> i, n <span class="syntax-keyword">in</span> <span class="syntax-function">enumerate</span>(tamanhos_amostra):
+    row, col = posicoes[i]
+    medias = medias_amostrais[n]
+    
+    <span class="syntax-comment"># Histograma das médias</span>
+    axes[row, col].hist(medias, bins=<span class="syntax-number">30</span>, alpha=<span class="syntax-number">0.7</span>, color=cores[i], density=<span class="syntax-keyword">True</span>, edgecolor=<span class="syntax-string">'black'</span>)
+    
+    <span class="syntax-comment"># Sobrepor curva normal teórica</span>
+    x_normal = np.linspace(medias.min(), medias.max(), <span class="syntax-number">100</span>)
+    media_teorica = populacao_precos.mean()
+    erro_padrao_teorico = populacao_precos.std() / np.sqrt(n)
+    y_normal = stats.norm.pdf(x_normal, media_teorica, erro_padrao_teorico)
+    
+    axes[row, col].plot(x_normal, y_normal, <span class="syntax-string">'r-'</span>, linewidth=<span class="syntax-number">2</span>, label=<span class="syntax-string">'Normal Teórica'</span>)
+    axes[row, col].axvline(medias.mean(), color=<span class="syntax-string">'blue'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">f'Média: R${medias.mean():.0f}'</span>)
+    
+    axes[row, col].set_title(<span class="syntax-string">f'Médias Amostrais (n={n})\\nAssimetria: {stats.skew(medias):.3f}'</span>)
+    axes[row, col].set_xlabel(<span class="syntax-string">'Média da Amostra (R$)'</span>)
+    axes[row, col].set_ylabel(<span class="syntax-string">'Densidade'</span>)
+    axes[row, col].legend(fontsize=<span class="syntax-number">8</span>)
+    axes[row, col].grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Comparação da evolução da normalidade</span>
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>].remove()  <span class="syntax-comment"># Remove o último subplot</span>
+ax_comparacao = fig.add_subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, <span class="syntax-number">6</span>)
+
+<span class="syntax-comment"># Gráfico da evolução da assimetria</span>
+assimetrias = [stats.skew(medias_amostrais[n]) <span class="syntax-keyword">for</span> n <span class="syntax-keyword">in</span> tamanhos_amostra]
+ax_comparacao.plot(tamanhos_amostra, assimetrias, <span class="syntax-string">'bo-'</span>, linewidth=<span class="syntax-number">2</span>, markersize=<span class="syntax-number">8</span>)
+ax_comparacao.axhline(y=<span class="syntax-number">0</span>, color=<span class="syntax-string">'r'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">'Simétrica Perfeita'</span>)
+ax_comparacao.set_title(<span class="syntax-string">'Evolução da Assimetria\\n(TCL em Ação)'</span>)
+ax_comparacao.set_xlabel(<span class="syntax-string">'Tamanho da Amostra (n)'</span>)
+ax_comparacao.set_ylabel(<span class="syntax-string">'Assimetria'</span>)
+ax_comparacao.legend()
+ax_comparacao.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n🎉 Teorema Central do Limite demonstrado!"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📈 Observe como as distribuições ficam mais simétricas"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎯 A partir de n=30, a normalidade fica evidente"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Curva vermelha = distribuição normal teórica"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Interpretação do TCL:</h5>
+                <p><strong>n=5,10:</strong> Distribuições ainda assimétricas | <strong>n=30:</strong> Aproximação à normalidade evidente | <strong>n=100:</strong> Quase perfeitamente normal | <strong>Implicação:</strong> Podemos usar estatística paramétrica mesmo com dados não-normais se n ≥ 30</p>
+            </div>
+        </div>
+
+        <!-- Passo 5: Preparação para Checkpoint 1 -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <h2 class="step-title">Preparação para o Checkpoint 1</h2>
+            </div>
+            <div class="stats-badge">🎯 Projeto</div>
+            <p class="step-description">Agora vamos aplicar os conceitos aprendidos na preparação do <strong>Checkpoint 1 do projeto</strong>. Analisaremos nosso dataset e definiremos estratégias de amostragem e análise quantitativa.</p>
+            
+            <div class="theory-box">
+                <h4>📋 Entregáveis do Checkpoint 1</h4>
+                <p>Definição do dataset, esboço da modelagem dimensional, identificação de transformações necessárias e planejamento das análises quantitativas que serão aplicadas nos dados estruturados.</p>
+            </div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📋 Análise Estatística para o Projeto</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📋 PREPARAÇÃO PARA CHECKPOINT 1"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">"\n🎯 ROTEIRO DE ANÁLISE PARA SEU PROJETO:"</span>)
+
+<span class="syntax-comment"># 1. Análise exploratória do dataset</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n1️⃣ ANÁLISE EXPLORATÓRIA INICIAL"</span>)
+
+<span class="syntax-comment"># Criar um relatório estatístico resumido do dataset</span>
+relatorio_dataset = {
+    <span class="syntax-string">'Tamanho da População'</span>: <span class="syntax-function">len</span>(df_populacao),
+    <span class="syntax-string">'Número de Variáveis'</span>: <span class="syntax-function">len</span>(df_populacao.columns),
+    <span class="syntax-string">'Período Temporal'</span>: <span class="syntax-string">'2024 (simulado)'</span>,
+    <span class="syntax-string">'Variáveis Numéricas'</span>: [<span class="syntax-string">'customer_age'</span>, <span class="syntax-string">'unit_price'</span>, <span class="syntax-string">'quantity'</span>, <span class="syntax-string">'total_amount'</span>],
+    <span class="syntax-string">'Variáveis Categóricas'</span>: [<span class="syntax-string">'product_category'</span>, <span class="syntax-string">'region'</span>],
+    <span class="syntax-string">'Grão dos Dados'</span>: <span class="syntax-string">'Transação individual'</span>
+}
+
+<span class="syntax-keyword">for</span> chave, valor <span class="syntax-keyword">in</span> relatorio_dataset.items():
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 {chave}: {valor}"</span>)
+
+<span class="syntax-comment"># 2. Identificação de distribuições nos dados</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n2️⃣ CARACTERIZAÇÃO DAS DISTRIBUIÇÕES"</span>)
+
+variaveis_analise = [<span class="syntax-string">'customer_age'</span>, <span class="syntax-string">'unit_price'</span>, <span class="syntax-string">'total_amount'</span>]
+
+<span class="syntax-keyword">for</span> var <span class="syntax-keyword">in</span> variaveis_analise:
+    dados_var = df_populacao[var]
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n   📈 {var}:"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Média: {dados_var.mean():.2f}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Mediana: {dados_var.median():.2f}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Desvio padrão: {dados_var.std():.2f}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Assimetria: {dados_var.skew():.3f}"</span>)
+    
+    <span class="syntax-comment"># Classificar tipo de distribuição</span>
+    <span class="syntax-keyword">if</span> <span class="syntax-function">abs</span>(dados_var.skew()) < <span class="syntax-number">0.5</span>:
+        tipo_dist = <span class="syntax-string">"Aproximadamente normal"</span>
+    <span class="syntax-keyword">elif</span> dados_var.skew() > <span class="syntax-number">1</span>:
+        tipo_dist = <span class="syntax-string">"Fortemente assimétrica à direita"</span>
+    <span class="syntax-keyword">elif</span> dados_var.skew() > <span class="syntax-number">0.5</span>:
+        tipo_dist = <span class="syntax-string">"Moderadamente assimétrica à direita"</span>
+    <span class="syntax-keyword">else</span>:
+        tipo_dist = <span class="syntax-string">"Assimétrica à esquerda"</span>
+    
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Tipo: {tipo_dist}"</span>)
+
+<span class="syntax-comment"># 3. Estratégia de amostragem recomendada</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n3️⃣ ESTRATÉGIA DE AMOSTRAGEM RECOMENDADA"</span>)
+
+<span class="syntax-comment"># Analisar variabilidade entre grupos</span>
+variabilidade_regioes = df_populacao.groupby(<span class="syntax-string">'region'</span>)[<span class="syntax-string">'total_amount'</span>].agg([<span class="syntax-string">'mean'</span>, <span class="syntax-string">'std'</span>])
+cv_regioes = (variabilidade_regioes[<span class="syntax-string">'std'</span>] / variabilidade_regioes[<span class="syntax-string">'mean'</span>]).mean()
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎯 Coeficiente de variação entre regiões: {cv_regioes:.3f}"</span>)
+
+<span class="syntax-keyword">if</span> cv_regioes > <span class="syntax-number">0.3</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Recomendação: Amostragem ESTRATIFICADA por região"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Razão: Alta variabilidade entre regiões"</span>)
+<span class="syntax-keyword">else</span>:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Recomendação: Amostragem ALEATÓRIA SIMPLES"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"      Razão: Baixa variabilidade entre regiões"</span>)
+
+<span class="syntax-comment"># Calcular tamanho mínimo de amostra</span>
+margem_erro = <span class="syntax-number">0.05</span>  <span class="syntax-comment"># 5%</span>
+confianca = <span class="syntax-number">0.95</span>   <span class="syntax-comment"># 95%</span>
+z_score = stats.norm.ppf(<span class="syntax-number">1</span> - (<span class="syntax-number">1</span> - confianca) / <span class="syntax-number">2</span>)
+
+<span class="syntax-comment"># Para proporção (fórmula conservadora p=0.5)</span>
+n_min_prop = (<span class="syntax-function">int</span>)((z_score ** <span class="syntax-number">2</span> * <span class="syntax-number">0.5</span> * <span class="syntax-number">0.5</span>) / (margem_erro ** <span class="syntax-number">2</span>))
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   📏 Tamanho mínimo de amostra:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Para proporções: {n_min_prop} (margem de erro 5%, confiança 95%)"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Para análises gerais: 1000+ (2% da população atual)"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"      Para Machine Learning: 70% treino, 15% validação, 15% teste"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Relatório Estatístico:</h5>
+                <p><strong>Análise Exploratória:</strong> Caracterização básica do dataset | <strong>Distribuições:</strong> Identificação de padrões estatísticos | <strong>Amostragem:</strong> Estratégia baseada na variabilidade dos dados | <strong>Tamanho:</strong> Cálculo baseado em margem de erro e confiança desejadas</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>🎯 Template para o Checkpoint 1</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code>
