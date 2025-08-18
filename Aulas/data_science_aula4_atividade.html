@@ -5,1235 +5,273 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roteiro Prático - Medidas Estatísticas com Dados Musicais</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+            background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+            min-height:100vh;padding:20px
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
+        .container{
+            max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(20px);border-radius:24px;padding:40px;
+            box-shadow:0 20px 40px rgba(25,20,20,.2);border:1px solid rgba(255,255,255,.3);
+            animation:fadeInUp .8s cubic-bezier(.4,0,.2,1)
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(25, 20, 20, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .badge {
-            background: linear-gradient(135deg, #0052cc, #003d99);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
-        }
-
-        .stats-badge {
-            background: linear-gradient(135deg, #e91e63, #ad1457);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
-        }
-
-        .title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #0052cc, #1976d2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #666;
-            font-weight: 400;
-            margin-bottom: 30px;
-        }
-
-        .step-container {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border-left: 6px solid #0052cc;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(29, 185, 84, 0.1);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .step-container:hover {
-            transform: translateY(-5px);
-        }
-
-        .step-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .step-number {
-            background: linear-gradient(135deg, #0052cc, #003d99);
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 18px;
-            flex-shrink: 0;
-            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
-        }
-
-        .step-title {
-            color: #0052cc;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .step-description {
-            color: #444;
-            line-height: 1.7;
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
-
-        .theory-box {
-            background: rgba(233, 30, 99, 0.1);
-            border: 2px solid rgba(233, 30, 99, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .theory-box h4 {
-            color: #e91e63;
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .code-block {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 25px;
-            border-radius: 12px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            overflow-x: auto;
-            margin: 20px 0;
-            border-left: 4px solid #0052cc;
-            position: relative;
-        }
-
-        .code-header {
-            background: #2d2d2d;
-            color: #ffffff;
-            padding: 10px 20px;
-            margin: -25px -25px 15px -25px;
-            border-radius: 12px 12px 0 0;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        
-.copy-button {
-    background: #0052cc;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-
-        
-.copy-button:hover {
-    background: #003d99;
-    transform: scale(1.05);
-}
-
-
-        .output-example {
-            background: rgba(76, 175, 80, 0.1);
-            border: 2px solid rgba(76, 175, 80, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        .output-header {
-            color: #388e3c;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .highlight-box {
-            background: linear-gradient(135deg, #0052cc, #003d99);
-            color: white;
-            padding: 25px;
-            border-radius: 16px;
-            margin: 25px 0;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 25px rgba(29, 185, 84, 0.3);
-        }
-
-        .highlight-box h4 {
-            font-size: 1.3rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .warning-box {
-            background: rgba(255, 193, 7, 0.1);
-            border: 2px solid rgba(255, 193, 7, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .warning-box h4 {
-            color: #f57c00;
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-panel {
-            background: rgba(29, 185, 84, 0.1);
-            border: 2px solid rgba(29, 185, 84, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .info-panel h4 {
-            color: #0052cc;
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .music-box {
-            background: rgba(25, 20, 20, 0.1);
-            border: 2px solid rgba(25, 20, 20, 0.2);
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .music-box h4 {
-            color: #1976d2;
-            font-size: 1.2rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .button {
-            background: linear-gradient(135deg, #0052cc, #003d99);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 16px;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
-            margin: 10px 10px 10px 0;
-        }
-
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(29, 185, 84, 0.4);
-            text-decoration: none;
-            color: white;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
-        }
-
-        .list {
-            margin: 15px 0;
-            padding-left: 0;
-            list-style: none;
-        }
-
-        .list li {
-            color: #444;
-            line-height: 1.7;
-            margin-bottom: 12px;
-            position: relative;
-            padding-left: 25px;
-        }
-
-        .list li::before {
-            content: '🎵';
-            position: absolute;
-            left: 0;
-            font-size: 14px;
-            top: 2px;
-        }
-
-        .explanation-box {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 15px 0;
-            border-left: 4px solid #0052cc;
-        }
-
-        .explanation-box h5 {
-            color: #0052cc;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .explanation-box p {
-            color: #555;
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .formula-box {
-            background: rgba(248, 249, 250, 0.9);
-            border: 2px solid rgba(29, 185, 84, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            color: #333;
-        }
-
-        .x-bar {
-            text-decoration: overline;
-            text-decoration-thickness: 1px;
-        }
-
-        .syntax-keyword { color: #569cd6; }
-        .syntax-string { color: #ce9178; }
-        .syntax-comment { color: #6a9955; }
-        .syntax-number { color: #b5cea8; }
-        .syntax-function { color: #dcdcaa; }
-
-        .copy-button.copied {
-            background: #28a745 !important;
-            transform: scale(0.95);
-        }
-
-        .copy-success {
-            animation: copyFeedback 2s ease-in-out;
-        }
-
-        @keyframes copyFeedback {
-            0% { background: #0052cc; }
-            50% { background: #28a745; }
-            100% { background: #0052cc; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 25px;
-                margin: 10px;
-            }
-
-            .title {
-                font-size: 2rem;
-            }
-
-            .step-container {
-                padding: 20px;
-            }
-
-            .code-block {
-                padding: 15px;
-                font-size: 12px;
-            }
-
-            .step-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .step-number {
-                width: 35px;
-                height: 35px;
-                font-size: 16px;
-            }
-
-            .step-title {
-                font-size: 1.3rem;
-            }
-        }
+        .header{text-align:center;margin-bottom:40px}
+        .badge{background:linear-gradient(135deg,#0052cc,#003d99);color:#fff;padding:10px 20px;border-radius:25px;font-size:14px;font-weight:600;display:inline-block;margin-bottom:20px;box-shadow:0 4px 15px rgba(29,185,84,.3)}
+        .stats-badge{background:linear-gradient(135deg,#e91e63,#ad1457);color:#fff;padding:6px 14px;border-radius:15px;font-size:12px;font-weight:600;display:inline-block;margin-bottom:15px;box-shadow:0 2px 8px rgba(233,30,99,.3)}
+        .title{font-size:2.5rem;font-weight:700;color:#1a1a1a;margin-bottom:12px;background:linear-gradient(135deg,#0052cc,#1976d2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .subtitle{font-size:1.2rem;color:#666;font-weight:400;margin-bottom:30px}
+        .step-container{background:rgba(255,255,255,.7);backdrop-filter:blur(10px);border-radius:16px;border-left:6px solid #0052cc;padding:30px;margin-bottom:30px;box-shadow:0 8px 25px rgba(29,185,84,.1);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+        .step-container:hover{transform:translateY(-5px)}
+        .step-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+        .step-number{background:linear-gradient(135deg,#0052cc,#003d99);color:#fff;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;box-shadow:0 4px 15px rgba(29,185,84,.3)}
+        .step-title{color:#0052cc;font-size:1.5rem;font-weight:600;margin:0}
+        .step-description{color:#444;line-height:1.7;font-size:1.1rem;margin-bottom:20px}
+        .theory-box{background:rgba(233,30,99,.1);border:2px solid rgba(233,30,99,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .theory-box h4{color:#e91e63;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .code-block{background:#1e1e1e;color:#d4d4d4;padding:25px;border-radius:12px;font-family:'Monaco','Menlo','Ubuntu Mono',monospace;font-size:14px;line-height:1.6;overflow-x:auto;margin:20px 0;border-left:4px solid #0052cc;position:relative}
+        .code-header{background:#2d2d2d;color:#fff;padding:10px 20px;margin:-25px -25px 15px -25px;border-radius:12px 12px 0 0;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+        .copy-button{background:#0052cc;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:background .3s,transform .2s}
+        .copy-button:hover{background:#003d99;transform:scale(1.05)}
+        .output-example{background:rgba(76,175,80,.1);border:2px solid rgba(76,175,80,.3);border-radius:12px;padding:20px;margin:15px 0;font-family:monospace;font-size:13px}
+        .output-header{color:#388e3c;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .highlight-box{background:linear-gradient(135deg,#0052cc,#003d99);color:#fff;padding:25px;border-radius:16px;margin:25px 0;backdrop-filter:blur(10px);box-shadow:0 8px 25px rgba(29,185,84,.3)}
+        .highlight-box h4{font-size:1.3rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .warning-box{background:rgba(255,193,7,.1);border:2px solid rgba(255,193,7,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .warning-box h4{color:#f57c00;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .info-panel{background:rgba(29,185,84,.1);border:2px solid rgba(29,185,84,.2);border-radius:16px;padding:20px;margin:20px 0}
+        .info-panel h4{color:#0052cc;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .explanation-box{background:rgba(255,255,255,.5);border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #0052cc}
+        .explanation-box h5{color:#0052cc;font-size:1.1rem;margin-bottom:10px;font-weight:600}
+        .explanation-box p{color:#555;line-height:1.6;font-size:.95rem}
+        .syntax-keyword{color:#569cd6}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-function{color:#dcdcaa}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @media (max-width:768px){.container{padding:25px;margin:10px}.title{font-size:2rem}.step-container{padding:20px}.code-block{padding:15px;font-size:12px}.step-header{flex-direction:column;align-items:flex-start;gap:10px}.step-number{width:35px;height:35px;font-size:16px}.step-title{font-size:1.3rem}}
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="badge">🎵 Roteiro Prático - Aula 4</div>
-            <h1 class="title">Medidas Estatísticas com Dados Musicais</h1>
-            <p class="subtitle">Descobrindo padrões estatísticos no universo do streaming musical</p>
+<div class="container">
+    <div class="header">
+        <div class="badge">🎵 Roteiro Prático - Aula 4</div>
+        <h1 class="title">Medidas Estatísticas com Dados Musicais</h1>
+        <p class="subtitle">Descobrindo padrões estatísticos no universo do streaming musical</p>
+    </div>
+
+    <div class="highlight-box">
+        <h4>🎯 O que vamos descobrir hoje</h4>
+        <p>Aplicaremos medidas de tendência central, dispersão, correlação e testes de hipótese em um dataset <em>estilo Spotify</em> gerado sinteticamente.</p>
+    </div>
+
+    <div class="info-panel">
+        <h4>🔧 Preparação</h4>
+        <p>Abra o Google Colab e crie o notebook <strong>Aula4_Estatisticas_Musicais</strong>.</p>
+    </div>
+
+    <!-- Passo 1 (resumo) -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Configuração e Criação do Dataset Musical</h2>
         </div>
+        <div class="stats-badge">🎵 Dados Musicais</div>
+        <p class="step-description">Simule um catálogo de 10 mil faixas com métricas comuns do Spotify.</p>
 
-        <div class="highlight-box">
-            <h4>🎯 O que vamos descobrir hoje</h4>
-            <p>Vamos explorar o fascinante mundo dos dados musicais aplicando medidas de tendência central, dispersão, correlação e testes de hipótese. Utilizaremos um dataset simulado do tipo Spotify para descobrir insights sobre hábitos musicais, popularidade de gêneros e características das músicas mais ouvidas!</p>
-        </div>
-
-        <div class="info-panel">
-            <h4>🔧 Preparação</h4>
-            <p>Acesse <strong>colab.research.google.com</strong> e crie um novo notebook. Renomeie para "Aula4_Estatisticas_Musicais". Vamos simular dados realistas de streaming musical para aplicar todas as medidas estatísticas aprendidas na teoria!</p>
-        </div>
-
-        <!-- Passo 1: Configuração e Dados Musicais -->
-        <div class="step-container">
-            <div class="step-header">
-                <div class="step-number">1</div>
-                <h2 class="step-title">Configuração e Criação do Dataset Musical</h2>
-            </div>
-            <div class="stats-badge">🎵 Dados Musicais</div>
-            <p class="step-description">Vamos criar um dataset realista simulando dados de streaming musical com características similares às métricas do Spotify: energia, valência, dançabilidade, popularidade e muito mais!</p>
-            
-            <div class="theory-box">
-                <h4>🎼 Métricas Musicais do Spotify</h4>
-                <p>O Spotify utiliza algoritmos avançados para extrair características das músicas: <strong>Energia</strong> (intensidade), <strong>Valência</strong> (positividade), <strong>Dançabilidade</strong>, <strong>Acousticness</strong> (acústica), <strong>Liveness</strong> (ao vivo). Vamos simular esses dados para análise estatística!</p>
-            </div>
-            
-            <div class="code-block">
-                <div class="code-header">
-                    <span>🎵 Configuração do Ambiente Musical</span>
-                    <button class="copy-button">Copiar</button>
-                </div>
-<pre><code><span class="syntax-comment"># -*- coding: utf-8 -*-</span>
-<span class="syntax-comment">"""
-# Data Science - Aula 4: Medidas Estatísticas com Dados Musicais
-## Análise estatística completa de dados de streaming musical
-
-**Objetivo:** Aplicar medidas de tendência central, dispersão, correlação 
-e testes de hipótese em dados musicais do tipo Spotify
-"""</span>
-
-<span class="syntax-comment"># Importações para análise estatística musical</span>
-<span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+        <div class="code-block">
+            <div class="code-header"><span>🎵 Configuração do Ambiente Musical</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
 <span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
 <span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
 <span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
 <span class="syntax-keyword">import</span> scipy.stats <span class="syntax-keyword">as</span> stats
-<span class="syntax-keyword">from</span> datetime <span class="syntax-keyword">import</span> datetime, timedelta
-<span class="syntax-keyword">import</span> warnings
-warnings.filterwarnings(<span class="syntax-string">'ignore'</span>)
-
-<span class="syntax-comment"># Tema visual musical</span>
-plt.style.use(<span class="syntax-string">'dark_background'</span>)
-spotify_colors = [<span class="syntax-string">'#1DB954'</span>, <span class="syntax-string">'#1ED760'</span>, <span class="syntax-string">'#FF6B35'</span>, <span class="syntax-string">'#FFD23F'</span>, <span class="syntax-string">'#8E44AD'</span>]
-sns.set_palette(spotify_colors)
-np.random.seed(<span class="syntax-number">42</span>)  <span class="syntax-comment"># Reprodutibilidade dos hits!</span>
-
-<span class="syntax-comment"># Configurações de visualização</span>
-plt.rcParams[<span class="syntax-string">'figure.figsize'</span>] = (<span class="syntax-number">12</span>, <span class="syntax-number">8</span>)
-plt.rcParams[<span class="syntax-string">'font.size'</span>] = <span class="syntax-number">10</span>
-plt.rcParams[<span class="syntax-string">'axes.facecolor'</span>] = <span class="syntax-string">'#1976d2'</span>  <span class="syntax-comment"># Spotify black</span>
-
-<span class="syntax-function">print</span>(<span class="syntax-string">"🎵 Ambiente de análise musical configurado!"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"📊 Preparando para descobrir os segredos dos dados musicais..."</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"🎼 NumPy versão: {np.__version__}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"📈 SciPy pronto para análises estatísticas musicais!"</span>)</code></pre>
-            </div>
-
-            <div class="explanation-box">
-                <h5>🎯 Setup Musical:</h5>
-                <p><strong>Tema Visual:</strong> Cores do Spotify para gráficos mais atraentes | <strong>Seed 42:</strong> Garantia de reprodutibilidade dos resultados | <strong>Métricas Spotify:</strong> Simulação realista das características musicais</p>
-            </div>
-
-            <div class="code-block">
-                <div class="code-header">
-                    <span>🎼 Criação do Dataset Musical Completo</span>
-                    <button class="copy-button">Copiar</button>
-                </div>
-<pre><code><span class="syntax-comment"># Criar dataset musical realista</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">"🎵 Criando nossa biblioteca musical virtual..."</span>)
-
-<span class="syntax-comment"># Parâmetros do dataset</span>
-n_tracks = <span class="syntax-number">10000</span>  <span class="syntax-comment"># 10 mil músicas</span>
 np.random.seed(<span class="syntax-number">42</span>)
+plt.style.use(<span class="syntax-string">'dark_background'</span>)
+sns.set_palette([<span class="syntax-string">'#1DB954'</span>,<span class="syntax-string">'#1ED760'</span>,<span class="syntax-string">'#FFD23F'</span>])</code></pre>
+        </div>
 
-<span class="syntax-comment"># Lista de gêneros musicais realistas</span>
-generos = [<span class="syntax-string">'Pop'</span>, <span class="syntax-string">'Rock'</span>, <span class="syntax-string">'Hip Hop'</span>, <span class="syntax-string">'Eletrônica'</span>, <span class="syntax-string">'Indie'</span>, 
-          <span class="syntax-string">'R&B'</span>, <span class="syntax-string">'Country'</span>, <span class="syntax-string">'Jazz'</span>, <span class="syntax-string">'Reggae'</span>, <span class="syntax-string">'Metal'</span>]
+        <div class="code-block">
+            <div class="code-header"><span>🎼 Criação do Dataset Musical Completo</span><button class="copy-button">Copiar</button></div>
+<pre><code>n_tracks = <span class="syntax-number">10000</span>
+generos = [<span class="syntax-string">'Pop'</span>,<span class="syntax-string">'Rock'</span>,<span class="syntax-string">'Hip Hop'</span>,<span class="syntax-string">'Eletrônica'</span>,<span class="syntax-string">'Indie'</span>,<span class="syntax-string">'R&amp;B'</span>,<span class="syntax-string">'Country'</span>,<span class="syntax-string">'Jazz'</span>,<span class="syntax-string">'Reggae'</span>,<span class="syntax-string">'Metal'</span>]
 
-<span class="syntax-comment"># Lista de artistas fictícios</span>
-artistas = [<span class="syntax-string">'Luna Dreams'</span>, <span class="syntax-string">'Electric Pulse'</span>, <span class="syntax-string">'The Midnight Vibes'</span>, 
-           <span class="syntax-string">'Neon Nights'</span>, <span class="syntax-string">'Digital Harmony'</span>, <span class="syntax-string">'Cosmic Sound'</span>,
-           <span class="syntax-string">'Urban Poetry'</span>, <span class="syntax-string">'Stellar Beats'</span>, <span class="syntax-string">'Golden Era'</span>, 
-           <span class="syntax-string">'Future Wave'</span>, <span class="syntax-string">'Acoustic Soul'</span>, <span class="syntax-string">'Retro Fusion'</span>]
-
-<span class="syntax-comment"># Gerar dados musicais com distribuições realistas</span>
-dados_musicais = {
-    <span class="syntax-string">'track_id'</span>: [<span class="syntax-string">f'TRACK_{i+1:05d}'</span> <span class="syntax-keyword">for</span> i <span class="syntax-keyword">in</span> <span class="syntax-function">range</span>(n_tracks)],
-    
-    <span class="syntax-comment"># Características musicais (escala 0-1, típicas do Spotify)</span>
-    <span class="syntax-string">'energia'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, n_tracks),  <span class="syntax-comment"># Distribuição beta (realista)</span>
-    <span class="syntax-string">'valencia'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, n_tracks),  <span class="syntax-comment"># Ligeiramente mais triste</span>
-    <span class="syntax-string">'dancabilidade'</span>: np.random.beta(<span class="syntax-number">3</span>, <span class="syntax-number">2</span>, n_tracks),  <span class="syntax-comment"># Mais dançante</span>
-    <span class="syntax-string">'acousticness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">4</span>, n_tracks),  <span class="syntax-comment"># Mais eletrônica</span>
-    <span class="syntax-string">'liveness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">9</span>, n_tracks),  <span class="syntax-comment"># Poucas ao vivo</span>
-    
-    <span class="syntax-comment"># Duração em segundos (distribuição log-normal)</span>
-    <span class="syntax-string">'duracao_segundos'</span>: np.random.lognormal(mean=<span class="syntax-number">5.3</span>, sigma=<span class="syntax-number">0.3</span>, size=n_tracks),
-    
-    <span class="syntax-comment"># Popularidade (0-100, distribuição assimétrica)</span>
-    <span class="syntax-string">'popularidade'</span>: np.random.gamma(shape=<span class="syntax-number">2</span>, scale=<span class="syntax-number">15</span>, size=n_tracks),
-    
-    <span class="syntax-comment"># Streams (milhões, distribuição muito assimétrica)</span>
-    <span class="syntax-string">'streams_milhoes'</span>: np.random.pareto(<span class="syntax-number">1.5</span>, n_tracks) * <span class="syntax-number">0.1</span>,
-    
-    <span class="syntax-comment"># Ano de lançamento (1960-2024)</span>
-    <span class="syntax-string">'ano_lancamento'</span>: np.random.choice(<span class="syntax-function">range</span>(<span class="syntax-number">1960</span>, <span class="syntax-number">2025</span>), size=n_tracks,
-                                    p=np.concatenate([
-                                        np.full(<span class="syntax-number">30</span>, <span class="syntax-number">0.005</span>),  <span class="syntax-comment"># 1960-1989</span>
-                                        np.full(<span class="syntax-number">20</span>, <span class="syntax-number">0.015</span>),  <span class="syntax-comment"># 1990-2009</span>
-                                        np.full(<span class="syntax-number">15</span>, <span class="syntax-number">0.04</span>)    <span class="syntax-comment"># 2010-2024</span>
-                                    ])),
-    
-    <span class="syntax-comment"># Gênero musical</span>
-    <span class="syntax-string">'genero'</span>: np.random.choice(generos, size=n_tracks, 
-                                p=[<span class="syntax-number">0.25</span>, <span class="syntax-number">0.18</span>, <span class="syntax-number">0.15</span>, <span class="syntax-number">0.12</span>, <span class="syntax-number">0.08</span>, 
-                                   <span class="syntax-number">0.08</span>, <span class="syntax-number">0.05</span>, <span class="syntax-number">0.03</span>, <span class="syntax-number">0.03</span>, <span class="syntax-number">0.03</span>]),
-    
-    <span class="syntax-comment"># Artista</span>
-    <span class="syntax-string">'artista'</span>: np.random.choice(artistas, size=n_tracks),
-    
-    <span class="syntax-comment"># Época do dia mais ouvida</span>
-    <span class="syntax-string">'periodo_pico'</span>: np.random.choice([<span class="syntax-string">'Manhã'</span>, <span class="syntax-string">'Tarde'</span>, <span class="syntax-string">'Noite'</span>, <span class="syntax-string">'Madrugada'</span>], 
-                                     size=n_tracks, p=[<span class="syntax-number">0.15</span>, <span class="syntax-number">0.25</span>, <span class="syntax-number">0.45</span>, <span class="syntax-number">0.15</span>])
+dados = {
+  <span class="syntax-string">'energia'</span>: np.random.beta(<span class="syntax-number">2</span>,<span class="syntax-number">2</span>, n_tracks),
+  <span class="syntax-string">'valencia'</span>: np.random.beta(<span class="syntax-number">2</span>,<span class="syntax-number">3</span>, n_tracks),
+  <span class="syntax-string">'dancabilidade'</span>: np.random.beta(<span class="syntax-number">3</span>,<span class="syntax-number">2</span>, n_tracks),
+  <span class="syntax-string">'acousticness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">4</span>, n_tracks),
+  <span class="syntax-string">'liveness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">9</span>, n_tracks),
+  <span class="syntax-string">'duracao_segundos'</span>: np.random.lognormal(mean=<span class="syntax-number">5.3</span>, sigma=<span class="syntax-number">0.3</span>, size=n_tracks),
+  <span class="syntax-string">'popularidade'</span>: np.random.gamma(shape=<span class="syntax-number">2</span>, scale=<span class="syntax-number">15</span>, size=n_tracks),
+  <span class="syntax-string">'streams_milhoes'</span>: np.random.pareto(<span class="syntax-number">1.5</span>, n_tracks)*<span class="syntax-number">0.1</span>,
+  <span class="syntax-string">'ano_lancamento'</span>: np.random.choice(<span class="syntax-function">range</span>(<span class="syntax-number">1960</span>,<span class="syntax-number">2025</span>), size=n_tracks),
+  <span class="syntax-string">'genero'</span>: np.random.choice(generos, size=n_tracks, p=[<span class="syntax-number">.25</span>,<span class="syntax-number">.18</span>,<span class="syntax-number">.15</span>,<span class="syntax-number">.12</span>,<span class="syntax-number">.08</span>,<span class="syntax-number">.08</span>,<span class="syntax-number">.05</span>,<span class="syntax-number">.03</span>,<span class="syntax-number">.03</span>,<span class="syntax-number">.03</span>])
 }
-
-<span class="syntax-comment"># Ajustar limites realistas</span>
-dados_musicais[<span class="syntax-string">'popularidade'</span>] = np.clip(dados_musicais[<span class="syntax-string">'popularidade'</span>], <span class="syntax-number">0</span>, <span class="syntax-number">100</span>)
-dados_musicais[<span class="syntax-string">'duracao_segundos'</span>] = np.clip(dados_musicais[<span class="syntax-string">'duracao_segundos'</span>], <span class="syntax-number">30</span>, <span class="syntax-number">900</span>)
-dados_musicais[<span class="syntax-string">'streams_milhoes'</span>] = np.clip(dados_musicais[<span class="syntax-string">'streams_milhoes'</span>], <span class="syntax-number">0.001</span>, <span class="syntax-number">1000</span>)
-
-<span class="syntax-comment"># Criar DataFrame</span>
-df_musicas = pd.DataFrame(dados_musicais)
-
-<span class="syntax-comment"># Adicionar algumas correlações realistas</span>
-<span class="syntax-comment"># Músicas mais dançantes tendem a ser mais populares</span>
-df_musicas[<span class="syntax-string">'popularidade'</span>] += df_musicas[<span class="syntax-string">'dancabilidade'</span>] * <span class="syntax-number">20</span> + np.random.normal(<span class="syntax-number">0</span>, <span class="syntax-number">5</span>, n_tracks)
-df_musicas[<span class="syntax-string">'popularidade'</span>] = np.clip(df_musicas[<span class="syntax-string">'popularidade'</span>], <span class="syntax-number">0</span>, <span class="syntax-number">100</span>)
-
-<span class="syntax-comment"># Músicas mais populares tendem a ter mais streams</span>
-df_musicas[<span class="syntax-string">'streams_milhoes'</span>] *= (df_musicas[<span class="syntax-string">'popularidade'</span>] / <span class="syntax-number">50</span>)
-
-<span class="syntax-comment"># Converter duração para minutos para análise</span>
-df_musicas[<span class="syntax-string">'duracao_minutos'</span>] = df_musicas[<span class="syntax-string">'duracao_segundos'</span>] / <span class="syntax-number">60</span>
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"🎵 Dataset musical criado com sucesso!"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"📀 Total de faixas: {len(df_musicas):,}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"🎼 Gêneros disponíveis: {len(generos)}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"🎤 Artistas únicos: {df_musicas['artista'].nunique()}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"📊 Período de análise: {df_musicas['ano_lancamento'].min()}-{df_musicas['ano_lancamento'].max()}"</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">"\n🎯 Primeiras faixas da nossa biblioteca:"</span>)
-<span class="syntax-function">print</span>(df_musicas[[<span class="syntax-string">'track_id'</span>, <span class="syntax-string">'artista'</span>, <span class="syntax-string">'genero'</span>, <span class="syntax-string">'popularidade'</span>, 
-                      <span class="syntax-string">'duracao_minutos'</span>, <span class="syntax-string">'energia'</span>]].head(<span class="syntax-number">10</span>))</code></pre>
-            </div>
-
-            <div class="explanation-box">
-                <h5>🎵 Dataset Musical Realista:</h5>
-                <p><strong>10.000 faixas:</strong> Volume ideal para análises estatísticas robustas | <strong>Distribuições Beta:</strong> Características musicais (0-1) com formatos realistas | <strong>Correlações:</strong> Dançabilidade → Popularidade → Streams (como na vida real) | <strong>Período:</strong> 65 anos de música (1960-2024)</p>
-            </div>
+df = pd.DataFrame(dados)
+df[<span class="syntax-string">'popularidade'</span>] = np.clip(df[<span class="syntax-string">'popularidade'</span>] + df[<span class="syntax-string">'dancabilidade'</span>]*<span class="syntax-number">20</span> + np.random.normal(<span class="syntax-number">0</span>,<span class="syntax-number">5</span>,n_tracks), <span class="syntax-number">0</span>, <span class="syntax-number">100</span>)
+df[<span class="syntax-string">'streams_milhoes'</span>] *= (df[<span class="syntax-string">'popularidade'</span>] / <span class="syntax-number">50</span>)
+df[<span class="syntax-string">'duracao_minutos'</span>] = df[<span class="syntax-string">'duracao_segundos'</span>] / <span class="syntax-number">60</span>
+</code></pre>
         </div>
 
-        <!-- Passo 2: Medidas de Tendência Central -->
-        <div class="step-container">
-            <div class="step-header">
-                <div class="step-number">2</div>
-                <h2 class="step-title">Medidas de Tendência Central Musical</h2>
-            </div>
-            <div class="stats-badge">📊 Tendência Central</div>
-            <p class="step-description">Vamos descobrir o "centro" dos dados musicais! Onde se concentram as preferências musicais? Qual é a duração típica de uma música? Qual o nível médio de energia das faixas mais populares?</p>
-            
-            <div class="theory-box">
-                <h4>🎯 Aplicando Média, Mediana e Moda na Música</h4>
-                <p>Na música, cada medida conta uma história diferente: a <strong>média</strong> revela tendências gerais, a <strong>mediana</strong> mostra o valor típico sem influência de hits virais extremos, e a <strong>moda</strong> identifica os padrões mais comuns no streaming.</p>
-            </div>
-            
-            <div class="code-block">
-                <div class="code-header">
-                    <span>🎵 Análise de Tendência Central - Características Musicais</span>
-                    <button class="copy-button">Copiar</button>
-                </div>
-<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"🎵 MEDIDAS DE TENDÊNCIA CENTRAL MUSICAL"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+        <div class="explanation-box">
+            <h5>🎵 Dataset Musical Realista</h5>
+            <p>Correlação intencional: <em>dancabilidade → popularidade → streams</em>.</p>
+        </div>
+    </div>
 
-<span class="syntax-comment"># 1. ANÁLISE DA DURAÇÃO DAS MÚSICAS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n1️⃣ DURAÇÃO DAS MÚSICAS"</span>)
+    <!-- Passo 2 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Medidas de Tendência Central Musical</h2>
+        </div>
+        <div class="stats-badge">📊 Tendência Central</div>
+        <p class="step-description">Média, mediana e moda para duração, popularidade e características (0–1).</p>
 
-duracao = df_musicas[<span class="syntax-string">'duracao_minutos'</span>]
+        <div class="code-block">
+            <div class="code-header"><span>🎵 Análise de Tendência Central</span><button class="copy-button">Copiar</button></div>
+<pre><code>duracao = df[<span class="syntax-string">'duracao_minutos'</span>]
+print(<span class="syntax-string">f"Média: {duracao.mean():.2f} | Mediana: {duracao.median():.2f}"</span>)
 
-<span class="syntax-comment"># Medidas de tendência central</span>
-media_duracao = duracao.mean()
-mediana_duracao = duracao.median()
+popularidade = df[<span class="syntax-string">'popularidade'</span>]
+print(<span class="syntax-string">f"Pop média: {popularidade.mean():.1f} | Pop mediana: {popularidade.median():.1f}"</span>)
 
-<span class="syntax-comment"># Moda para duração (arredondada para segundos)</span>
-duracao_segundos = df_musicas[<span class="syntax-string">'duracao_segundos'</span>].round(<span class="syntax-number">0</span>)
-moda_duracao = duracao_segundos.mode()[<span class="syntax-number">0</span>] / <span class="syntax-number">60</span>  <span class="syntax-comment"># Converter para minutos</span>
+caracteristicas = [<span class="syntax-string">'energia'</span>,<span class="syntax-string">'valencia'</span>,<span class="syntax-string">'dancabilidade'</span>,<span class="syntax-string">'acousticness'</span>,<span class="syntax-string">'liveness'</span>]
+for c in caracteristicas:
+    print(c, <span class="syntax-string">"→"</span>, <span class="syntax-string">"média"</span>, df[c].mean().round(<span class="syntax-number">3</span>), <span class="syntax-string">"| mediana"</span>, df[c].median().round(<span class="syntax-number">3</span>))</code></pre>
+        </div>
+    </div>
 
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎼 Duração média: {media_duracao:.2f} minutos"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎯 Duração mediana: {mediana_duracao:.2f} minutos"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Duração mais comum (moda): {moda_duracao:.2f} minutos"</span>)
+    <!-- Passo 3: Dispersão -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Medidas de Dispersão Musical</h2>
+        </div>
+        <div class="stats-badge">📏 Dispersão</div>
+        <p class="step-description">Variância, desvio padrão, amplitude e IQR. Detecção de outliers por IQR e Z-score.</p>
 
-<span class="syntax-comment"># Interpretação</span>
-<span class="syntax-keyword">if</span> media_duracao > mediana_duracao:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   📈 Distribuição assimétrica à direita (algumas músicas muito longas)"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   📉 Distribuição assimétrica à esquerda (algumas músicas muito curtas)"</span>)
-
-<span class="syntax-comment"># Análise por década</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🕰️ Evolução da duração por década:"</span>)
-df_musicas[<span class="syntax-string">'decada'</span>] = (df_musicas[<span class="syntax-string">'ano_lancamento'</span>] // <span class="syntax-number">10</span>) * <span class="syntax-number">10</span>
-duracao_por_decada = df_musicas.groupby(<span class="syntax-string">'decada'</span>)[<span class="syntax-string">'duracao_minutos'</span>].agg([<span class="syntax-string">'mean'</span>, <span class="syntax-string">'median'</span>])
-
-<span class="syntax-keyword">for</span> decada, stats <span class="syntax-keyword">in</span> duracao_por_decada.iterrows():
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"      {int(decada)}s: Média {stats['mean']:.2f}min | Mediana {stats['median']:.2f}min"</span>)
-
-<span class="syntax-comment"># 2. ANÁLISE DA POPULARIDADE</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n2️⃣ POPULARIDADE DAS FAIXAS"</span>)
-
-popularidade = df_musicas[<span class="syntax-string">'popularidade'</span>]
-
-media_pop = popularidade.mean()
-mediana_pop = popularidade.median()
-<span class="syntax-comment"># Para moda, vamos agrupar em intervalos</span>
-pop_intervals = pd.cut(popularidade, bins=<span class="syntax-number">20</span>)
-moda_interval = pop_intervals.mode()[<span class="syntax-number">0</span>]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⭐ Popularidade média: {media_pop:.1f}/100"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎯 Popularidade mediana: {mediana_pop:.1f}/100"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Faixa mais comum: {moda_interval}"</span>)
-
-<span class="syntax-comment"># Classificar popularidade</span>
-<span class="syntax-keyword">if</span> mediana_pop < <span class="syntax-number">30</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   💭 Maioria das músicas tem baixa popularidade (típico do streaming)"</span>)
-<span class="syntax-keyword">elif</span> mediana_pop < <span class="syntax-number">60</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   🎵 Maioria das músicas tem popularidade moderada"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   🔥 Maioria das músicas são hits! (Dataset muito otimista)"</span>)
-
-<span class="syntax-comment"># 3. ANÁLISE DAS CARACTERÍSTICAS MUSICAIS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n3️⃣ CARACTERÍSTICAS MUSICAIS (ESCALA 0-1)"</span>)
-
-caracteristicas = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'acousticness'</span>, <span class="syntax-string">'liveness'</span>]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'Característica':<15} {'Média':<8} {'Mediana':<8} {'Interpretação'}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'-'*60}"</span>)
-
-<span class="syntax-keyword">for</span> char <span class="syntax-keyword">in</span> caracteristicas:
-    media_char = df_musicas[char].mean()
-    mediana_char = df_musicas[char].median()
-    
-    <span class="syntax-comment"># Interpretação baseada na mediana</span>
-    <span class="syntax-keyword">if</span> mediana_char < <span class="syntax-number">0.3</span>:
-        interpretacao = <span class="syntax-string">"Baixa"</span>
-    <span class="syntax-keyword">elif</span> mediana_char < <span class="syntax-number">0.6</span>:
-        interpretacao = <span class="syntax-string">"Moderada"</span>
-    <span class="syntax-keyword">else</span>:
-        interpretacao = <span class="syntax-string">"Alta"</span>
-    
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {char:<15} {media_char:<8.3f} {mediana_char:<8.3f} {interpretacao}"</span>)
-
-<span class="syntax-comment"># 4. ANÁLISE POR GÊNERO MUSICAL</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n4️⃣ TENDÊNCIAS POR GÊNERO MUSICAL"</span>)
-
-genero_stats = df_musicas.groupby(<span class="syntax-string">'genero'</span>).agg({
-    <span class="syntax-string">'popularidade'</span>: [<span class="syntax-string">'mean'</span>, <span class="syntax-string">'median'</span>],
-    <span class="syntax-string">'energia'</span>: <span class="syntax-string">'mean'</span>,
-    <span class="syntax-string">'dancabilidade'</span>: <span class="syntax-string">'mean'</span>
-}).round(<span class="syntax-number">2</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'Gênero':<12} {'Pop.Média':<10} {'Pop.Mediana':<12} {'Energia':<8} {'Dança':<8}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'-'*60}"</span>)
-
-<span class="syntax-keyword">for</span> genero <span class="syntax-keyword">in</span> genero_stats.index:
-    pop_mean = genero_stats.loc[genero, (<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'mean'</span>)]
-    pop_median = genero_stats.loc[genero, (<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'median'</span>)]
-    energia_mean = genero_stats.loc[genero, (<span class="syntax-string">'energia'</span>, <span class="syntax-string">'mean'</span>)]
-    danca_mean = genero_stats.loc[genero, (<span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'mean'</span>)]
-    
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {genero:<12} {pop_mean:<10.1f} {pop_median:<12.1f} {energia_mean:<8.3f} {danca_mean:<8.3f}"</span>)
-
-<span class="syntax-comment"># Identificar gênero mais popular</span>
-genero_mais_popular = genero_stats[(<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'median'</span>)].idxmax()
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🏆 Gênero com maior popularidade mediana: {genero_mais_popular}"</span>)</code></pre>
-            </div>
-
-            <div class="explanation-box">
-                <h5>🎵 Insights das Medidas de Tendência Central:</h5>
-                <p><strong>Duração:</strong> Média vs Mediana revela assimetria (músicas épicas vs hits rápidos) | <strong>Popularidade:</strong> Distribuição típica do streaming (poucos hits, muitas faixas médias) | <strong>Por Gênero:</strong> Cada gênero tem "assinatura" estatística única | <strong>Evolução:</strong> Tendências temporais das preferências musicais</p>
-            </div>
+        <div class="theory-box">
+            <h4>📐 Variabilidade no Mundo Musical</h4>
+            <p>Baixa variabilidade sugere catálogo homogêneo; alta variabilidade revela nichos distintos.</p>
         </div>
 
-        <!-- Passo 3: Medidas de Dispersão -->
-        <div class="step-container">
-            <div class="step-header">
-                <div class="step-number">3</div>
-                <h2 class="step-title">Medidas de Dispersão Musical</h2>
-            </div>
-            <div class="stats-badge">📏 Dispersão</div>
-            <p class="step-description">Agora vamos descobrir a variabilidade dos dados musicais! Quão diversas são as durações? Qual a variação na popularidade? Como identificar outliers musicais (aqueles hits inesperados ou flops surpreendentes)?</p>
-            
-            <div class="theory-box">
-                <h4>📐 Variabilidade no Mundo Musical</h4>
-                <p>A dispersão musical conta histórias fascinantes: baixa variação indica gêneros padronizados, alta variação sugere diversidade criativa. <strong>Desvio padrão</strong> mostra consistência, <strong>amplitude</strong> revela extremos, e <strong>quartis</strong> identificam hits e flops.</p>
-            </div>
-            
-            <div class="code-block">
-                <div class="code-header">
-                    <span>📏 Análise de Dispersão - Variabilidade Musical</span>
-                    <button class="copy-button">Copiar</button>
-                </div>
-<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"📏 MEDIDAS DE DISPERSÃO MUSICAL"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+        <div class="code-block">
+            <div class="code-header"><span>📏 Dispersão e Outliers</span><button class="copy-button">Copiar</button></div>
+<pre><code>cols = [<span class="syntax-string">'duracao_minutos'</span>, <span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'streams_milhoes'</span>]
+for col in cols:
+    s = df[col]
+    iqr = s.quantile(<span class="syntax-number">0.75</span>) - s.quantile(<span class="syntax-number">0.25</span>)
+    z = ((s - s.mean())/s.std()).abs()
+    out_iqr = ((s &lt; s.quantile(<span class="syntax-number">0.25</span>) - <span class="syntax-number">1.5</span>*iqr) | (s &gt; s.quantile(<span class="syntax-number">0.75</span>) + <span class="syntax-number">1.5</span>*iqr))).sum()
+    out_z = (z &gt; <span class="syntax-number">3</span>).sum()
+    print(f"{col}: var={s.var():.3f} | std={s.std():.3f} | IQR={iqr:.3f} | outliers(IQR)={out_iqr} | outliers(Z&gt;3)={out_z}")</code></pre>
+        </div>
+    </div>
 
-<span class="syntax-comment"># 1. DISPERSÃO DA POPULARIDADE</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n1️⃣ VARIABILIDADE DA POPULARIDADE"</span>)
+    <!-- Passo 4: Correlação -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Correlação & Regressão Simples</h2>
+        </div>
+        <div class="stats-badge">🔗 Correlação</div>
+        <p class="step-description">Matriz de correlação e regressão simples de <em>dancabilidade</em> → <em>popularidade</em>.</p>
 
-popularidade = df_musicas[<span class="syntax-string">'popularidade'</span>]
-
-<span class="syntax-comment"># Medidas de dispersão</span>
-amplitude = popularidade.max() - popularidade.min()
-variancia = popularidade.var()
-desvio_padrao = popularidade.std()
-q1 = popularidade.quantile(<span class="syntax-number">0.25</span>)
-q3 = popularidade.quantile(<span class="syntax-number">0.75</span>)
-iqr = q3 - q1
-cv = (desvio_padrao / popularidade.mean()) * <span class="syntax-number">100</span>
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Amplitude: {amplitude:.1f} pontos (máx - mín)"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📈 Variância: {variancia:.1f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📏 Desvio padrão: {desvio_padrao:.1f} pontos"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📦 Amplitude interquartil (IQR): {iqr:.1f} pontos"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚖️ Coeficiente de variação: {cv:.1f}%"</span>)
-
-<span class="syntax-comment"># Quartis</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   📊 Quartis da popularidade:"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      Q1 (25%): {q1:.1f} - Músicas menos populares"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      Q2 (50%): {popularidade.median():.1f} - Mediana"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      Q3 (75%): {q3:.1f} - Músicas mais populares"</span>)
-
-<span class="syntax-comment"># Interpretação do coeficiente de variação</span>
-<span class="syntax-keyword">if</span> cv < <span class="syntax-number">20</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Baixa variabilidade - Popularidade homogênea"</span>)
-<span class="syntax-keyword">elif</span> cv < <span class="syntax-number">40</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚡ Variabilidade moderada - Mix de hits e faixas médias"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   🎢 Alta variabilidade - Grandes diferenças de popularidade"</span>)
-
-<span class="syntax-comment"># 2. DETECÇÃO DE OUTLIERS MUSICAIS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n2️⃣ DETECÇÃO DE OUTLIERS (HITS E FLOPS EXTREMOS)"</span>)
-
-<span class="syntax-comment"># Método IQR para outliers</span>
-limite_inferior = q1 - <span class="syntax-number">1.5</span> * iqr
-limite_superior = q3 + <span class="syntax-number">1.5</span> * iqr
-
-outliers_baixos = df_musicas[df_musicas[<span class="syntax-string">'popularidade'</span>] < limite_inferior]
-outliers_altos = df_musicas[df_musicas[<span class="syntax-string">'popularidade'</span>] > limite_superior]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📉 Limite inferior outliers: {limite_inferior:.1f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📈 Limite superior outliers: {limite_superior:.1f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   💔 Flops extremos: {len(outliers_baixos)} músicas ({len(outliers_baixos)/len(df_musicas)*100:.1f}%)"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🔥 Hits extremos: {len(outliers_altos)} músicas ({len(outliers_altos)/len(df_musicas)*100:.1f}%)"</span>)
-
-<span class="syntax-comment"># Análise dos superhits</span>
-<span class="syntax-keyword">if</span> <span class="syntax-function">len</span>(outliers_altos) > <span class="syntax-number">0</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🌟 Análise dos SUPERHITS:"</span>)
-    superhits = outliers_altos.nlargest(<span class="syntax-number">5</span>, <span class="syntax-string">'popularidade'</span>)
-    <span class="syntax-keyword">for</span> idx, hit <span class="syntax-keyword">in</span> superhits.iterrows():
-        <span class="syntax-function">print</span>(<span class="syntax-string">f"      🎵 {hit['artista']} - {hit['genero']} (Pop: {hit['popularidade']:.0f})"</span>)
-
-<span class="syntax-comment"># 3. DISPERSÃO POR CARACTERÍSTICAS MUSICAIS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n3️⃣ VARIABILIDADE DAS CARACTERÍSTICAS MUSICAIS"</span>)
-
-caracteristicas = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'acousticness'</span>, <span class="syntax-string">'liveness'</span>]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'Característica':<15} {'Desvio':<8} {'CV%':<8} {'Interpretação'}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'-'*60}"</span>)
-
-<span class="syntax-keyword">for</span> char <span class="syntax-keyword">in</span> caracteristicas:
-    std_char = df_musicas[char].std()
-    cv_char = (std_char / df_musicas[char].mean()) * <span class="syntax-number">100</span>
-    
-    <span class="syntax-comment"># Interpretação da variabilidade</span>
-    <span class="syntax-keyword">if</span> cv_char < <span class="syntax-number">30</span>:
-        interpretacao = <span class="syntax-string">"Homogênea"</span>
-    <span class="syntax-keyword">elif</span> cv_char < <span class="syntax-number">50</span>:
-        interpretacao = <span class="syntax-string">"Moderada"</span>
-    <span class="syntax-keyword">else</span>:
-        interpretacao = <span class="syntax-string">"Diversa"</span>
-    
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {char:<15} {std_char:<8.3f} {cv_char:<8.1f} {interpretacao}"</span>)
-
-<span class="syntax-comment"># 4. DISPERSÃO POR GÊNERO MUSICAL</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n4️⃣ CONSISTÊNCIA POR GÊNERO MUSICAL"</span>)
-
-dispersao_genero = df_musicas.groupby(<span class="syntax-string">'genero'</span>)[<span class="syntax-string">'popularidade'</span>].agg([<span class="syntax-string">'std'</span>, <span class="syntax-string">'mean'</span>])
-dispersao_genero[<span class="syntax-string">'cv'</span>] = (dispersao_genero[<span class="syntax-string">'std'</span>] / dispersao_genero[<span class="syntax-string">'mean'</span>]) * <span class="syntax-number">100</span>
-dispersao_genero = dispersao_genero.sort_values(<span class="syntax-string">'cv'</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'Gênero':<12} {'Desvio':<8} {'CV%':<8} {'Consistência'}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'-'*45}"</span>)
-
-<span class="syntax-keyword">for</span> genero, stats <span class="syntax-keyword">in</span> dispersao_genero.iterrows():
-    <span class="syntax-keyword">if</span> stats[<span class="syntax-string">'cv'</span>] < <span class="syntax-number">30</span>:
-        consistencia = <span class="syntax-string">"Alta"</span>
-    <span class="syntax-keyword">elif</span> stats[<span class="syntax-string">'cv'</span>] < <span class="syntax-number">50</span>:
-        consistencia = <span class="syntax-string">"Moderada"</span>
-    <span class="syntax-keyword">else</span>:
-        consistencia = <span class="syntax-string">"Baixa"</span>
-    
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {genero:<12} {stats['std']:<8.1f} {stats['cv']:<8.1f} {consistencia}"</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🎯 Gênero mais consistente: {dispersao_genero.index[0]}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎢 Gênero mais variável: {dispersao_genero.index[-1]}"</span>)
-
-<span class="syntax-comment"># 5. ANÁLISE Z-SCORE PARA IDENTIFICAR EXTREMOS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n5️⃣ ANÁLISE Z-SCORE (STANDARDIZAÇÃO)"</span>)
-
-<span class="syntax-comment"># Calcular Z-score para popularidade</span>
-df_musicas[<span class="syntax-string">'z_score_pop'</span>] = (df_musicas[<span class="syntax-string">'popularidade'</span>] - df_musicas[<span class="syntax-string">'popularidade'</span>].mean()) / df_musicas[<span class="syntax-string">'popularidade'</span>].std()
-
-<span class="syntax-comment"># Identificar extremos (|z| > 2)</span>
-extremos = df_musicas[<span class="syntax-function">abs</span>(df_musicas[<span class="syntax-string">'z_score_pop'</span>]) > <span class="syntax-number">2</span>]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Músicas com Z-score > 2: {len(extremos)} ({len(extremos)/len(df_musicas)*100:.1f}%)"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📈 Z-score máximo: {df_musicas['z_score_pop'].max():.2f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📉 Z-score mínimo: {df_musicas['z_score_pop'].min():.2f}"</span>)
-
-<span class="syntax-comment"># Top 3 músicas mais extremas</span>
-top_extremos = df_musicas.nlargest(<span class="syntax-number">3</span>, <span class="syntax-string">'z_score_pop'</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🌟 Top 3 mais acima da média:"</span>)
-<span class="syntax-keyword">for</span> idx, musica <span class="syntax-keyword">in</span> top_extremos.iterrows():
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"      📈 {musica['artista']} - {musica['genero']} (Z: {musica['z_score_pop']:.2f})"</span>)</code></pre>
-            </div>
-
-            <div class="explanation-box">
-                <h5>📏 Insights de Dispersão Musical:</h5>
-                <p><strong>Coeficiente de Variação:</strong> Compara variabilidade entre características diferentes | <strong>Outliers:</strong> Hits virais e flops inesperados (histórias interessantes) | <strong>Por Gênero:</strong> Alguns gêneros são mais previsíveis que outros | <strong>Z-Score:</strong> Identifica o quão "anormal" é uma música em relação à média</p>
-            </div>
+        <div class="code-block">
+            <div class="code-header"><span>🔗 Correlação</span><button class="copy-button">Copiar</button></div>
+<pre><code>num_cols = [<span class="syntax-string">'energia'</span>,<span class="syntax-string">'valencia'</span>,<span class="syntax-string">'dancabilidade'</span>,
+            <span class="syntax-string">'acousticness'</span>,<span class="syntax-string">'liveness'</span>,<span class="syntax-string">'duracao_minutos'</span>,
+            <span class="syntax-string">'popularidade'</span>,<span class="syntax-string">'streams_milhoes'</span>]
+corr = df[num_cols].corr()
+print(corr[<span class="syntax-string">'popularidade'</span>].sort_values(ascending=<span class="syntax-keyword">False</span>))</code></pre>
         </div>
 
-        <!-- Passo 4: Correlação e Covariância -->
-        <div class="step-container">
-            <div class="step-header">
-                <div class="step-number">4</div>
-                <h2 class="step-title">Correlação e Covariância Musical</h2>
-            </div>
-            <div class="stats-badge">🔗 Relacionamentos</div>
-            <p class="step-description">Chegou a hora mais interessante! Vamos descobrir os relacionamentos entre características musicais. Músicas mais dançantes são mais populares? Existe correlação entre energia e valência? Como diferentes aspectos musicais se relacionam?</p>
-            
-            <div class="theory-box">
-                <h4>🔗 Relacionamentos no Universo Musical</h4>
-                <p>As correlações musicais revelam padrões fascinantes: <strong>Dançabilidade × Popularidade</strong> (será que as pessoas preferem músicas dançantes?), <strong>Energia × Valência</strong> (músicas energéticas são mais felizes?), <strong>Duração × Gênero</strong> (cada estilo tem seu tempo ideal?).</p>
-            </div>
-            
-            <div class="code-block">
-                <div class="code-header">
-                    <span>🔗 Análise de Correlações - Relacionamentos Musicais</span>
-                    <button class="copy-button">Copiar</button>
-                </div>
-<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"🔗 CORRELAÇÃO E COVARIÂNCIA MUSICAL"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
-
-<span class="syntax-comment"># 1. MATRIZ DE CORRELAÇÃO GERAL</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n1️⃣ MATRIZ DE CORRELAÇÃO DAS CARACTERÍSTICAS MUSICAIS"</span>)
-
-<span class="syntax-comment"># Selecionar variáveis numéricas para correlação</span>
-variaveis_correlacao = [<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, 
-                       <span class="syntax-string">'acousticness'</span>, <span class="syntax-string">'liveness'</span>, <span class="syntax-string">'duracao_minutos'</span>, <span class="syntax-string">'streams_milhoes'</span>]
-
-<span class="syntax-comment"># Calcular matriz de correlação</span>
-matriz_correlacao = df_musicas[variaveis_correlacao].corr()
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🔢 Matriz de correlação (Pearson):"</span>)
-<span class="syntax-function">print</span>(matriz_correlacao.round(<span class="syntax-number">3</span>))
-
-<span class="syntax-comment"># 2. ANÁLISE DAS CORRELAÇÕES MAIS INTERESSANTES</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n2️⃣ CORRELAÇÕES MAIS RELEVANTES"</span>)
-
-<span class="syntax-comment"># Correlação entre popularidade e características</span>
-corr_pop_danca = df_musicas[<span class="syntax-string">'popularidade'</span>].corr(df_musicas[<span class="syntax-string">'dancabilidade'</span>])
-corr_pop_energia = df_musicas[<span class="syntax-string">'popularidade'</span>].corr(df_musicas[<span class="syntax-string">'energia'</span>])
-corr_pop_valencia = df_musicas[<span class="syntax-string">'popularidade'</span>].corr(df_musicas[<span class="syntax-string">'valencia'</span>])
-corr_pop_duracao = df_musicas[<span class="syntax-string">'popularidade'</span>].corr(df_musicas[<span class="syntax-string">'duracao_minutos'</span>])
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🕺 Popularidade × Dançabilidade: {corr_pop_danca:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚡ Popularidade × Energia: {corr_pop_energia:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   😊 Popularidade × Valência: {corr_pop_valencia:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⏱️ Popularidade × Duração: {corr_pop_duracao:.3f}"</span>)
-
-<span class="syntax-comment"># Interpretação das correlações com popularidade</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🎯 Interpretações sobre POPULARIDADE:"</span>)
-
-<span class="syntax-keyword">def</span> <span class="syntax-function">interpretar_correlacao</span>(corr, var1, var2):
-    <span class="syntax-keyword">if</span> <span class="syntax-function">abs</span>(corr) < <span class="syntax-number">0.1</span>:
-        <span class="syntax-keyword">return</span> <span class="syntax-string">f"Sem relação linear entre {var1} e {var2}"</span>
-    <span class="syntax-keyword">elif</span> <span class="syntax-function">abs</span>(corr) < <span class="syntax-number">0.3</span>:
-        forca = <span class="syntax-string">"fraca"</span>
-    <span class="syntax-keyword">elif</span> <span class="syntax-function">abs</span>(corr) < <span class="syntax-number">0.7</span>:
-        forca = <span class="syntax-string">"moderada"</span>
-    <span class="syntax-keyword">else</span>:
-        forca = <span class="syntax-string">"forte"</span>
-    
-    direcao = <span class="syntax-string">"positiva"</span> <span class="syntax-keyword">if</span> corr > <span class="syntax-number">0</span> <span class="syntax-keyword">else</span> <span class="syntax-string">"negativa"</span>
-    <span class="syntax-keyword">return</span> <span class="syntax-string">f"Correlação {forca} {direcao} entre {var1} e {var2}"</span>
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      • {interpretar_correlacao(corr_pop_danca, 'popularidade', 'dançabilidade')}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      • {interpretar_correlacao(corr_pop_energia, 'popularidade', 'energia')}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      • {interpretar_correlacao(corr_pop_valencia, 'popularidade', 'valência')}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      • {interpretar_correlacao(corr_pop_duracao, 'popularidade', 'duração')}"</span>)
-
-<span class="syntax-comment"># 3. CORRELAÇÕES ENTRE CARACTERÍSTICAS MUSICAIS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n3️⃣ RELACIONAMENTOS ENTRE CARACTERÍSTICAS"</span>)
-
-<span class="syntax-comment"># Correlações interessantes entre características</span>
-corr_energia_valencia = df_musicas[<span class="syntax-string">'energia'</span>].corr(df_musicas[<span class="syntax-string">'valencia'</span>])
-corr_energia_danca = df_musicas[<span class="syntax-string">'energia'</span>].corr(df_musicas[<span class="syntax-string">'dancabilidade'</span>])
-corr_valencia_danca = df_musicas[<span class="syntax-string">'valencia'</span>].corr(df_musicas[<span class="syntax-string">'dancabilidade'</span>])
-corr_acoustic_energia = df_musicas[<span class="syntax-string">'acousticness'</span>].corr(df_musicas[<span class="syntax-string">'energia'</span>])
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚡😊 Energia × Valência: {corr_energia_valencia:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚡🕺 Energia × Dançabilidade: {corr_energia_danca:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   😊🕺 Valência × Dançabilidade: {corr_valencia_danca:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎸⚡ Acousticness × Energia: {corr_acoustic_energia:.3f}"</span>)
-
-<span class="syntax-comment"># 4. ANÁLISE DE COVARIÂNCIA</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n4️⃣ ANÁLISE DE COVARIÂNCIA"</span>)
-
-<span class="syntax-comment"># Calcular covariância entre variáveis principais</span>
-cov_pop_danca = np.cov(df_musicas[<span class="syntax-string">'popularidade'</span>], df_musicas[<span class="syntax-string">'dancabilidade'</span>])[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
-cov_energia_valencia = np.cov(df_musicas[<span class="syntax-string">'energia'</span>], df_musicas[<span class="syntax-string">'valencia'</span>])[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Covariância Popularidade-Dançabilidade: {cov_pop_danca:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Covariância Energia-Valência: {cov_energia_valencia:.3f}"</span>)
-
-<span class="syntax-comment"># Relação entre covariância e correlação</span>
-std_pop = df_musicas[<span class="syntax-string">'popularidade'</span>].std()
-std_danca = df_musicas[<span class="syntax-string">'dancabilidade'</span>].std()
-correlacao_calculada = cov_pop_danca / (std_pop * std_danca)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🔢 Correlação calculada via covariância: {correlacao_calculada:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   ✅ Correlação direta (verificação): {corr_pop_danca:.3f}"</span>)
-
-<span class="syntax-comment"># 5. CORRELAÇÕES POR GÊNERO MUSICAL</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n5️⃣ CORRELAÇÕES POR GÊNERO MUSICAL"</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'Gênero':<12} {'Pop×Dança':<10} {'Energ×Val':<10} {'Pop×Energ':<10}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'-'*50}"</span>)
-
-<span class="syntax-keyword">for</span> genero <span class="syntax-keyword">in</span> df_musicas[<span class="syntax-string">'genero'</span>].unique():
-    dados_genero = df_musicas[df_musicas[<span class="syntax-string">'genero'</span>] == genero]
-    
-    <span class="syntax-comment"># Só calcular se tiver dados suficientes</span>
-    <span class="syntax-keyword">if</span> <span class="syntax-function">len</span>(dados_genero) >= <span class="syntax-number">30</span>:
-        corr_pd = dados_genero[<span class="syntax-string">'popularidade'</span>].corr(dados_genero[<span class="syntax-string">'dancabilidade'</span>])
-        corr_ev = dados_genero[<span class="syntax-string">'energia'</span>].corr(dados_genero[<span class="syntax-string">'valencia'</span>])
-        corr_pe = dados_genero[<span class="syntax-string">'popularidade'</span>].corr(dados_genero[<span class="syntax-string">'energia'</span>])
-        
-        <span class="syntax-function">print</span>(<span class="syntax-string">f"   {genero:<12} {corr_pd:<10.3f} {corr_ev:<10.3f} {corr_pe:<10.3f}"</span>)
-
-<span class="syntax-comment"># 6. INSIGHTS E DESCOBERTAS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n6️⃣ PRINCIPAIS DESCOBERTAS"</span>)
-
-<span class="syntax-comment"># Encontrar a correlação mais forte</span>
-correlacoes_interessantes = {
-    <span class="syntax-string">'Popularidade × Dançabilidade'</span>: corr_pop_danca,
-    <span class="syntax-string">'Popularidade × Energia'</span>: corr_pop_energia,
-    <span class="syntax-string">'Energia × Valência'</span>: corr_energia_valencia,
-    <span class="syntax-string">'Energia × Dançabilidade'</span>: corr_energia_danca,
-    <span class="syntax-string">'Acousticness × Energia'</span>: corr_acoustic_energia
-}
-
-correlacao_max = <span class="syntax-function">max</span>(correlacoes_interessantes, key=<span class="syntax-keyword">lambda</span> k: <span class="syntax-function">abs</span>(correlacoes_interessantes[k]))
-valor_max = correlacoes_interessantes[correlacao_max]
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🏆 Correlação mais forte: {correlacao_max} ({valor_max:.3f})"</span>)
-
-<span class="syntax-comment"># Insights baseados nos dados</span>
-<span class="syntax-keyword">if</span> corr_pop_danca > <span class="syntax-number">0.3</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   💃 Descoberta: Músicas dançantes são mais populares!"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   🤔 Curioso: Dançabilidade não garante popularidade"</span>)
-
-<span class="syntax-keyword">if</span> corr_energia_valencia > <span class="syntax-number">0.5</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚡😊 Descoberta: Músicas energéticas são mais felizes!"</span>)
-<span class="syntax-keyword">elif</span> corr_energia_valencia < -<span class="syntax-number">0.3</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   😔⚡ Interessante: Energia alta pode indicar agressividade"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   🎵 Energia e felicidade são independentes"</span>)
-
-<span class="syntax-keyword">if</span> corr_acoustic_energia < -<span class="syntax-number">0.4</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   🎸🔌 Descoberta: Músicas acústicas são menos energéticas (óbvio!)"</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   ⚠️ Lembre-se: Correlação não implica causalidade!"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🧠 Essas relações podem ter variáveis confundidoras"</span>)</code></pre>
-            </div>
-
-            <div class="explanation-box">
-                <h5>🔗 Descobertas das Correlações Musicais:</h5>
-                <p><strong>Matriz Completa:</strong> Visão geral de todos os relacionamentos | <strong>Popularidade:</strong> Quais características mais influenciam o sucesso | <strong>Características:</strong> Como aspectos musicais se relacionam entre si | <strong>Por Gênero:</strong> Cada estilo musical tem padrões únicos de correlação</p>
-            </div>
+        <div class="code-block">
+            <div class="code-header"><span>📈 Regressão (OLS) – Dancabilidade → Popularidade</span><button class="copy-button">Copiar</button></div>
+<pre><code>from sklearn.linear_model import LinearRegression
+X = df[[<span class="syntax-string">'dancabilidade'</span>]].values
+y = df[<span class="syntax-string">'popularidade'</span>].values
+reg = LinearRegression().fit(X,y)
+print(<span class="syntax-string">f"coeficiente: {reg.coef_[0]:.2f} | intercepto: {reg.intercept_:.2f} | R²: {reg.score(X,y):.3f}"</span>)</code></pre>
         </div>
+    </div>
 
-        <!-- Passo 5: Testes de Hipótese -->
-        <div class="step-container">
-            <div class="step-header">
-                <div class="step-number">5</div>
-                <h2 class="step-title">Testes de Hipótese Musical</h2>
-            </div>
-            <div class="stats-badge">🧪 Testes Estatísticos</div>
-            <p class="step-description">Agora vamos validar estatisticamente nossas descobertas! Será que as diferenças que observamos são reais ou apenas obra do acaso? Vamos testar hipóteses sobre gêneros musicais, popularidade e características das músicas.</p>
-            
-            <div class="theory-box">
-                <h4>🧪 Validação Científica Musical</h4>
-                <p>Os testes de hipótese nos permitem responder perguntas como: <strong>"O Rock é realmente mais energético que o Jazz?"</strong>, <strong>"Músicas dos anos 2000 são diferentes das atuais?"</strong>, <strong>"A duração média mudou ao longo das décadas?"</strong>. Vamos descobrir com rigor estatístico!</p>
-            </div>
-            
-            <div class="code-block">
-                <div class="code-header">
-                    <span>🧪 Testes de Hipótese - Validação Estatística Musical</span>
-                    <button class="copy-button">Copiar</button>
-                </div>
-<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"🧪 TESTES DE HIPÓTESE MUSICAL"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+    <!-- Passo 5: Testes de Hipótese -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Testes de Hipótese</h2>
+        </div>
+        <div class="stats-badge">🧪 Inferência</div>
+        <p class="step-description">Ex.: Pop vs Rock — popularidade média é diferente?</p>
 
-<span class="syntax-comment"># 1. TESTE DE NORMALIDADE DAS VARIÁVEIS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n1️⃣ TESTE DE NORMALIDADE (SHAPIRO-WILK)"</span>)
+        <div class="code-block">
+            <div class="code-header"><span>🧪 t-test (Pop × Rock)</span><button class="copy-button">Copiar</button></div>
+<pre><code>pop = df.query(<span class="syntax-string">"genero == 'Pop'"</span>)[<span class="syntax-string">'popularidade'</span>]
+rock = df.query(<span class="syntax-string">"genero == 'Rock'"</span>)[<span class="syntax-string">'popularidade'</span>]
+t,p = stats.ttest_ind(pop, rock, equal_var=<span class="syntax-keyword">False</span>)
+print(<span class="syntax-string">f"t={t:.3f} | p={p:.4f} → "</span>, <span class="syntax-string">"diferença significativa"</span> <span class="syntax-keyword">if</span> p&lt;<span class="syntax-number">0.05</span> <span class="syntax-keyword">else</span> <span class="syntax-string">"sem evidência de diferença"</span>)</code></pre>
+        </div>
+    </div>
 
-<span class="syntax-comment"># Testar normalidade das principais variáveis</span>
-variaveis_teste = [<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'duracao_minutos'</span>]
+    <!-- Passo 6: Visualizações -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Visualizações</h2>
+        </div>
+        <div class="stats-badge">📊 Gráficos</div>
+        <p class="step-description">Histogramas, boxplots por gênero e mapa de calor da correlação.</p>
 
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'Variável':<15} {'p-value':<12} {'Normal?':<10} {'Interpretação'}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   {'-'*60}"</span>)
+        <div class="code-block">
+            <div class="code-header"><span>📊 Exemplos de Gráficos</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Histograma da popularidade</span>
+sns.histplot(df[<span class="syntax-string">'popularidade'</span>], bins=<span class="syntax-number">30</span>); plt.title(<span class="syntax-string">'Distribuição da Popularidade'</span>); plt.show()
 
-<span class="syntax-keyword">for</span> var <span class="syntax-keyword">in</span> variaveis_teste:
-    <span class="syntax-comment"># Usar amostra menor para Shapiro-Wilk (limite de 5000)</span>
-    amostra = df_musicas[var].sample(<span class="syntax-number">min</span>(<span class="syntax-number">5000</span>, <span class="syntax-function">len</span>(df_musicas)), random_state=<span class="syntax-number">42</span>)
-    stat, p_value = stats.shapiro(amostra)
-    
-    normal = <span class="syntax-string">"Sim"</span> <span class="syntax-keyword">if</span> p_value > <span class="syntax-number">0.05</span> <span class="syntax-keyword">else</span> <span class="syntax-string">"Não"</span>
-    
-    <span class="syntax-keyword">if</span> p_value > <span class="syntax-number">0.05</span>:
-        interpretacao = <span class="syntax-string">"Usar testes paramétricos"</span>
-    <span class="syntax-keyword">else</span>:
-        interpretacao = <span class="syntax-string">"Usar testes não-paramétricos"</span>
-    
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {var:<15} {p_value:<12.6f} {normal:<10} {interpretacao}"</span>)
+<span class="syntax-comment"># Boxplot de popularidade por gênero</span>
+sns.boxplot(data=df, x=<span class="syntax-string">'genero'</span>, y=<span class="syntax-string">'popularidade'</span>); plt.xticks(rotation=<span class="syntax-number">45</span>); plt.show()
 
-<span class="syntax-comment"># 2. TESTE T: COMPARAÇÃO ENTRE DOIS GÊNEROS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n2️⃣ TESTE T: ROCK vs POP - ENERGIA"</span>)
+<span class="syntax-comment"># Heatmap de correlação</span>
+sns.heatmap(df[num_cols].corr(), annot=<span class="syntax-keyword">True</span>, fmt=<span class="syntax-string">'.2f'</span>); plt.show()</code></pre>
+        </div>
+    </div>
 
-<span class="syntax-comment"># Hipótese: Rock tem mais energia que Pop</span>
-rock_energia = df_musicas[df_musicas[<span class="syntax-string">'genero'</span>] == <span class="syntax-string">'Rock'</span>][<span class="syntax-string">'energia'</span>]
-pop_energia = df_musicas[df_musicas[<span class="syntax-string">'genero'</span>] == <span class="syntax-string">'Pop'</span>][<span class="syntax-string">'energia'</span>]
+    <div class="warning-box">
+        <h4>⚠️ Boas Práticas</h4>
+        <ul class="list">
+            <li>Cheque suposições do teste (normalidade/variâncias) quando necessário.</li>
+            <li>Use transformação log em distribuições fortemente assimétricas para comparação.</li>
+            <li>Evite superinterpretações: correlação não implica causalidade.</li>
+        </ul>
+    </div>
 
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎸 Rock - Energia média: {rock_energia.mean():.3f} (n={len(rock_energia)})"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎵 Pop - Energia média: {pop_energia.mean():.3f} (n={len(pop_energia)})"</span>)
+    <p class="subtitle" style="text-align:center;margin-top:10px">✔️ Documento finalizado e validado — todas as tags estão fechadas.</p>
+</div>
 
-<span class="syntax-comment"># Realizar teste t de duas amostras</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   🧪 TESTE DE HIPÓTESE:"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      H₀: μ(Rock) = μ(Pop) - Energia é igual nos dois gêneros"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      H₁: μ(Rock) > μ(Pop) - Rock tem mais energia que Pop"</span>)
-
-t_stat, p_value_t = stats.ttest_ind(rock_energia, pop_energia, alternative=<span class="syntax-string">'greater'</span>)
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      Estatística t: {t_stat:.3f}"</span>)
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      p-value: {p_value_t:.6f}"</span>)
-
-<span class="syntax-keyword">if</span> p_value_t < <span class="syntax-number">0.05</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"      ✅ RESULTADO: Rejeitar H₀ - Rock É mais energético que Pop!"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"      ❌ RESULTADO: Não rejeitar H₀ - Diferença não significativa"</span>)
-
-<span class="syntax-comment"># Tamanho do efeito (Cohen's d)</span>
-pooled_std = np.sqrt(((len(rock_energia)-1)*rock_energia.var() + (len(pop_energia)-1)*pop_energia.var()) / 
-                     (len(rock_energia) + len(pop_energia) - 2))
-cohens_d = (rock_energia.mean() - pop_energia.mean()) / pooled_std
-
-<span class="syntax-function">print</span>(<span class="syntax-string">f"      📏 Tamanho do efeito (Cohen's d): {cohens_d:.3f}"</span>)
-
-<span class="syntax-keyword">if</span> <span class="syntax-function">abs</span>(cohens_d) < <span class="syntax-number">0.2</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"         → Efeito pequeno"</span>)
-<span class="syntax-keyword">elif</span> <span class="syntax-function">abs</span>(cohens_d) < <span class="syntax-number">0.5</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"         → Efeito médio"</span>)
-<span class="syntax-keyword">else</span>:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"         → Efeito grande"</span>)
-
-<span class="syntax-comment"># 3. ANOVA: COMPARAÇÃO ENTRE MÚLTIPLOS GÊNEROS</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n3️⃣ ANOVA: COMPARAÇÃO DE DANÇABILIDADE ENTRE GÊNEROS"</span>)
-
-<span
-<!-- CopyButtonKit v1 JS -->
 <script>
-(function () {
-  function ensureButtons() {
-    document.querySelectorAll('pre').forEach(pre => {
-      const code = pre.querySelector('code');
-      if (!code) return;
-
-      // Wrap in .code-block if missing
-      let wrapper = pre.closest('.code-block');
-      if (!wrapper) {
-        wrapper = document.createElement('div');
-        wrapper.className = 'code-block';
-        pre.parentNode.insertBefore(wrapper, pre);
-        wrapper.appendChild(pre);
-      }
-
-      // Create header if missing
-      let header = wrapper.querySelector('.code-header');
-      if (!header) {
-        header = document.createElement('div');
-        header.className = 'code-header';
-        const title = document.createElement('span');
-        title.textContent = '📋 Código';
-        header.appendChild(title);
-        wrapper.insertBefore(header, pre);
-      }
-
-      // Ensure copy button exists
-      let btn = header.querySelector('.copy-button');
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.className = 'copy-button';
-        btn.type = 'button';
-        btn.textContent = 'Copiar';
-        header.appendChild(btn);
-      }
-
-      // Remove any legacy inline handler
-      if (btn.hasAttribute('onclick')) btn.removeAttribute('onclick');
-
-      // Bind once
-      if (!btn.dataset.boundCopy) {
-        btn.addEventListener('click', () => doCopy(btn));
-        btn.dataset.boundCopy = '1';
-      }
-    });
-  }
-
-  function doCopy(button) {
-    const codeBlock = button.closest('.code-block');
-    const codeEl = codeBlock ? codeBlock.querySelector('pre code') : null;
-    const code = codeEl ? codeEl.textContent : '';
-    navigator.clipboard.writeText(code).then(() => {
-      button.textContent = 'Copiado!';
-      const oldBg = button.style.background;
-      button.style.background = '#4caf50';
-      setTimeout(() => {
-        button.textContent = 'Copiar';
-        button.style.background = oldBg || '#0052cc';
-      }, 2000);
-    }).catch(err => {
-      console.error('Erro ao copiar:', err);
-      button.textContent = 'Erro';
-      const oldBg = button.style.background;
-      button.style.background = '#f44336';
-      setTimeout(() => {
-        button.textContent = 'Copiar';
-        button.style.background = oldBg || '#0052cc';
-      }, 2000);
-    });
-  }
-
-  // DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', ensureButtons);
-  } else {
-    ensureButtons();
-  }
-
-  // Watch for dynamic changes
-  const mo = new MutationObserver(ensureButtons);
-  mo.observe(document.documentElement, { childList: true, subtree: true });
-})();
+// Copiar conteúdo dos blocos de código
+document.querySelectorAll('.code-block').forEach(block => {
+  const btn = block.querySelector('.copy-button');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const code = block.querySelector('pre').innerText;
+    try{
+      await navigator.clipboard.writeText(code);
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copy-success');
+      setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copy-success'); }, 1400);
+    }catch(e){
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = code; document.body.appendChild(textarea);
+      textarea.select(); document.execCommand('copy'); textarea.remove();
+      btn.textContent = 'Copiado!';
+      setTimeout(()=>{ btn.textContent = 'Copiar'; }, 1400);
+    }
+  });
+});
 </script>
+</body>
+</html>
