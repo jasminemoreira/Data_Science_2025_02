@@ -181,11 +181,12 @@
             border-radius: 6px;
             font-size: 11px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
 
         .copy-button:hover {
             background: #003d99;
+            transform: scale(1.05);
         }
 
         .output-example {
@@ -347,6 +348,28 @@
             color: #333;
         }
 
+        .syntax-keyword { color: #569cd6; }
+        .syntax-string { color: #ce9178; }
+        .syntax-comment { color: #6a9955; }
+        .syntax-number { color: #b5cea8; }
+        .syntax-function { color: #dcdcaa; }
+
+        /* Animação para feedback do botão de copiar */
+        .copy-button.copied {
+            background: #28a745 !important;
+            transform: scale(0.95);
+        }
+
+        .copy-success {
+            animation: copyFeedback 2s ease-in-out;
+        }
+
+        @keyframes copyFeedback {
+            0% { background: #0052cc; }
+            50% { background: #28a745; }
+            100% { background: #0052cc; }
+        }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -393,12 +416,6 @@
                 font-size: 1.3rem;
             }
         }
-
-        .syntax-keyword { color: #569cd6; }
-        .syntax-string { color: #ce9178; }
-        .syntax-comment { color: #6a9955; }
-        .syntax-number { color: #b5cea8; }
-        .syntax-function { color: #dcdcaa; }
     </style>
 </head>
 <body>
@@ -479,11 +496,11 @@ plt.rcParams[<span class="syntax-string">'font.size'</span>] = <span class="synt
 
             <div class="code-block">
                 <div class="code-header">
-                    <span>🏪 Recriação Rápida dos Dados Estruturados</span>
+                    <span>🔄 Recriação Rápida dos Dados Estruturados</span>
                     <button class="copy-button" onclick="copyCode(this)">Copiar</button>
                 </div>
 <pre><code><span class="syntax-comment"># Recriar dados estruturados rapidamente (baseado na aula anterior)</span>
-<span class="syntax-function">print</span>(<span class="syntax-string">"🔄 Recriando dados estruturados do e-commerce..."</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"📄 Recriando dados estruturados do e-commerce..."</span>)
 
 <span class="syntax-comment"># Simular dados de vendas (população completa)</span>
 n_total = <span class="syntax-number">50000</span>  <span class="syntax-comment"># População maior para demonstrar amostragem</span>
@@ -641,7 +658,7 @@ ticket_medio_estratificada = amostra_estratificada[<span class="syntax-string">'
 
 <span class="syntax-comment"># Calcular intervalo k</span>
 k = <span class="syntax-function">len</span>(df_populacao) // tamanho_amostra
-<span class="syntax-function">print</span>(<span class="syntax-string">f"   📏 Intervalo k = {k} (cada {k}º elemento)"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📐 Intervalo k = {k} (cada {k}º elemento)"</span>)
 
 <span class="syntax-comment"># Sortear ponto de partida aleatório</span>
 np.random.seed(<span class="syntax-number">42</span>)
@@ -883,7 +900,7 @@ num_amostras = <span class="syntax-number">1000</span>  <span class="syntax-comm
 medias_amostrais = {}
 
 <span class="syntax-keyword">for</span> n <span class="syntax-keyword">in</span> tamanhos_amostra:
-    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n📏 Tamanho da amostra: {n}"</span>)
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"\n🔍 Tamanho da amostra: {n}"</span>)
     
     <span class="syntax-comment"># Gerar múltiplas amostras e calcular suas médias</span>
     medias = []
@@ -1075,7 +1092,7 @@ z_score = stats.norm.ppf(<span class="syntax-number">1</span> - (<span class="sy
 <span class="syntax-comment"># Para proporção (fórmula conservadora p=0.5)</span>
 n_min_prop = (<span class="syntax-function">int</span>)((z_score ** <span class="syntax-number">2</span> * <span class="syntax-number">0.5</span> * <span class="syntax-number">0.5</span>) / (margem_erro ** <span class="syntax-number">2</span>))
 
-<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   📏 Tamanho mínimo de amostra:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n   📐 Tamanho mínimo de amostra:"</span>)
 <span class="syntax-function">print</span>(<span class="syntax-string">f"      Para proporções: {n_min_prop} (margem de erro 5%, confiança 95%)"</span>)
 <span class="syntax-function">print</span>(<span class="syntax-string">f"      Para análises gerais: 1000+ (2% da população atual)"</span>)
 <span class="syntax-function">print</span>(<span class="syntax-string">f"      Para Machine Learning: 70% treino, 15% validação, 15% teste"</span>)</code></pre>
@@ -1091,4 +1108,335 @@ n_min_prop = (<span class="syntax-function">int</span>)((z_score ** <span class=
                     <span>🎯 Template para o Checkpoint 1</span>
                     <button class="copy-button" onclick="copyCode(this)">Copiar</button>
                 </div>
-<pre><code>
+<pre><code><span class="syntax-comment"># 4. TEMPLATE PARA CHECKPOINT 1 DO PROJETO</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n4️⃣ TEMPLATE PARA SEU CHECKPOINT 1"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"="*50</span>)
+
+template_checkpoint = <span class="syntax-string">"""
+📋 CHECKPOINT 1 - ANÁLISE ESTATÍSTICA DO DATASET
+
+🎯 1. DEFINIÇÃO DO PROBLEMA E DATASET
+   • Fonte dos dados: [Descreva aqui]
+   • Tamanho: [X registros, Y variáveis]
+   • Período: [Temporal dos dados]
+   • Objetivo: [Problema de negócio a resolver]
+
+📊 2. ANÁLISE EXPLORATÓRIA INICIAL
+   • Variáveis numéricas: [Lista]
+   • Variáveis categóricas: [Lista]
+   • Valores ausentes: [Análise]
+   • Outliers identificados: [Descrição]
+
+📈 3. CARACTERIZAÇÃO DAS DISTRIBUIÇÕES
+   • Variável 1: [Normal/Log-normal/Assimétrica]
+   • Variável 2: [Distribuição identificada]
+   • Transformações necessárias: [Log, sqrt, etc.]
+
+🎲 4. ESTRATÉGIA DE AMOSTRAGEM
+   • Método escolhido: [Aleatória/Estratificada/Sistemática]
+   • Justificativa: [Baseado na variabilidade]
+   • Tamanho da amostra: [Cálculo estatístico]
+
+🔧 5. MODELAGEM DIMENSIONAL PROPOSTA
+   • Tabela Fato: [Nome e grão]
+   • Dimensões: [Lista das dimensões]
+   • Medidas/KPIs: [Métricas principais]
+
+📋 6. PLANO DE ANÁLISES QUANTITATIVAS
+   • Testes estatísticos previstos: [t-test, ANOVA, etc.]
+   • Análises de correlação: [Pearson, Spearman]
+   • Técnicas de ML: [Regressão, classificação, clustering]
+
+⚠️ 7. LIMITAÇÕES E CONSIDERAÇÕES
+   • Vieses identificados: [Seleção, temporal, etc.]
+   • Premissas assumidas: [Normalidade, independência]
+   • Riscos e mitigações: [Overfitting, dados ausentes]
+"""</span>
+
+<span class="syntax-function">print</span>(template_checkpoint)
+
+<span class="syntax-comment"># 5. CHECKLIST FINAL</span>
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n5️⃣ CHECKLIST FINAL PARA O CHECKPOINT 1"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"="*50</span>)
+
+checklist = [
+    <span class="syntax-string">"✅ Dataset definido e carregado"</span>,
+    <span class="syntax-string">"✅ Análise exploratória completa"</span>,
+    <span class="syntax-string">"✅ Distribuições caracterizadas"</span>,
+    <span class="syntax-string">"✅ Estratégia de amostragem definida"</span>,
+    <span class="syntax-string">"✅ Modelagem dimensional esboçada"</span>,
+    <span class="syntax-string">"✅ Transformações identificadas"</span>,
+    <span class="syntax-string">"✅ Plano de análises quantitativas"</span>,
+    <span class="syntax-string">"✅ Limitações documentadas"</span>
+]
+
+<span class="syntax-keyword">for</span> item <span class="syntax-keyword">in</span> checklist:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {item}"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n💡 DICAS IMPORTANTES:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📊 Use gráficos para ilustrar suas descobertas"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   🔢 Inclua estatísticas descritivas detalhadas"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   📈 Justifique escolhas com base nos dados"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   ⚖️ Balance rigor técnico com clareza"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   🎯 Conecte análises ao problema de negócio"</span>)</code></pre>
+            </div>
+
+            <div class="explanation-box">
+                <h5>🔍 Guia para o Checkpoint 1:</h5>
+                <p><strong>Template Completo:</strong> Estrutura detalhada para documentar sua análise | <strong>Checklist:</strong> Itens obrigatórios para entrega | <strong>Dicas:</strong> Melhores práticas para apresentação | <strong>Foco:</strong> Conexão entre análise técnica e valor de negócio</p>
+            </div>
+        </div>
+
+        <!-- Conclusão -->
+        <div class="step-container">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <h2 class="step-title">Conclusão e Próximos Passos</h2>
+            </div>
+            <div class="stats-badge">🎉 Resumo</div>
+            <p class="step-description">Parabéns! Você completou a aplicação prática de métodos quantitativos e amostragem. Vamos revisar o que aprendemos e definir os próximos passos.</p>
+            
+            <div class="highlight-box">
+                <h4>🎯 O que você dominou hoje</h4>
+                <p>Implementação de quatro técnicas de amostragem, análise de distribuições de dados, demonstração prática do Teorema Central do Limite e preparação estruturada para o primeiro checkpoint do projeto. Estes são fundamentos essenciais para qualquer análise estatística robusta.</p>
+            </div>
+
+            <div class="code-block">
+                <div class="code-header">
+                    <span>📋 Resumo dos Conceitos Aplicados</span>
+                    <button class="copy-button" onclick="copyCode(this)">Copiar</button>
+                </div>
+<pre><code><span class="syntax-function">print</span>(<span class="syntax-string">"\n" + "="*60</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"🎉 RESUMO DA AULA 3: MÉTODOS QUANTITATIVOS"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n✅ CONCEITOS DOMINADOS:"</span>)
+
+conceitos_aplicados = {
+    <span class="syntax-string">"🎲 Amostragem Aleatória Simples"</span>: <span class="syntax-string">"Seleção equiprovável de elementos"</span>,
+    <span class="syntax-string">"📊 Amostragem Estratificada"</span>: <span class="syntax-string">"Representação proporcional de subgrupos"</span>,
+    <span class="syntax-string">"⚙️ Amostragem Sistemática"</span>: <span class="syntax-string">"Seleção em intervalos regulares"</span>,
+    <span class="syntax-string">"🎯 Amostragem por Conglomerados"</span>: <span class="syntax-string">"Seleção de grupos inteiros"</span>,
+    <span class="syntax-string">"📈 Análise de Distribuições"</span>: <span class="syntax-string">"Identificação de padrões estatísticos"</span>,
+    <span class="syntax-string">"🧪 Teorema Central do Limite"</span>: <span class="syntax-string">"Convergência à normalidade das médias"</span>,
+    <span class="syntax-string">"🔍 Estatística Descritiva"</span>: <span class="syntax-string">"Medidas de posição, dispersão e forma"</span>,
+    <span class="syntax-string">"📋 Preparação de Projeto"</span>: <span class="syntax-string">"Estruturação do Checkpoint 1"</span>
+}
+
+<span class="syntax-keyword">for</span> conceito, descricao <span class="syntax-keyword">in</span> conceitos_aplicados.items():
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {conceito}: {descricao}"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n📊 RESULTADOS OBTIDOS:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • População analisada: {len(df_populacao):,} transações"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Amostras criadas: 4 métodos diferentes"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Distribuições identificadas: Normal e Log-normal"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • TCL demonstrado: {len(tamanhos_amostra)} tamanhos de amostra"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   • Template do projeto: Estrutura completa"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n🎯 PRÓXIMOS PASSOS:"</span>)
+proximos_passos = [
+    <span class="syntax-string">"1. Aplicar estes conceitos ao seu dataset do projeto"</span>,
+    <span class="syntax-string">"2. Completar o Checkpoint 1 usando o template fornecido"</span>,
+    <span class="syntax-string">"3. Escolher a estratégia de amostragem mais adequada"</span>,
+    <span class="syntax-string">"4. Documentar todas as análises exploratórias"</span>,
+    <span class="syntax-string">"5. Preparar-se para técnicas avançadas de ML"</span>
+]
+
+<span class="syntax-keyword">for</span> passo <span class="syntax-keyword">in</span> proximos_passos:
+    <span class="syntax-function">print</span>(<span class="syntax-string">f"   {passo}"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n💡 LEMBRETE IMPORTANTE:"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   A qualidade da análise estatística determina"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   a confiabilidade de todos os modelos posteriores!"</span>)
+
+<span class="syntax-function">print</span>(<span class="syntax-string">f"\n🎉 Parabéns! Você está preparado para análises"</span>)
+<span class="syntax-function">print</span>(<span class="syntax-string">f"   estatísticas robustas e científicas! 📊✨"</span>)</code></pre>
+            </div>
+
+            <div class="theory-box">
+                <h4>🚀 Para a Próxima Aula</h4>
+                <p>Na próxima aula, aplicaremos técnicas avançadas de Machine Learning aos dados preparados. Usaremos as amostras criadas hoje para treinar modelos de classificação, regressão e clustering, demonstrando como a preparação estatística adequada impacta diretamente na performance dos algoritmos.</p>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ Pontos de Atenção</h4>
+                <p>Lembre-se: a escolha do método de amostragem deve sempre considerar o objetivo da análise, a variabilidade dos dados e os recursos disponíveis. Não existe um método "melhor" universal - cada situação demanda uma abordagem específica baseada em critérios estatísticos sólidos.</p>
+            </div>
+
+            <div class="info-panel">
+                <h4>📚 Recursos Complementares</h4>
+                <p>Para aprofundar seus conhecimentos, estude: Teorema do Limite Central em detalhes, cálculo de tamanhos amostrais para diferentes tipos de análise, testes de normalidade (Kolmogorov-Smirnov, Anderson-Darling), e técnicas de correção de vieses amostrais. A documentação do SciPy é uma excelente referência para implementações avançadas.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para copiar código
+        function copyCode(button) {
+            try {
+                // Encontrar o bloco de código relacionado ao botão
+                const codeBlock = button.closest('.code-block');
+                const codeContent = codeBlock.querySelector('pre code');
+                
+                if (!codeContent) {
+                    console.error('Conteúdo do código não encontrado');
+                    return;
+                }
+
+                // Criar um elemento temporário para selecionar o texto
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = codeContent.textContent || codeContent.innerText;
+                document.body.appendChild(tempTextArea);
+                
+                // Selecionar e copiar o texto
+                tempTextArea.select();
+                tempTextArea.setSelectionRange(0, 99999); // Para dispositivos móveis
+                
+                // Tentar copiar usando a API moderna primeiro
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(tempTextArea.value).then(() => {
+                        showCopyFeedback(button, true);
+                    }).catch(err => {
+                        // Fallback para o método antigo
+                        const success = document.execCommand('copy');
+                        showCopyFeedback(button, success);
+                    });
+                } else {
+                    // Método antigo para navegadores mais antigos
+                    const success = document.execCommand('copy');
+                    showCopyFeedback(button, success);
+                }
+                
+                // Remover o elemento temporário
+                document.body.removeChild(tempTextArea);
+                
+            } catch (err) {
+                console.error('Erro ao copiar código:', err);
+                showCopyFeedback(button, false);
+            }
+        }
+
+        // Função para mostrar feedback visual
+        function showCopyFeedback(button, success) {
+            const originalText = button.textContent;
+            
+            if (success) {
+                button.textContent = '✅ Copiado!';
+                button.classList.add('copy-success');
+                
+                // Restaurar texto original após 2 segundos
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copy-success');
+                }, 2000);
+            } else {
+                button.textContent = '❌ Erro';
+                button.style.background = '#dc3545';
+                
+                // Restaurar texto original após 2 segundos
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#0052cc';
+                }, 2000);
+            }
+        }
+
+        // Adicionar evento de carregamento da página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📋 Sistema de cópia de código carregado!');
+            
+            // Verificar se a API de clipboard está disponível
+            if (navigator.clipboard) {
+                console.log('✅ API moderna de clipboard disponível');
+            } else {
+                console.log('⚠️ Usando método de fallback para cópia');
+            }
+            
+            // Contar quantos blocos de código existem
+            const codeBlocks = document.querySelectorAll('.code-block');
+            console.log(`📝 ${codeBlocks.length} blocos de código encontrados`);
+        });
+
+        // Função para melhorar a experiência em dispositivos móveis
+        function initMobileSupport() {
+            // Detectar se é dispositivo móvel
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Adicionar classe CSS específica para mobile
+                document.body.classList.add('mobile-device');
+                
+                // Ajustar comportamento dos botões de copiar
+                const copyButtons = document.querySelectorAll('.copy-button');
+                copyButtons.forEach(button => {
+                    button.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        copyCode(this);
+                    });
+                });
+            }
+        }
+
+        // Inicializar suporte mobile quando a página carregar
+        document.addEventListener('DOMContentLoaded', initMobileSupport);
+    </script>
+
+<script>
+(function () {
+  // Inject header + copy button into any <pre><code> that doesn't already have .code-header
+  document.querySelectorAll('pre').forEach(pre => {
+    const code = pre.querySelector('code');
+    if (!code) return;
+
+    // Wrap in .code-block if missing
+    let wrapper = pre.closest('.code-block');
+    if (!wrapper) {
+      wrapper = document.createElement('div');
+      wrapper.className = 'code-block';
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+    }
+
+    // Create header if missing
+    if (!wrapper.querySelector('.code-header')) {
+      const header = document.createElement('div');
+      header.className = 'code-header';
+      const title = document.createElement('span');
+      title.textContent = '📋 Código';
+      const btn = document.createElement('button');
+      btn.className = 'copy-button';
+      btn.type = 'button';
+      btn.textContent = 'Copiar';
+      btn.addEventListener('click', () => copyCode(btn));
+      header.appendChild(title);
+      header.appendChild(btn);
+      wrapper.insertBefore(header, pre);
+    }
+  });
+
+  // Copy function mirroring the reference behavior
+  window.copyCode = function (button) {
+    const codeBlock = button.closest('.code-block');
+    const code = codeBlock.querySelector('pre code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      button.textContent = 'Copiado!';
+      button.style.background = '#4caf50';
+      setTimeout(() => {
+        button.textContent = 'Copiar';
+        button.style.background = '#0052cc';
+      }, 2000);
+    }).catch(err => {
+      console.error('Erro ao copiar:', err);
+      button.textContent = 'Erro';
+      button.style.background = '#f44336';
+      setTimeout(() => {
+        button.textContent = 'Copiar';
+        button.style.background = '#0052cc';
+      }, 2000);
+    });
+  };
+})();
+</script>
+
+</body>
+</html>
