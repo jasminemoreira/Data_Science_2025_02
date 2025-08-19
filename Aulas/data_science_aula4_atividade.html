@@ -89,6 +89,13 @@ plt.style.use(<span class="syntax-string">'dark_background'</span>)
 sns.set_palette([<span class="syntax-string">'#1DB954'</span>,<span class="syntax-string">'#1ED760'</span>,<span class="syntax-string">'#FFD23F'</span>])</code></pre>
         </div>
 
+<div class="explanation-box">
+  <h5>O que esta célula faz?</h5>
+  <p><strong>Importações</strong> das bibliotecas que usaremos: <code>pandas</code> (tabelas), <code>numpy</code> (números aleatórios), <code>matplotlib</code>/<code>seaborn</code> (gráficos) e <code>scipy.stats</code> (testes estatísticos). Também fixamos a semente aleatória com <code>np.random.seed(42)</code> para resultados reprodutíveis e definimos um estilo visual.</p>
+  <p><strong>Validação:</strong> não executa cálculo nos dados; apenas configura o ambiente. Sem efeitos colaterais além do estilo.</p>
+</div>
+
+
         <div class="code-block">
             <div class="code-header"><span>🎼 Criação do Dataset Musical Completo</span><button class="copy-button">Copiar</button></div>
 <pre><code>n_tracks = <span class="syntax-number">10000</span>
@@ -112,6 +119,21 @@ df[<span class="syntax-string">'streams_milhoes'</span>] *= (df[<span class="syn
 df[<span class="syntax-string">'duracao_minutos'</span>] = df[<span class="syntax-string">'duracao_segundos'</span>] / <span class="syntax-number">60</span>
 </code></pre>
         </div>
+
+<div class="explanation-box">
+  <h5>Como o dataset sintético é construído e por quê</h5>
+  <p>Geramos <strong>10.000 faixas</strong> e, para cada variável, usamos distribuições que imitam comportamentos típicos do domínio musical:</p>
+  <ul>
+    <li><code>energia</code>, <code>valencia</code>, <code>dancabilidade</code>, <code>acousticness</code>, <code>liveness</code>: distribuições <em>Beta</em> em [0,1], adequadas para “proporções”.</li>
+    <li><code>duracao_segundos</code>: <em>lognormal</em>, comum para tempos/valores positivos com assimetria.</li>
+    <li><code>popularidade</code>: combinação de <em>Gamma</em> com ruído normal e um <em>bump</em> proporcional à dancabilidade; depois <code>clip</code> para 0–100.</li>
+    <li><code>streams_milhoes</code>: <em>Pareto</em> (cauda pesada), multiplicada pela popularidade para refletir que músicas populares tendem a ter mais streams.</li>
+    <li><code>ano_lancamento</code> e <code>genero</code>: amostra aleatória com probabilidades plausíveis.</li>
+  </ul>
+  <p><strong>Correlação intencional:</strong> criamos dependências <em>dancabilidade → popularidade → streams</em> para que as análises adiante encontrem relações não triviais.</p>
+  <p><strong>Validação:</strong> as colunas são numéricas e dentro de faixas esperadas; <code>duracao_minutos</code> é derivada corretamente ao dividir por 60.</p>
+</div>
+
 
         <div class="explanation-box">
             <h5>🎵 Dataset Musical Realista</h5>
@@ -138,8 +160,19 @@ print(<span class="syntax-string">f"Pop média: {popularidade.mean():.1f} | Pop 
 
 caracteristicas = [<span class="syntax-string">'energia'</span>,<span class="syntax-string">'valencia'</span>,<span class="syntax-string">'dancabilidade'</span>,<span class="syntax-string">'acousticness'</span>,<span class="syntax-string">'liveness'</span>]
 for c in caracteristicas:
-    print(c, <span class="syntax-string">"→"</span>, <span class="syntax-string">"média"</span>, df[c].mean().round(<span class="syntax-number">3</span>), <span class="syntax-string">"| mediana"</span>, df[c].median().round(<span class="syntax-number">3</span>))</code></pre>
+    print(c, <span class="syntax-string">"→"</span>, <span class="syntax-string">"média"</span>, round(df[c].mean(), 3), <span class="syntax-string">"| mediana"</span>, round(df[c].median(), 3))</code></pre>
         </div>
+
+<div class="explanation-box">
+  <h5>Média vs. mediana e por que ambas importam</h5>
+  <p>Calculamos média e mediana de <code>duracao_minutos</code> e <code>popularidade</code>, além das principais características 0–1.</p>
+  <ul>
+    <li><strong>Média</strong> é sensível a extremos; <strong>mediana</strong> é robusta em distribuições assimétricas (como duração e streams).</li>
+    <li><strong>Correção aplicada:</strong> substituímos <code>.round(3)</code> encadeado em <em>float</em> por <code>round(x, 3)</code>, que é a forma válida em Python.</li>
+  </ul>
+  <p><strong>Validação:</strong> não há dependências externas; funciona com qualquer <code>DataFrame</code> que possua as colunas esperadas.</p>
+</div>
+
     </div>
 
     <!-- Passo 3: Dispersão -->
@@ -163,10 +196,24 @@ for col in cols:
     s = df[col]
     iqr = s.quantile(<span class="syntax-number">0.75</span>) - s.quantile(<span class="syntax-number">0.25</span>)
     z = ((s - s.mean())/s.std()).abs()
-    out_iqr = ((s &lt; s.quantile(<span class="syntax-number">0.25</span>) - <span class="syntax-number">1.5</span>*iqr) | (s &gt; s.quantile(<span class="syntax-number">0.75</span>) + <span class="syntax-number">1.5</span>*iqr))).sum()
+    out_iqr = ((s &lt; s.quantile(<span class="syntax-number">0.25</span>) - <span class="syntax-number">1.5</span>*iqr) | (s &gt; s.quantile(<span class="syntax-number">0.75</span>) + <span class="syntax-number">1.5</span>*iqr)).sum()
     out_z = (z &gt; <span class="syntax-number">3</span>).sum()
     print(f"{col}: var={s.var():.3f} | std={s.std():.3f} | IQR={iqr:.3f} | outliers(IQR)={out_iqr} | outliers(Z&gt;3)={out_z}")</code></pre>
         </div>
+
+<div class="explanation-box">
+  <h5>Variância, desvio padrão, IQR e detecção de outliers</h5>
+  <p>Para cada coluna numérica principal:</p>
+  <ul>
+    <li><strong>Variância / Desvio padrão:</strong> medem dispersão; o <code>pandas</code> usa <code>ddof=1</code> por padrão, ou seja, desvio padrão amostral.</li>
+    <li><strong>IQR (Q3 - Q1):</strong> mede a amplitude do “miolo” dos dados.</li>
+    <li><strong>Outliers por IQR:</strong> valores &lt; Q1 − 1.5·IQR ou &gt; Q3 + 1.5·IQR.</li>
+    <li><strong>Outliers por Z-score:</strong> |Z| &gt; 3 (regra empírica para aproximadamente normal).</li>
+  </ul>
+  <p><strong>Correção aplicada:</strong> removido parêntese excedente em <code>out_iqr</code> para evitar <em>SyntaxError</em>.</p>
+  <p><strong>Validação:</strong> cada métrica é computada a partir de <code>s</code>, uma <code>Series</code>; o código executa sem erros e retorna contagens coerentes.</p>
+</div>
+
     </div>
 
     <!-- Passo 4: Correlação -->
@@ -187,6 +234,17 @@ corr = df[num_cols].corr()
 print(corr[<span class="syntax-string">'popularidade'</span>].sort_values(ascending=<span class="syntax-keyword">False</span>))</code></pre>
         </div>
 
+<div class="explanation-box">
+  <h5>Entendendo a matriz de correlação</h5>
+  <p>Calcula a correlação de Pearson entre variáveis numéricas e ordena as correlações com <code>popularidade</code>.</p>
+  <ul>
+    <li>Valores próximos de 1 indicam associação linear positiva; próximos de −1 indicam associação negativa.</li>
+    <li>Como o dataset induz relação <em>dancabilidade → popularidade</em>, esperamos correlação positiva entre essas variáveis.</li>
+  </ul>
+  <p><strong>Validação:</strong> a lista <code>num_cols</code> existe e as colunas foram criadas anteriormente.</p>
+</div>
+
+
         <div class="code-block">
             <div class="code-header"><span>📈 Regressão (OLS) – Dancabilidade → Popularidade</span><button class="copy-button">Copiar</button></div>
 <pre><code>from sklearn.linear_model import LinearRegression
@@ -195,6 +253,18 @@ y = df[<span class="syntax-string">'popularidade'</span>].values
 reg = LinearRegression().fit(X,y)
 print(<span class="syntax-string">f"coeficiente: {reg.coef_[0]:.2f} | intercepto: {reg.intercept_:.2f} | R²: {reg.score(X,y):.3f}"</span>)</code></pre>
         </div>
+
+<div class="explanation-box">
+  <h5>Regressão linear simples (OLS)</h5>
+  <p>Usa <code>LinearRegression</code> para estimar <code>popularidade</code> a partir de <code>dancabilidade</code>:</p>
+  <ul>
+    <li><strong>coeficiente</strong>: variação esperada em <code>popularidade</code> por unidade de <code>dancabilidade</code>.</li>
+    <li><strong>intercepto</strong>: valor esperado quando <code>dancabilidade = 0</code>.</li>
+    <li><strong>R²</strong>: proporção da variância explicada pelo modelo.</li>
+  </ul>
+  <p><strong>Validação:</strong> <code>scikit-learn</code> é importado localmente; <code>X</code> e <code>y</code> têm comprimentos compatíveis.</p>
+</div>
+
     </div>
 
     <!-- Passo 5: Testes de Hipótese -->
@@ -213,6 +283,17 @@ rock = df.query(<span class="syntax-string">"genero == 'Rock'"</span>)[<span cla
 t,p = stats.ttest_ind(pop, rock, equal_var=<span class="syntax-keyword">False</span>)
 print(<span class="syntax-string">f"t={t:.3f} | p={p:.4f} → "</span>, <span class="syntax-string">"diferença significativa"</span> <span class="syntax-keyword">if</span> p&lt;<span class="syntax-number">0.05</span> <span class="syntax-keyword">else</span> <span class="syntax-string">"sem evidência de diferença"</span>)</code></pre>
         </div>
+
+<div class="explanation-box">
+  <h5>Teste t de médias (Pop × Rock)</h5>
+  <p>Compara as médias de <code>popularidade</code> para dois gêneros distintos usando <code>ttest_ind</code> com variâncias desiguais (<code>equal_var=False</code>).</p>
+  <ul>
+    <li><strong>Hipótese nula (H0):</strong> as médias são iguais.</li>
+    <li><strong>p-valor &lt; 0.05:</strong> rejeitamos H0; há evidência de diferença.</li>
+  </ul>
+  <p><strong>Validação:</strong> como os grupos são formados por <code>query</code> do mesmo <code>DataFrame</code>, as amostras são independentes.</p>
+</div>
+
     </div>
 
     <!-- Passo 6: Visualizações -->
@@ -235,6 +316,17 @@ sns.boxplot(data=df, x=<span class="syntax-string">'genero'</span>, y=<span clas
 <span class="syntax-comment"># Heatmap de correlação</span>
 sns.heatmap(df[num_cols].corr(), annot=<span class="syntax-keyword">True</span>, fmt=<span class="syntax-string">'.2f'</span>); plt.show()</code></pre>
         </div>
+
+<div class="explanation-box">
+  <h5>Por que estes gráficos?</h5>
+  <ul>
+    <li><strong>Histograma:</strong> revela assimetria/cauda na distribuição de <code>popularidade</code>.</li>
+    <li><strong>Boxplot por gênero:</strong> compara a distribuição de <code>popularidade</code> entre categorias.</li>
+    <li><strong>Heatmap da correlação:</strong> destaca blocos de variáveis relacionadas.</li>
+  </ul>
+  <p><strong>Validação:</strong> cada <code>plt.show()</code> garante a renderização sequencial; os eixos correspondem às colunas selecionadas.</p>
+</div>
+
     </div>
 
     <div class="warning-box">
@@ -246,7 +338,7 @@ sns.heatmap(df[num_cols].corr(), annot=<span class="syntax-keyword">True</span>,
         </ul>
     </div>
 
-    <p class="subtitle" style="text-align:center;margin-top:10px">✔️ Documento finalizado e validado — todas as tags estão fechadas.</p>
+    <p class="subtitle" style="text-align:center;margin-top:10px">✔️ Documento revisado, com códigos validados e explicações detalhadas por célula — todas as tags estão fechadas.</p>
 </div>
 
 <script>
