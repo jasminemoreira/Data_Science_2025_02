@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Prático - Análise de Agrupamentos com K-Means</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+            background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+            min-height:100vh;padding:20px
+        }
+        .container{
+            max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(20px);border-radius:24px;padding:40px;
+            box-shadow:0 20px 40px rgba(25,20,20,.2);border:1px solid rgba(255,255,255,.3);
+            animation:fadeInUp .8s cubic-bezier(.4,0,.2,1)
+        }
+        .header{text-align:center;margin-bottom:40px}
+        .badge{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff;padding:10px 20px;border-radius:25px;font-size:14px;font-weight:600;display:inline-block;margin-bottom:20px;box-shadow:0 4px 15px rgba(156,39,176,.3)}
+        .stats-badge{background:linear-gradient(135deg,#ff5722,#d84315);color:#fff;padding:6px 14px;border-radius:15px;font-size:12px;font-weight:600;display:inline-block;margin-bottom:15px;box-shadow:0 2px 8px rgba(255,87,34,.3)}
+        .title{font-size:2.5rem;font-weight:700;color:#1a1a1a;margin-bottom:12px;background:linear-gradient(135deg,#9c27b0,#673ab7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .subtitle{font-size:1.2rem;color:#666;font-weight:400;margin-bottom:30px}
+        .step-container{background:rgba(255,255,255,.7);backdrop-filter:blur(10px);border-radius:16px;border-left:6px solid #9c27b0;padding:30px;margin-bottom:30px;box-shadow:0 8px 25px rgba(156,39,176,.1);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+        .step-container:hover{transform:translateY(-5px)}
+        .step-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+        .step-number{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;box-shadow:0 4px 15px rgba(156,39,176,.3)}
+        .step-title{color:#9c27b0;font-size:1.5rem;font-weight:600;margin:0}
+        .step-description{color:#444;line-height:1.7;font-size:1.1rem;margin-bottom:20px}
+        .theory-box{background:rgba(255,87,34,.1);border:2px solid rgba(255,87,34,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .theory-box h4{color:#ff5722;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .code-block{background:#1e1e1e;color:#d4d4d4;padding:25px;border-radius:12px;font-family:'Monaco','Menlo','Ubuntu Mono',monospace;font-size:14px;line-height:1.6;overflow-x:auto;margin:20px 0;border-left:4px solid #9c27b0;position:relative}
+        .code-header{background:#2d2d2d;color:#fff;padding:10px 20px;margin:-25px -25px 15px -25px;border-radius:12px 12px 0 0;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+        .copy-button{background:#9c27b0;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:background .3s,transform .2s}
+        .copy-button:hover{background:#673ab7;transform:scale(1.05)}
+        .output-example{background:rgba(76,175,80,.1);border:2px solid rgba(76,175,80,.3);border-radius:12px;padding:20px;margin:15px 0;font-family:monospace;font-size:13px}
+        .output-header{color:#388e3c;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .highlight-box{background:linear-gradient(135deg,#9c27b0,#673ab7);color:#fff;padding:25px;border-radius:16px;margin:25px 0;backdrop-filter:blur(10px);box-shadow:0 8px 25px rgba(156,39,176,.3)}
+        .highlight-box h4{font-size:1.3rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .warning-box{background:rgba(255,193,7,.1);border:2px solid rgba(255,193,7,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .warning-box h4{color:#f57c00;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .info-panel{background:rgba(156,39,176,.1);border:2px solid rgba(156,39,176,.2);border-radius:16px;padding:20px;margin:20px 0}
+        .info-panel h4{color:#9c27b0;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .explanation-box{background:rgba(255,255,255,.5);border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #9c27b0}
+        .explanation-box h5{color:#9c27b0;font-size:1.1rem;margin-bottom:10px;font-weight:600}
+        .explanation-box p{color:#555;line-height:1.6;font-size:.95rem}
+        .syntax-keyword{color:#569cd6}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-function{color:#dcdcaa}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @media (max-width:768px){.container{padding:25px;margin:10px}.title{font-size:2rem}.step-container{padding:20px}.code-block{padding:15px;font-size:12px}.step-header{flex-direction:column;align-items:flex-start;gap:10px}.step-number{width:35px;height:35px;font-size:16px}.step-title{font-size:1.3rem}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="badge">🤖 Roteiro Prático - Aula 5</div>
+        <h1 class="title">Análise de Agrupamentos com K-Means</h1>
+        <p class="subtitle">Descobrindo perfis musicais através de aprendizado não supervisionado</p>
+    </div>
+
+    <div class="highlight-box">
+        <h4>🎯 O que vamos descobrir hoje</h4>
+        <p>Aplicaremos algoritmo K-Means para identificar grupos naturais de músicas com características similares, criando "perfis musicais" automaticamente sem supervisão.</p>
+    </div>
+
+    <div class="info-panel">
+        <h4>🔧 Preparação</h4>
+        <p>Abra o Google Colab e crie o notebook <strong>Aula5_KMeans_Musicais</strong>. Utilizaremos o dataset da aula anterior expandido.</p>
+    </div>
+
+    <!-- Passo 1 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Preparação do Dataset Musical</h2>
+        </div>
+        <div class="stats-badge">🎵 Dados Musicais</div>
+        <p class="step-description">Recrie o dataset da aula anterior e prepare as features para clustering.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>🎵 Configuração e Dataset</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+<span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
+<span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
+<span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
+<span class="syntax-keyword">from</span> sklearn.cluster <span class="syntax-keyword">import</span> KMeans
+<span class="syntax-keyword">from</span> sklearn.preprocessing <span class="syntax-keyword">import</span> StandardScaler
+<span class="syntax-keyword">from</span> sklearn.metrics <span class="syntax-keyword">import</span> silhouette_score
+<span class="syntax-keyword">from</span> sklearn.decomposition <span class="syntax-keyword">import</span> PCA
+
+np.random.seed(<span class="syntax-number">42</span>)
+plt.style.use(<span class="syntax-string">'dark_background'</span>)
+sns.set_palette([<span class="syntax-string">'#9C27B0'</span>,<span class="syntax-string">'#FF5722'</span>,<span class="syntax-string">'#4CAF50'</span>,<span class="syntax-string">'#2196F3'</span>,<span class="syntax-string">'#FF9800'</span>])
+
+<span class="syntax-comment"># Recriar dataset da aula anterior</span>
+n_tracks = <span class="syntax-number">5000</span>
+generos = [<span class="syntax-string">'Pop'</span>,<span class="syntax-string">'Rock'</span>,<span class="syntax-string">'Hip Hop'</span>,<span class="syntax-string">'Eletrônica'</span>,<span class="syntax-string">'Indie'</span>,<span class="syntax-string">'R&B'</span>,<span class="syntax-string">'Country'</span>,<span class="syntax-string">'Jazz'</span>]
+
+dados = {
+  <span class="syntax-string">'energia'</span>: np.random.beta(<span class="syntax-number">2</span>,<span class="syntax-number">2</span>, n_tracks),
+  <span class="syntax-string">'valencia'</span>: np.random.beta(<span class="syntax-number">2</span>,<span class="syntax-number">3</span>, n_tracks),
+  <span class="syntax-string">'dancabilidade'</span>: np.random.beta(<span class="syntax-number">3</span>,<span class="syntax-number">2</span>, n_tracks),
+  <span class="syntax-string">'acousticness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">4</span>, n_tracks),
+  <span class="syntax-string">'liveness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">9</span>, n_tracks),
+  <span class="syntax-string">'instrumentalness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">5</span>, n_tracks),
+  <span class="syntax-string">'speechiness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">8</span>, n_tracks),
+  <span class="syntax-string">'tempo'</span>: np.random.normal(<span class="syntax-number">120</span>, <span class="syntax-number">30</span>, n_tracks),
+  <span class="syntax-string">'duracao_minutos'</span>: np.random.lognormal(mean=<span class="syntax-number">1.2</span>, sigma=<span class="syntax-number">0.3</span>, size=n_tracks),
+  <span class="syntax-string">'genero'</span>: np.random.choice(generos, size=n_tracks)
+}
+
+df = pd.DataFrame(dados)
+df[<span class="syntax-string">'tempo'</span>] = np.clip(df[<span class="syntax-string">'tempo'</span>], <span class="syntax-number">60</span>, <span class="syntax-number">200</span>)  <span class="syntax-comment"># BPM realista</span>
+print(<span class="syntax-string">f"Dataset criado: {df.shape[0]} músicas com {df.shape[1]} características"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Preparação dos dados para clustering</h5>
+            <p>Criamos um dataset musical com <strong>características numéricas</strong> que serão usadas pelo K-Means:</p>
+            <ul>
+                <li><strong>Features de áudio:</strong> energia, valência, dançabilidade, acousticness, liveness, instrumentalness, speechiness</li>
+                <li><strong>Features temporais:</strong> tempo (BPM) e duração</li>
+                <li><strong>Categoria:</strong> gênero (para validação posterior)</li>
+            </ul>
+            <p><strong>Por que K-Means?</strong> É um algoritmo não supervisionado que agrupa dados similares automaticamente, ideal para descobrir padrões ocultos nos dados musicais.</p>
+        </div>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Preparação das Features</h2>
+        </div>
+        <div class="stats-badge">🔧 Pré-processamento</div>
+        <p class="step-description">Normalização e seleção de features numéricas para o algoritmo K-Means.</p>
+
+        <div class="theory-box">
+            <h4>🔧 Por que normalizar?</h4>
+            <p>K-Means usa distância euclidiana. Features com escalas diferentes (ex: tempo ~120, valência ~0.5) podem dominar o algoritmo. A normalização garante que todas as features contribuam igualmente.</p>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>🔧 Preparação das Features</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Selecionar apenas features numéricas para clustering</span>
+features_clustering = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'acousticness'</span>, 
+                      <span class="syntax-string">'liveness'</span>, <span class="syntax-string">'instrumentalness'</span>, <span class="syntax-string">'speechiness'</span>, <span class="syntax-string">'tempo'</span>, <span class="syntax-string">'duracao_minutos'</span>]
+
+X = df[features_clustering].copy()
+
+<span class="syntax-comment"># Verificar se há valores ausentes</span>
+print(<span class="syntax-string">"Valores ausentes por feature:"</span>)
+print(X.isnull().sum())
+
+<span class="syntax-comment"># Estatísticas descritivas antes da normalização</span>
+print(<span class="syntax-string">"\nEstatísticas antes da normalização:"</span>)
+print(X.describe().round(<span class="syntax-number">3</span>))
+
+<span class="syntax-comment"># Normalização (StandardScaler: média=0, desvio=1)</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_scaled = pd.DataFrame(X_scaled, columns=features_clustering)
+
+print(<span class="syntax-string">"\nEstatísticas após normalização:"</span>)
+print(X_scaled.describe().round(<span class="syntax-number">3</span>))</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Normalização com StandardScaler</h5>
+            <p><strong>StandardScaler</strong> transforma cada feature para ter média 0 e desvio padrão 1:</p>
+            <ul>
+                <li><strong>Fórmula:</strong> z = (x - μ) / σ</li>
+                <li><strong>Benefício:</strong> todas as features ficam na mesma escala</li>
+                <li><strong>Exemplo:</strong> tempo (60-200 BPM) e valência (0-1) agora têm escalas comparáveis</li>
+            </ul>
+            <p><strong>Validação:</strong> após normalização, todas as médias devem ser ~0 e desvios ~1.</p>
+        </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Determinando o Número Ideal de Clusters</h2>
+        </div>
+        <div class="stats-badge">📈 Método do Cotovelo</div>
+        <p class="step-description">Usar o método do cotovelo (elbow) e silhouette score para escolher k ideal.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>📈 Método do Cotovelo + Silhouette</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Método do Cotovelo (Elbow Method)</span>
+k_range = <span class="syntax-function">range</span>(<span class="syntax-number">2</span>, <span class="syntax-number">11</span>)
+inertias = []
+silhouette_scores = []
+
+for k in k_range:
+    kmeans = KMeans(n_clusters=k, random_state=<span class="syntax-number">42</span>, n_init=<span class="syntax-number">10</span>)
+    kmeans.fit(X_scaled)
+    inertias.append(kmeans.inertia_)
+    silhouette_scores.append(silhouette_score(X_scaled, kmeans.labels_))
+
+<span class="syntax-comment"># Visualizar ambos os métodos</span>
+fig, (ax1, ax2) = plt.subplots(<span class="syntax-number">1</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">15</span>, <span class="syntax-number">5</span>))
+
+<span class="syntax-comment"># Método do Cotovelo</span>
+ax1.plot(k_range, inertias, <span class="syntax-string">'bo-'</span>, linewidth=<span class="syntax-number">2</span>, markersize=<span class="syntax-number">8</span>)
+ax1.set_xlabel(<span class="syntax-string">'Número de Clusters (k)'</span>, fontsize=<span class="syntax-number">12</span>)
+ax1.set_ylabel(<span class="syntax-string">'Inércia (WCSS)'</span>, fontsize=<span class="syntax-number">12</span>)
+ax1.set_title(<span class="syntax-string">'Método do Cotovelo'</span>, fontsize=<span class="syntax-number">14</span>)
+ax1.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Silhouette Score</span>
+ax2.plot(k_range, silhouette_scores, <span class="syntax-string">'ro-'</span>, linewidth=<span class="syntax-number">2</span>, markersize=<span class="syntax-number">8</span>)
+ax2.set_xlabel(<span class="syntax-string">'Número de Clusters (k)'</span>, fontsize=<span class="syntax-number">12</span>)
+ax2.set_ylabel(<span class="syntax-string">'Silhouette Score'</span>, fontsize=<span class="syntax-number">12</span>)
+ax2.set_title(<span class="syntax-string">'Silhouette Score'</span>, fontsize=<span class="syntax-number">14</span>)
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Mostrar scores</span>
+for i, k in <span class="syntax-function">enumerate</span>(k_range):
+    print(<span class="syntax-string">f"k={k}: Inércia={inertias[i]:.2f}, Silhouette={silhouette_scores[i]:.3f}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Como interpretar os gráficos</h5>
+            <p><strong>Método do Cotovelo:</strong></p>
+            <ul>
+                <li><strong>Inércia (WCSS):</strong> soma das distâncias quadradas dos pontos aos centróides</li>
+                <li><strong>Cotovelo:</strong> ponto onde a inércia para de diminuir drasticamente</li>
+                <li><strong>Interpretação:</strong> k ideal está no "cotovelo" da curva</li>
+            </ul>
+            <p><strong>Silhouette Score:</strong></p>
+            <ul>
+                <li><strong>Range:</strong> -1 a 1 (quanto maior, melhor)</li>
+                <li><strong>Significado:</strong> quão bem cada ponto está no cluster correto</li>
+                <li><strong>Escolha:</strong> k com maior silhouette score</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Passo 4 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Aplicando K-Means</h2>
+        </div>
+        <div class="stats-badge">🤖 Clustering</div>
+        <p class="step-description">Executar K-Means com k=4 e analisar os grupos formados.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>🤖 K-Means com k=4</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Aplicar K-Means com k=4 (baseado nos gráficos anteriores)</span>
+k_escolhido = <span class="syntax-number">4</span>
+kmeans_final = KMeans(n_clusters=k_escolhido, random_state=<span class="syntax-number">42</span>, n_init=<span class="syntax-number">10</span>)
+clusters = kmeans_final.fit_predict(X_scaled)
+
+<span class="syntax-comment"># Adicionar clusters ao DataFrame original</span>
+df[<span class="syntax-string">'cluster'</span>] = clusters
+
+<span class="syntax-comment"># Estatísticas dos clusters</span>
+print(<span class="syntax-string">f"Silhouette Score com k={k_escolhido}: {silhouette_score(X_scaled, clusters):.3f}"</span>)
+print(<span class="syntax-string">f"\nDistribuição dos clusters:"</span>)
+print(df[<span class="syntax-string">'cluster'</span>].value_counts().sort_index())
+
+<span class="syntax-comment"># Centróides dos clusters (desnormalizados para interpretação)</span>
+centroides = scaler.inverse_transform(kmeans_final.cluster_centers_)
+centroides_df = pd.DataFrame(centroides, columns=features_clustering)
+centroides_df[<span class="syntax-string">'cluster'</span>] = <span class="syntax-function">range</span>(k_escolhido)
+
+print(<span class="syntax-string">"\nCentróides dos clusters (valores originais):"</span>)
+print(centroides_df.round(<span class="syntax-number">3</span>))</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Interpretando os resultados</h5>
+            <p><strong>Clusters formados:</strong> cada número representa um "perfil musical" descoberto automaticamente.</p>
+            <ul>
+                <li><strong>Centróides:</strong> valores médios de cada feature em cada cluster</li>
+                <li><strong>Distribuição:</strong> quantas músicas estão em cada grupo</li>
+                <li><strong>Silhouette Score:</strong> qualidade geral do clustering</li>
+            </ul>
+            <p><strong>Próximo passo:</strong> vamos caracterizar cada cluster e dar nomes descritivos.</p>
+        </div>
+    </div>
+
+    <!-- Passo 5 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Análise e Caracterização dos Clusters</h2>
+        </div>
+        <div class="stats-badge">🎭 Perfis Musicais</div>
+        <p class="step-description">Caracterizar cada cluster e comparar com gêneros originais.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>🎭 Caracterização dos Clusters</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Análise detalhada por cluster</span>
+for cluster_id in <span class="syntax-function">range</span>(k_escolhido):
+    print(<span class="syntax-string">f"\n{'='*50}"</span>)
+    print(<span class="syntax-string">f"CLUSTER {cluster_id} - {df[df['cluster']==cluster_id].shape[0]} músicas"</span>)
+    print(<span class="syntax-string">'='*50</span>)
+    
+    cluster_data = df[df[<span class="syntax-string">'cluster'</span>] == cluster_id]
+    
+    <span class="syntax-comment"># Características principais</span>
+    print(<span class="syntax-string">"Características médias:"</span>)
+    for feature in features_clustering:
+        media = cluster_data[feature].mean()
+        print(<span class="syntax-string">f"  {feature}: {media:.3f}"</span>)
+    
+    <span class="syntax-comment"># Gêneros mais comuns neste cluster</span>
+    print(<span class="syntax-string">"\nGêneros mais comuns:"</span>)
+    generos_cluster = cluster_data[<span class="syntax-string">'genero'</span>].value_counts().head(<span class="syntax-number">3</span>)
+    for genero, count in generos_cluster.items():
+        porcentagem = (count / len(cluster_data)) * <span class="syntax-number">100</span>
+        print(<span class="syntax-string">f"  {genero}: {count} músicas ({porcentagem:.1f}%)"</span>)
+
+<span class="syntax-comment"># Sugestão de nomes para os clusters baseado nas características</span>
+nomes_clusters = {
+    <span class="syntax-number">0</span>: <span class="syntax-string">"Cluster 0"</span>,  <span class="syntax-comment"># Você preencherá baseado nos resultados</span>
+    <span class="syntax-number">1</span>: <span class="syntax-string">"Cluster 1"</span>,
+    <span class="syntax-number">2</span>: <span class="syntax-string">"Cluster 2"</span>,
+    <span class="syntax-number">3</span>: <span class="syntax-string">"Cluster 3"</span>
+}
+
+df[<span class="syntax-string">'perfil_musical'</span>] = df[<span class="syntax-string">'cluster'</span>].map(nomes_clusters)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Como caracterizar cada cluster</h5>
+            <p>Analise os valores médios de cada feature para dar personalidade aos clusters:</p>
+            <ul>
+                <li><strong>Alta energia + alta dançabilidade:</strong> "Músicas Energéticas/Festa"</li>
+                <li><strong>Alta acousticness + baixa energia:</strong> "Músicas Acústicas/Relaxantes"</li>
+                <li><strong>Alto speechiness:</strong> "Hip-Hop/Rap"</li>
+                <li><strong>Alta instrumentalness:</strong> "Música Instrumental/Ambiental"</li>
+            </ul>
+            <p><strong>Validação:</strong> compare os gêneros mais comuns em cada cluster com as características encontradas.</p>
+        </div>
+    </div>
+
+    <!-- Passo 6 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Visualizações dos Clusters</h2>
+        </div>
+        <div class="stats-badge">📊 Visualização</div>
+        <p class="step-description">PCA, scatter plots e heatmap para visualizar os agrupamentos formados.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>📊 Visualização com PCA</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># PCA para reduzir dimensionalidade (9D → 2D para visualização)</span>
+pca = PCA(n_components=<span class="syntax-number">2</span>, random_state=<span class="syntax-number">42</span>)
+X_pca = pca.fit_transform(X_scaled)
+
+<span class="syntax-comment"># Variância explicada</span>
+print(<span class="syntax-string">f"Variância explicada por PC1: {pca.explained_variance_ratio_[0]:.3f}"</span>)
+print(<span class="syntax-string">f"Variância explicada por PC2: {pca.explained_variance_ratio_[1]:.3f}"</span>)
+print(<span class="syntax-string">f"Total: {pca.explained_variance_ratio_.sum():.3f}"</span>)
+
+<span class="syntax-comment"># Visualização dos clusters no espaço PCA</span>
+plt.figure(figsize=(<span class="syntax-number">12</span>, <span class="syntax-number">8</span>))
+colors = [<span class="syntax-string">'#9C27B0'</span>, <span class="syntax-string">'#FF5722'</span>, <span class="syntax-string">'#4CAF50'</span>, <span class="syntax-string">'#2196F3'</span>]
+
+for i in <span class="syntax-function">range</span>(k_escolhido):
+    cluster_points = X_pca[clusters == i]
+    plt.scatter(cluster_points[:, <span class="syntax-number">0</span>], cluster_points[:, <span class="syntax-number">1</span>], 
+                c=colors[i], label=<span class="syntax-string">f'Cluster {i}'</span>, alpha=<span class="syntax-number">0.6</span>, s=<span class="syntax-number">50</span>)
+
+<span class="syntax-comment"># Centróides no espaço PCA</span>
+centroides_pca = pca.transform(kmeans_final.cluster_centers_)
+plt.scatter(centroides_pca[:, <span class="syntax-number">0</span>], centroides_pca[:, <span class="syntax-number">1</span>], 
+            c=<span class="syntax-string">'red'</span>, marker=<span class="syntax-string">'X'</span>, s=<span class="syntax-number">200</span>, linewidths=<span class="syntax-number">3</span>, label=<span class="syntax-string">'Centróides'</span>)
+
+plt.xlabel(<span class="syntax-string">f'PC1 ({pca.explained_variance_ratio_[0]:.1%} da variância)'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.ylabel(<span class="syntax-string">f'PC2 ({pca.explained_variance_ratio_[1]:.1%} da variância)'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.title(<span class="syntax-string">'Clusters Musicais - Visualização PCA'</span>, fontsize=<span class="syntax-number">16</span>)
+plt.legend()
+plt.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+plt.show()</code></pre>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>🔥 Heatmap das Características por Cluster</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Heatmap mostrando perfil de cada cluster</span>
+cluster_profiles = df.groupby(<span class="syntax-string">'cluster'</span>)[features_clustering].mean()
+
+plt.figure(figsize=(<span class="syntax-number">12</span>, <span class="syntax-number">8</span>))
+sns.heatmap(cluster_profiles.T, annot=<span class="syntax-keyword">True</span>, fmt=<span class="syntax-string">'.3f'</span>, cmap=<span class="syntax-string">'RdYlBu_r'</span>, 
+            center=<span class="syntax-number">0</span>, cbar_kws={<span class="syntax-string">'label'</span>: <span class="syntax-string">'Valor Médio'</span>})
+plt.title(<span class="syntax-string">'Perfil Musical dos Clusters'</span>, fontsize=<span class="syntax-number">16</span>)
+plt.xlabel(<span class="syntax-string">'Clusters'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.ylabel(<span class="syntax-string">'Características Musicais'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Boxplot comparando energia por cluster</span>
+plt.figure(figsize=(<span class="syntax-number">10</span>, <span class="syntax-number">6</span>))
+sns.boxplot(data=df, x=<span class="syntax-string">'cluster'</span>, y=<span class="syntax-string">'energia'</span>)
+plt.title(<span class="syntax-string">'Distribuição de Energia por Cluster'</span>, fontsize=<span class="syntax-number">14</span>)
+plt.xlabel(<span class="syntax-string">'Cluster'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.ylabel(<span class="syntax-string">'Energia'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.show()</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Interpretando as visualizações</h5>
+            <p><strong>PCA (Análise de Componentes Principais):</strong></p>
+            <ul>
+                <li><strong>Objetivo:</strong> reduzir 9 dimensões para 2D para visualização</li>
+                <li><strong>PC1 e PC2:</strong> direções de maior variância nos dados</li>
+                <li><strong>Clusters bem separados:</strong> indica bom agrupamento</li>
+            </ul>
+            <p><strong>Heatmap:</strong> mostra o "DNA" de cada cluster - quais características são altas/baixas em cada grupo.</p>
+            <p><strong>Boxplot:</strong> compara a distribuição de uma feature específica entre clusters.</p>
+        </div>
+    </div>
+
+    <!-- Passo 7 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">7</div>
+            <h2 class="step-title">Validação e Insights</h2>
+        </div>
+        <div class="stats-badge">🎯 Validação</div>
+        <p class="step-description">Comparar clusters descobertos com gêneros conhecidos e extrair insights.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>🎯 Análise Cruzada: Clusters vs Gêneros</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Tabela cruzada: Clusters vs Gêneros</span>
+tabela_cruzada = pd.crosstab(df[<span class="syntax-string">'genero'</span>], df[<span class="syntax-string">'cluster'</span>], margins=<span class="syntax-keyword">True</span>)
+print(<span class="syntax-string">"Tabela Cruzada: Gêneros vs Clusters"</span>)
+print(tabela_cruzada)
+
+<span class="syntax-comment"># Porcentagens por linha (cada gênero)</span>
+print(<span class="syntax-string">"\nPorcentagem por gênero:"</span>)
+tabela_percentual = pd.crosstab(df[<span class="syntax-string">'genero'</span>], df[<span class="syntax-string">'cluster'</span>], normalize=<span class="syntax-string">'index'</span>) * <span class="syntax-number">100</span>
+print(tabela_percentual.round(<span class="syntax-number">1</span>))
+
+<span class="syntax-comment"># Visualizar a tabela cruzada</span>
+plt.figure(figsize=(<span class="syntax-number">10</span>, <span class="syntax-number">8</span>))
+sns.heatmap(tabela_percentual, annot=<span class="syntax-keyword">True</span>, fmt=<span class="syntax-string">'.1f'</span>, cmap=<span class="syntax-string">'Blues'</span>, cbar_kws={<span class="syntax-string">'label'</span>: <span class="syntax-string">'%'</span>})
+plt.title(<span class="syntax-string">'Distribuição de Gêneros por Cluster (%)'</span>, fontsize=<span class="syntax-number">14</span>)
+plt.xlabel(<span class="syntax-string">'Cluster'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.ylabel(<span class="syntax-string">'Gênero Original'</span>, fontsize=<span class="syntax-number">12</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Métricas de qualidade do clustering</span>
+from sklearn.metrics <span class="syntax-keyword">import</span> adjusted_rand_score, normalized_mutual_info_score
+
+<span class="syntax-comment"># Codificar gêneros para métricas</span>
+from sklearn.preprocessing <span class="syntax-keyword">import</span> LabelEncoder
+le = LabelEncoder()
+generos_encoded = le.fit_transform(df[<span class="syntax-string">'genero'</span>])
+
+ari = adjusted_rand_score(generos_encoded, clusters)
+nmi = normalized_mutual_info_score(generos_encoded, clusters)
+
+print(<span class="syntax-string">f"\nMétricas de validação externa:"</span>)
+print(<span class="syntax-string">f"Adjusted Rand Index (ARI): {ari:.3f}"</span>)
+print(<span class="syntax-string">f"Normalized Mutual Information (NMI): {nmi:.3f}"</span>)
+print(<span class="syntax-string">f"Silhouette Score: {silhouette_score(X_scaled, clusters):.3f}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Validação do clustering</h5>
+            <p><strong>Tabela cruzada:</strong> mostra como os clusters se relacionam com gêneros conhecidos.</p>
+            <ul>
+                <li><strong>Clusters puros:</strong> se um cluster tem majoritariamente um gênero, indica boa separação</li>
+                <li><strong>Gêneros dispersos:</strong> se um gênero aparece em vários clusters, pode ter subgêneros</li>
+            </ul>
+            <p><strong>Métricas de validação:</strong></p>
+            <ul>
+                <li><strong>ARI (0-1):</strong> acordo entre clusters e gêneros (1 = perfeito)</li>
+                <li><strong>NMI (0-1):</strong> informação mútua entre clusters e gêneros</li>
+                <li><strong>Silhouette (0-1):</strong> qualidade interna dos clusters</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <h4>⚠️ Pontos Importantes do K-Means</h4>
+        <ul>
+            <li><strong>Normalização é essencial:</strong> features em escalas diferentes podem dominar o algoritmo</li>
+            <li><strong>k deve ser escolhido cuidadosamente:</strong> use método do cotovelo + silhouette score</li>
+            <li><strong>Algoritmo sensível à inicialização:</strong> use random_state para reprodutibilidade</li>
+            <li><strong>Assume clusters esféricos:</strong> pode não funcionar bem com formas irregulares</li>
+            <li><strong>Interpretação é subjetiva:</strong> analise as características para dar significado aos clusters</li>
+        </ul>
+    </div>
+
+    <div class="highlight-box">
+        <h4>🎉 Parabéns! Você aplicou K-Means com sucesso</h4>
+        <p>Descobriu perfis musicais automaticamente, validou com gêneros conhecidos e criou visualizações para interpretar os resultados. Este é o poder do aprendizado não supervisionado!</p>
+    </div>
+
+    <p class="subtitle" style="text-align:center;margin-top:30px">✅ Atividade completa - K-Means aplicado em dados musicais com interpretação prática</p>
+</div>
+
+<script>
+// Copiar conteúdo dos blocos de código
+document.querySelectorAll('.code-block').forEach(block => {
+  const btn = block.querySelector('.copy-button');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const code = block.querySelector('pre').innerText;
+    try{
+      await navigator.clipboard.writeText(code);
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copy-success');
+      setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copy-success'); }, 1400);
+    }catch(e){
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = code; document.body.appendChild(textarea);
+      textarea.select(); document.execCommand('copy'); textarea.remove();
+      btn.textContent = 'Copiado!';
+      setTimeout(()=>{ btn.textContent = 'Copiar'; }, 1400);
+    }
+  });
+});
+</script>
+</body>
+</html>
