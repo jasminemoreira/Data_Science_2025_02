@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Prático - Expectation-Maximization e Clustering Hierárquico</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+            background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+            min-height:100vh;padding:20px
+        }
+        .container{
+            max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(20px);border-radius:24px;padding:40px;
+            box-shadow:0 20px 40px rgba(25,20,20,.2);border:1px solid rgba(255,255,255,.3);
+            animation:fadeInUp .8s cubic-bezier(.4,0,.2,1)
+        }
+        .header{text-align:center;margin-bottom:40px}
+        .badge{background:linear-gradient(135deg,#673ab7,#3f51b5);color:#fff;padding:10px 20px;border-radius:25px;font-size:14px;font-weight:600;display:inline-block;margin-bottom:20px;box-shadow:0 4px 15px rgba(103,58,183,.3)}
+        .stats-badge{background:linear-gradient(135deg,#2196f3,#1976d2);color:#fff;padding:6px 14px;border-radius:15px;font-size:12px;font-weight:600;display:inline-block;margin-bottom:15px;box-shadow:0 2px 8px rgba(33,150,243,.3)}
+        .title{font-size:2.5rem;font-weight:700;color:#1a1a1a;margin-bottom:12px;background:linear-gradient(135deg,#673ab7,#3f51b5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .subtitle{font-size:1.2rem;color:#666;font-weight:400;margin-bottom:30px}
+        .step-container{background:rgba(255,255,255,.7);backdrop-filter:blur(10px);border-radius:16px;border-left:6px solid #673ab7;padding:30px;margin-bottom:30px;box-shadow:0 8px 25px rgba(103,58,183,.1);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+        .step-container:hover{transform:translateY(-5px)}
+        .step-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+        .step-number{background:linear-gradient(135deg,#673ab7,#3f51b5);color:#fff;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;box-shadow:0 4px 15px rgba(103,58,183,.3)}
+        .step-title{color:#673ab7;font-size:1.5rem;font-weight:600;margin:0}
+        .step-description{color:#444;line-height:1.7;font-size:1.1rem;margin-bottom:20px}
+        .theory-box{background:rgba(33,150,243,.1);border:2px solid rgba(33,150,243,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .theory-box h4{color:#2196f3;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .code-block{background:#1e1e1e;color:#d4d4d4;padding:25px;border-radius:12px;font-family:'Monaco','Menlo','Ubuntu Mono',monospace;font-size:14px;line-height:1.6;overflow-x:auto;margin:20px 0;border-left:4px solid #673ab7;position:relative}
+        .code-header{background:#2d2d2d;color:#fff;padding:10px 20px;margin:-25px -25px 15px -25px;border-radius:12px 12px 0 0;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+        .copy-button{background:#673ab7;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:background .3s,transform .2s}
+        .copy-button:hover{background:#3f51b5;transform:scale(1.05)}
+        .output-example{background:rgba(76,175,80,.1);border:2px solid rgba(76,175,80,.3);border-radius:12px;padding:20px;margin:15px 0;font-family:monospace;font-size:13px}
+        .output-header{color:#388e3c;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .highlight-box{background:linear-gradient(135deg,#673ab7,#3f51b5);color:#fff;padding:25px;border-radius:16px;margin:25px 0;backdrop-filter:blur(10px);box-shadow:0 8px 25px rgba(103,58,183,.3)}
+        .highlight-box h4{font-size:1.3rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .warning-box{background:rgba(255,193,7,.1);border:2px solid rgba(255,193,7,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .warning-box h4{color:#f57c00;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .info-panel{background:rgba(103,58,183,.1);border:2px solid rgba(103,58,183,.2);border-radius:16px;padding:20px;margin:20px 0}
+        .info-panel h4{color:#673ab7;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .explanation-box{background:rgba(255,255,255,.5);border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #673ab7}
+        .explanation-box h5{color:#673ab7;font-size:1.1rem;margin-bottom:10px;font-weight:600}
+        .explanation-box p{color:#555;line-height:1.6;font-size:.95rem}
+        .comparison-box{background:rgba(255,235,59,.1);border:2px solid rgba(255,235,59,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .comparison-box h4{color:#f9a825;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .syntax-keyword{color:#569cd6}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-function{color:#dcdcaa}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @media (max-width:768px){.container{padding:25px;margin:10px}.title{font-size:2rem}.step-container{padding:20px}.code-block{padding:15px;font-size:12px}.step-header{flex-direction:column;align-items:flex-start;gap:10px}.step-number{width:35px;height:35px;font-size:16px}.step-title{font-size:1.3rem}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="badge">Roteiro Prático - Aula 6</div>
+        <h1 class="title">Expectation-Maximization e Clustering Hierárquico</h1>
+        <p class="subtitle">Algoritmos avançados de clustering para análise musical</p>
+    </div>
+
+    <div class="highlight-box">
+        <h4>O que vamos aprender hoje</h4>
+        <p>Aplicaremos algoritmos mais sofisticados de clustering: <strong>Expectation-Maximization (EM)</strong> com Gaussian Mixture Models e <strong>Clustering Hierárquico</strong>, comparando com o K-Means da aula anterior.</p>
+    </div>
+
+    <div class="info-panel">
+        <h4>Preparação</h4>
+        <p>Abra o Google Colab e crie o notebook <strong>Aula6_EM_Hierarchical_Clustering</strong>. Continuaremos a análise do dataset musical da aula anterior.</p>
+    </div>
+
+    <!-- Passo 1 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Revisão e Preparação do Dataset</h2>
+        </div>
+        <div class="stats-badge">Preparação dos Dados</div>
+        <p class="step-description">Recriaremos o dataset musical e aplicaremos a normalização necessária para os algoritmos avançados.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Configuração e Dataset</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+<span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
+<span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
+<span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
+<span class="syntax-keyword">from</span> sklearn.mixture <span class="syntax-keyword">import</span> GaussianMixture
+<span class="syntax-keyword">from</span> sklearn.cluster <span class="syntax-keyword">import</span> AgglomerativeClustering, KMeans
+<span class="syntax-keyword">from</span> sklearn.preprocessing <span class="syntax-keyword">import</span> StandardScaler
+<span class="syntax-keyword">from</span> sklearn.metrics <span class="syntax-keyword">import</span> silhouette_score, adjusted_rand_score
+<span class="syntax-keyword">from</span> sklearn.decomposition <span class="syntax-keyword">import</span> PCA
+<span class="syntax-keyword">from</span> scipy.cluster.hierarchy <span class="syntax-keyword">import</span> dendrogram, linkage
+<span class="syntax-keyword">from</span> scipy.spatial.distance <span class="syntax-keyword">import</span> pdist
+<span class="syntax-keyword">import</span> warnings
+warnings.filterwarnings(<span class="syntax-string">'ignore'</span>)
+
+np.random.seed(<span class="syntax-number">42</span>)
+plt.style.use(<span class="syntax-string">'dark_background'</span>)
+sns.set_palette([<span class="syntax-string">'#673AB7'</span>,<span class="syntax-string">'#2196F3'</span>,<span class="syntax-string">'#4CAF50'</span>,<span class="syntax-string">'#FF9800'</span>,<span class="syntax-string">'#F44336'</span>])
+
+<span class="syntax-comment"># Recrear o dataset musical da aula anterior</span>
+n_tracks = <span class="syntax-number">3000</span>
+generos = [<span class="syntax-string">'Pop'</span>,<span class="syntax-string">'Rock'</span>,<span class="syntax-string">'Hip Hop'</span>,<span class="syntax-string">'Eletrônica'</span>,<span class="syntax-string">'Indie'</span>,<span class="syntax-string">'R&B'</span>,<span class="syntax-string">'Jazz'</span>,<span class="syntax-string">'Country'</span>]
+
+dados = {
+  <span class="syntax-string">'energia'</span>: np.random.beta(<span class="syntax-number">2</span>,<span class="syntax-number">2</span>, n_tracks),
+  <span class="syntax-string">'valencia'</span>: np.random.beta(<span class="syntax-number">2</span>,<span class="syntax-number">3</span>, n_tracks),
+  <span class="syntax-string">'dancabilidade'</span>: np.random.beta(<span class="syntax-number">3</span>,<span class="syntax-number">2</span>, n_tracks),
+  <span class="syntax-string">'acousticness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">4</span>, n_tracks),
+  <span class="syntax-string">'liveness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">9</span>, n_tracks),
+  <span class="syntax-string">'instrumentalness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">5</span>, n_tracks),
+  <span class="syntax-string">'speechiness'</span>: np.random.beta(<span class="syntax-number">1</span>,<span class="syntax-number">8</span>, n_tracks),
+  <span class="syntax-string">'tempo'</span>: np.random.normal(<span class="syntax-number">120</span>, <span class="syntax-number">30</span>, n_tracks),
+  <span class="syntax-string">'duracao_minutos'</span>: np.random.lognormal(mean=<span class="syntax-number">1.2</span>, sigma=<span class="syntax-number">0.3</span>, size=n_tracks),
+  <span class="syntax-string">'genero'</span>: np.random.choice(generos, size=n_tracks)
+}
+
+df = pd.DataFrame(dados)
+df[<span class="syntax-string">'tempo'</span>] = np.clip(df[<span class="syntax-string">'tempo'</span>], <span class="syntax-number">60</span>, <span class="syntax-number">200</span>)
+
+<span class="syntax-comment"># Preparar features para clustering</span>
+features_clustering = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'acousticness'</span>, 
+                      <span class="syntax-string">'liveness'</span>, <span class="syntax-string">'instrumentalness'</span>, <span class="syntax-string">'speechiness'</span>, <span class="syntax-string">'tempo'</span>, <span class="syntax-string">'duracao_minutos'</span>]
+
+X = df[features_clustering].copy()
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_scaled = pd.DataFrame(X_scaled, columns=features_clustering)
+
+print(<span class="syntax-string">f"Dataset preparado: {df.shape[0]} músicas com {len(features_clustering)} características"</span>)
+print(<span class="syntax-string">f"Features normalizadas: média ≈ 0, desvio ≈ 1"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Por que usar algoritmos mais avançados?</h5>
+            <p>Embora o K-Means seja eficiente, ele tem limitações:</p>
+            <ul>
+                <li><strong>Assume clusters esféricos:</strong> nem sempre os dados musicais se agrupam em formas circulares</li>
+                <li><strong>Requer definir k antecipadamente:</strong> pode não ser óbvio quantos perfis musicais existem</li>
+                <li><strong>Sensível a outliers:</strong> uma música muito diferente pode distorcer todo um cluster</li>
+            </ul>
+            <p><strong>Algoritmos avançados</strong> como EM e clustering hierárquico podem capturar estruturas mais complexas nos dados musicais.</p>
+        </div>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Expectation-Maximization (EM) com Gaussian Mixture Models</h2>
+        </div>
+        <div class="stats-badge">Algoritmo EM</div>
+        <p class="step-description">Implementação do algoritmo EM usando Gaussian Mixture Models para descobrir perfis musicais probabilísticos.</p>
+
+        <div class="theory-box">
+            <h4>O que é Expectation-Maximization (EM)?</h4>
+            <p><strong>EM</strong> é um algoritmo iterativo que modela os dados como uma mistura de distribuições gaussianas. Diferente do K-Means que atribui cada ponto a um único cluster, o EM calcula a <strong>probabilidade</strong> de cada música pertencer a cada perfil musical.</p>
+            <ul>
+                <li><strong>E-step (Expectation):</strong> calcula probabilidades de pertencimento</li>
+                <li><strong>M-step (Maximization):</strong> atualiza parâmetros das gaussianas</li>
+                <li><strong>Vantagem:</strong> permite "soft clustering" - uma música pode ter características de múltiplos perfis</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Gaussian Mixture Model</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Função para testar diferentes números de componentes</span>
+<span class="syntax-keyword">def</span> <span class="syntax-function">avaliar_gmm</span>(X, max_components=<span class="syntax-number">10</span>):
+    n_components_range = <span class="syntax-function">range</span>(<span class="syntax-number">2</span>, max_components + <span class="syntax-number">1</span>)
+    aic_scores = []
+    bic_scores = []
+    log_likelihoods = []
+    
+    for n in n_components_range:
+        gmm = GaussianMixture(n_components=n, random_state=<span class="syntax-number">42</span>)
+        gmm.fit(X)
+        
+        aic_scores.append(gmm.aic(X))
+        bic_scores.append(gmm.bic(X))
+        log_likelihoods.append(gmm.score(X))
+    
+    <span class="syntax-keyword">return</span> n_components_range, aic_scores, bic_scores, log_likelihoods
+
+<span class="syntax-comment"># Avaliar diferentes números de componentes</span>
+n_range, aic, bic, log_likelihood = avaliar_gmm(X_scaled, <span class="syntax-number">8</span>)
+
+<span class="syntax-comment"># Visualizar critérios de seleção</span>
+fig, (ax1, ax2, ax3) = plt.subplots(<span class="syntax-number">1</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">18</span>, <span class="syntax-number">5</span>))
+
+<span class="syntax-comment"># AIC (menor é melhor)</span>
+ax1.plot(n_range, aic, <span class="syntax-string">'bo-'</span>, linewidth=<span class="syntax-number">2</span>, markersize=<span class="syntax-number">8</span>)
+ax1.set_xlabel(<span class="syntax-string">'Número de Componentes'</span>)
+ax1.set_ylabel(<span class="syntax-string">'AIC (menor = melhor)'</span>)
+ax1.set_title(<span class="syntax-string">'Critério AIC'</span>)
+ax1.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># BIC (menor é melhor)</span>
+ax2.plot(n_range, bic, <span class="syntax-string">'ro-'</span>, linewidth=<span class="syntax-number">2</span>, markersize=<span class="syntax-number">8</span>)
+ax2.set_xlabel(<span class="syntax-string">'Número de Componentes'</span>)
+ax2.set_ylabel(<span class="syntax-string">'BIC (menor = melhor)'</span>)
+ax2.set_title(<span class="syntax-string">'Critério BIC'</span>)
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Log-Likelihood (maior é melhor)</span>
+ax3.plot(n_range, log_likelihood, <span class="syntax-string">'go-'</span>, linewidth=<span class="syntax-number">2</span>, markersize=<span class="syntax-number">8</span>)
+ax3.set_xlabel(<span class="syntax-string">'Número de Componentes'</span>)
+ax3.set_ylabel(<span class="syntax-string">'Log-Likelihood'</span>)
+ax3.set_title(<span class="syntax-string">'Log-Likelihood'</span>)
+ax3.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Encontrar o melhor número de componentes</span>
+best_aic_idx = np.argmin(aic)
+best_bic_idx = np.argmin(bic)
+best_n_aic = n_range[best_aic_idx]
+best_n_bic = n_range[best_bic_idx]
+
+print(<span class="syntax-string">f"Melhor número de componentes (AIC): {best_n_aic}"</span>)
+print(<span class="syntax-string">f"Melhor número de componentes (BIC): {best_n_bic}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Critérios de seleção para GMM</h5>
+            <p><strong>AIC (Akaike Information Criterion):</strong> equilibra qualidade do modelo com complexidade</p>
+            <ul>
+                <li><strong>Penaliza:</strong> modelos com muitos parâmetros</li>
+                <li><strong>Escolha:</strong> menor valor de AIC</li>
+            </ul>
+            <p><strong>BIC (Bayesian Information Criterion):</strong> mais conservador que AIC</p>
+            <ul>
+                <li><strong>Penalização:</strong> mais severa para modelos complexos</li>
+                <li><strong>Preferência:</strong> modelos mais simples</li>
+            </ul>
+            <p><strong>Log-Likelihood:</strong> qualidade do ajuste aos dados (maior é melhor)</p>
+        </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Aplicando o Modelo EM Otimizado</h2>
+        </div>
+        <div class="stats-badge">Clustering Probabilístico</div>
+        <p class="step-description">Executar o GMM com o número otimizado de componentes e analisar os perfis musicais probabilísticos.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>GMM Otimizado</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Aplicar GMM com número otimizado de componentes</span>
+n_components_optimal = best_n_bic  <span class="syntax-comment"># Usar BIC (mais conservador)</span>
+gmm = GaussianMixture(n_components=n_components_optimal, random_state=<span class="syntax-number">42</span>)
+gmm.fit(X_scaled)
+
+<span class="syntax-comment"># Obter clusters e probabilidades</span>
+clusters_gmm = gmm.predict(X_scaled)
+probabilidades = gmm.predict_proba(X_scaled)
+
+<span class="syntax-comment"># Adicionar resultados ao DataFrame</span>
+df[<span class="syntax-string">'cluster_gmm'</span>] = clusters_gmm
+for i in <span class="syntax-function">range</span>(n_components_optimal):
+    df[<span class="syntax-string">f'prob_cluster_{i}'</span>] = probabilidades[:, i]
+
+<span class="syntax-comment"># Estatísticas dos clusters GMM</span>
+print(<span class="syntax-string">f"Modelo GMM com {n_components_optimal} componentes"</span>)
+print(<span class="syntax-string">f"AIC: {gmm.aic(X_scaled):.2f}"</span>)
+print(<span class="syntax-string">f"BIC: {gmm.bic(X_scaled):.2f}"</span>)
+print(<span class="syntax-string">f"Log-Likelihood: {gmm.score(X_scaled):.2f}"</span>)
+
+print(<span class="syntax-string">"\nDistribuição dos clusters GMM:"</span>)
+print(df[<span class="syntax-string">'cluster_gmm'</span>].value_counts().sort_index())
+
+<span class="syntax-comment"># Análise das probabilidades</span>
+print(<span class="syntax-string">"\nAnálise de incerteza (músicas com probabilidades similares):"</span>)
+<span class="syntax-comment"># Calcular entropia das probabilidades (alta entropia = incerteza)</span>
+entropy = -np.sum(probabilidades * np.log(probabilidades + <span class="syntax-number">1e-10</span>), axis=<span class="syntax-number">1</span>)
+df[<span class="syntax-string">'incerteza'</span>] = entropy
+
+print(<span class="syntax-string">f"Incerteza média: {entropy.mean():.3f}"</span>)
+print(<span class="syntax-string">f"Músicas com alta incerteza (>1.0): {np.sum(entropy > 1.0)}"</span>)
+
+<span class="syntax-comment"># Mostrar exemplos de alta incerteza</span>
+high_uncertainty = df[df[<span class="syntax-string">'incerteza'</span>] > <span class="syntax-number">1.0</span>].head(<span class="syntax-number">3</span>)
+print(<span class="syntax-string">"\nExemplos de músicas com características híbridas:"</span>)
+for idx, row in high_uncertainty.iterrows():
+    print(<span class="syntax-string">f"Música {idx}: Gênero {row['genero']}"</span>)
+    for i in <span class="syntax-function">range</span>(n_components_optimal):
+        print(<span class="syntax-string">f"  Probabilidade Cluster {i}: {row[f'prob_cluster_{i}']:.3f}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Interpretando o clustering probabilístico</h5>
+            <p><strong>Vantagens do GMM sobre K-Means:</strong></p>
+            <ul>
+                <li><strong>Probabilidades:</strong> cada música tem probabilidade de pertencer a cada cluster</li>
+                <li><strong>Incerteza:</strong> identifica músicas com características "híbridas"</li>
+                <li><strong>Flexibilidade:</strong> clusters podem ter formas elípticas, não apenas circulares</li>
+                <li><strong>Outliers suaves:</strong> músicas atípicas não são forçadas em um cluster específico</li>
+            </ul>
+            <p><strong>Entropia:</strong> mede incerteza. Alta entropia indica música com características de múltiplos perfis.</p>
+        </div>
+    </div>
+
+    <!-- Passo 4 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Clustering Hierárquico</h2>
+        </div>
+        <div class="stats-badge">Hierárquico</div>
+        <p class="step-description">Implementar clustering hierárquico aglomerativo e visualizar a hierarquia de perfis musicais com dendrograma.</p>
+
+        <div class="theory-box">
+            <h4>O que é Clustering Hierárquico?</h4>
+            <p><strong>Clustering Hierárquico Aglomerativo</strong> constrói uma árvore de clusters começando com cada ponto como um cluster individual e progressivamente unindo os mais similares.</p>
+            <ul>
+                <li><strong>Bottom-up:</strong> inicia com n clusters (cada ponto), termina com 1</li>
+                <li><strong>Critérios de ligação:</strong> como medir distância entre clusters</li>
+                <li><strong>Dendrograma:</strong> visualiza toda a hierarquia de agrupamentos</li>
+                <li><strong>Vantagem:</strong> não precisa definir número de clusters antecipadamente</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Clustering Hierárquico</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Usar amostra menor para dendrograma legível</span>
+sample_size = <span class="syntax-number">500</span>
+sample_indices = np.random.choice(X_scaled.shape[<span class="syntax-number">0</span>], sample_size, replace=<span class="syntax-keyword">False</span>)
+X_sample = X_scaled.iloc[sample_indices]
+df_sample = df.iloc[sample_indices]
+
+<span class="syntax-comment"># Calcular matriz de linkage para diferentes métodos</span>
+linkage_methods = [<span class="syntax-string">'ward'</span>, <span class="syntax-string">'complete'</span>, <span class="syntax-string">'average'</span>, <span class="syntax-string">'single'</span>]
+linkage_matrices = {}
+
+for method in linkage_methods:
+    linkage_matrices[method] = linkage(X_sample, method=method)
+
+<span class="syntax-comment"># Visualizar dendrogramas</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">20</span>, <span class="syntax-number">15</span>))
+axes = axes.flatten()
+
+for i, method in <span class="syntax-function">enumerate</span>(linkage_methods):
+    ax = axes[i]
+    dendrogram(linkage_matrices[method], ax=ax, truncate_mode=<span class="syntax-string">'level'</span>, p=<span class="syntax-number">5</span>)
+    ax.set_title(<span class="syntax-string">f'Dendrograma - Método {method.capitalize()}'</span>, fontsize=<span class="syntax-number">14</span>)
+    ax.set_xlabel(<span class="syntax-string">'Índice das amostras'</span>)
+    ax.set_ylabel(<span class="syntax-string">'Distância'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Aplicar clustering hierárquico com método Ward (melhor para dados contínuos)</span>
+n_clusters_hier = <span class="syntax-number">4</span>  <span class="syntax-comment"># Número similar ao usado anteriormente</span>
+hierarchical = AgglomerativeClustering(n_clusters=n_clusters_hier, linkage=<span class="syntax-string">'ward'</span>)
+clusters_hier = hierarchical.fit_predict(X_scaled)
+
+df[<span class="syntax-string">'cluster_hierarquico'</span>] = clusters_hier
+
+print(<span class="syntax-string">f"Clustering hierárquico com {n_clusters_hier} clusters"</span>)
+print(<span class="syntax-string">"Distribuição dos clusters hierárquicos:"</span>)
+print(df[<span class="syntax-string">'cluster_hierarquico'</span>].value_counts().sort_index())</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Métodos de ligação (linkage) explicados</h5>
+            <p><strong>Ward:</strong> minimiza a variância intra-cluster (melhor para clusters esféricos)</p>
+            <p><strong>Complete:</strong> distância máxima entre pontos de clusters diferentes (clusters compactos)</p>
+            <p><strong>Average:</strong> distância média entre todos os pares de pontos</p>
+            <p><strong>Single:</strong> distância mínima (pode criar clusters "chain-like")</p>
+            <p><strong>Dendrograma:</strong> mostra a sequência de fusões. Cortes horizontais em diferentes alturas geram diferentes números de clusters.</p>
+        </div>
+    </div>
+
+    <!-- Passo 5 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Comparação dos Três Algoritmos</h2>
+        </div>
+        <div class="stats-badge">Comparação</div>
+        <p class="step-description">Comparar K-Means, EM (GMM) e Clustering Hierárquico nos mesmos dados musicais.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Implementar K-Means para Comparação</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># K-Means para comparação</span>
+kmeans = KMeans(n_clusters=<span class="syntax-number">4</span>, random_state=<span class="syntax-number">42</span>)
+clusters_kmeans = kmeans.fit_predict(X_scaled)
+df[<span class="syntax-string">'cluster_kmeans'</span>] = clusters_kmeans
+
+<span class="syntax-comment"># Calcular métricas de qualidade para cada algoritmo</span>
+algorithms = {
+    <span class="syntax-string">'K-Means'</span>: clusters_kmeans,
+    <span class="syntax-string">'GMM'</span>: clusters_gmm,
+    <span class="syntax-string">'Hierárquico'</span>: clusters_hier
+}
+
+metrics_comparison = {}
+
+for name, clusters in algorithms.items():
+    silhouette = silhouette_score(X_scaled, clusters)
+    metrics_comparison[name] = {
+        <span class="syntax-string">'silhouette'</span>: silhouette,
+        <span class="syntax-string">'n_clusters'</span>: len(np.unique(clusters))
+    }
+
+<span class="syntax-comment"># Exibir comparação</span>
+print(<span class="syntax-string">"Comparação de Algoritmos de Clustering:"</span>)
+print(<span class="syntax-string">"=" * 50</span>)
+for name, metrics in metrics_comparison.items():
+    print(<span class="syntax-string">f"{name}:"</span>)
+    print(<span class="syntax-string">f"  Silhouette Score: {metrics['silhouette']:.3f}"</span>)
+    print(<span class="syntax-string">f"  Número de clusters: {metrics['n_clusters']}"</span>)
+    print()
+
+<span class="syntax-comment"># Visualização comparativa com PCA</span>
+pca = PCA(n_components=<span class="syntax-number">2</span>, random_state=<span class="syntax-number">42</span>)
+X_pca = pca.fit_transform(X_scaled)
+
+fig, axes = plt.subplots(<span class="syntax-number">1</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">20</span>, <span class="syntax-number">6</span>))
+colors = [<span class="syntax-string">'#673AB7'</span>, <span class="syntax-string">'#2196F3'</span>, <span class="syntax-string">'#4CAF50'</span>, <span class="syntax-string">'#FF9800'</span>, <span class="syntax-string">'#F44336'</span>]
+
+for i, (name, clusters) in <span class="syntax-function">enumerate</span>(algorithms.items()):
+    ax = axes[i]
+    
+    for cluster_id in np.unique(clusters):
+        mask = clusters == cluster_id
+        ax.scatter(X_pca[mask, <span class="syntax-number">0</span>], X_pca[mask, <span class="syntax-number">1</span>], 
+                  c=colors[cluster_id], label=<span class="syntax-string">f'Cluster {cluster_id}'</span>, 
+                  alpha=<span class="syntax-number">0.6</span>, s=<span class="syntax-number">50</span>)
+    
+    ax.set_title(<span class="syntax-string">f'{name}\nSilhouette: {metrics_comparison[name]["silhouette"]:.3f}'</span>)
+    ax.set_xlabel(<span class="syntax-string">f'PC1 ({pca.explained_variance_ratio_[0]:.1%})'</span>)
+    ax.set_ylabel(<span class="syntax-string">f'PC2 ({pca.explained_variance_ratio_[1]:.1%})'</span>)
+    ax.legend(bbox_to_anchor=(<span class="syntax-number">1.05</span>, <span class="syntax-number">1</span>), loc=<span class="syntax-string">'upper left'</span>)
+    ax.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()</code></pre>
+        </div>
+
+        <div class="comparison-box">
+            <h4>Quando usar cada algoritmo?</h4>
+            <p><strong>K-Means:</strong></p>
+            <ul>
+                <li>✅ Rápido e simples</li>
+                <li>✅ Bom para clusters esféricos de tamanhos similares</li>
+                <li>❌ Requer definir k antecipadamente</li>
+                <li>❌ Sensível a outliers</li>
+            </ul>
+            <p><strong>Gaussian Mixture Model (EM):</strong></p>
+            <ul>
+                <li>✅ Fornece probabilidades de pertencimento</li>
+                <li>✅ Clusters podem ter formas elípticas</li>
+                <li>✅ Identifica dados com características híbridas</li>
+                <li>❌ Computacionalmente mais custoso</li>
+            </ul>
+            <p><strong>Clustering Hierárquico:</strong></p>
+            <ul>
+                <li>✅ Não requer definir número de clusters</li>
+                <li>✅ Fornece hierarquia completa de agrupamentos</li>
+                <li>✅ Determinístico (sempre mesmo resultado)</li>
+                <li>❌ Computacionalmente caro para grandes datasets</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Passo 6 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Análise de Concordância entre Algoritmos</h2>
+        </div>
+        <div class="stats-badge">Concordância</div>
+        <p class="step-description">Analisar o grau de concordância entre os diferentes algoritmos e identificar padrões consistentes.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Análise de Concordância</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Calcular concordância entre algoritmos (Adjusted Rand Index)</span>
+from itertools <span class="syntax-keyword">import</span> combinations
+
+concordancias = {}
+algoritmos_nomes = list(algorithms.keys())
+
+for alg1, alg2 in combinations(algoritmos_nomes, <span class="syntax-number">2</span>):
+    clusters1 = algorithms[alg1]
+    clusters2 = algorithms[alg2]
+    ari = adjusted_rand_score(clusters1, clusters2)
+    concordancias[<span class="syntax-string">f"{alg1} vs {alg2}"</span>] = ari
+
+print(<span class="syntax-string">"Concordância entre algoritmos (Adjusted Rand Index):"</span>)
+for pair, score in concordancias.items():
+    print(<span class="syntax-string">f"{pair}: {score:.3f}"</span>)
+
+<span class="syntax-comment"># Criar matriz de confusão entre K-Means e GMM</span>
+confusion_matrix = pd.crosstab(df[<span class="syntax-string">'cluster_kmeans'</span>], df[<span class="syntax-string">'cluster_gmm'</span>], 
+                              rownames=[<span class="syntax-string">'K-Means'</span>], colnames=[<span class="syntax-string">'GMM'</span>])
+
+plt.figure(figsize=(<span class="syntax-number">8</span>, <span class="syntax-number">6</span>))
+sns.heatmap(confusion_matrix, annot=<span class="syntax-keyword">True</span>, fmt=<span class="syntax-string">'d'</span>, cmap=<span class="syntax-string">'Blues'</span>)
+plt.title(<span class="syntax-string">'Matriz de Confusão: K-Means vs GMM'</span>)
+plt.show()
+
+<span class="syntax-comment"># Análise de estabilidade: músicas que sempre ficam no mesmo cluster</span>
+<span class="syntax-comment"># Verificar consistência entre os 3 algoritmos</span>
+consistent_assignments = []
+
+for idx in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(df)):
+    clusters_song = [
+        df.iloc[idx][<span class="syntax-string">'cluster_kmeans'</span>],
+        df.iloc[idx][<span class="syntax-string">'cluster_gmm'</span>],
+        df.iloc[idx][<span class="syntax-string">'cluster_hierarquico'</span>]
+    ]
+    <span class="syntax-comment"># Verificar se pelo menos 2 dos 3 algoritmos concordam</span>
+    if <span class="syntax-function">len</span>(<span class="syntax-function">set</span>(clusters_song)) <= <span class="syntax-number">2</span>:  <span class="syntax-comment"># 2 ou 3 valores iguais</span>
+        consistent_assignments.append(idx)
+
+consistency_rate = <span class="syntax-function">len</span>(consistent_assignments) / <span class="syntax-function">len</span>(df)
+print(<span class="syntax-string">f"\nMúsicas com atribuição consistente (2+ algoritmos concordam): {len(consistent_assignments)} ({consistency_rate:.1%})"</span>)
+
+<span class="syntax-comment"># Análise por gênero</span>
+print(<span class="syntax-string">"\nConcordância por gênero musical:"</span>)
+for genero in df[<span class="syntax-string">'genero'</span>].unique():
+    mask = df[<span class="syntax-string">'genero'</span>] == genero
+    subset_kmeans = df.loc[mask, <span class="syntax-string">'cluster_kmeans'</span>]
+    subset_gmm = df.loc[mask, <span class="syntax-string">'cluster_gmm'</span>]
+    
+    ari_genero = adjusted_rand_score(subset_kmeans, subset_gmm)
+    print(<span class="syntax-string">f"  {genero}: ARI = {ari_genero:.3f}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Interpretando a concordância</h5>
+            <p><strong>Adjusted Rand Index (ARI):</strong></p>
+            <ul>
+                <li><strong>Range:</strong> -1 a 1 (1 = concordância perfeita, 0 = concordância aleatória)</li>
+                <li><strong>>0.75:</strong> concordância alta</li>
+                <li><strong>0.5-0.75:</strong> concordância moderada</li>
+                <li><strong><0.5:</strong> concordância baixa</li>
+            </ul>
+            <p><strong>Alta concordância:</strong> indica que os algoritmos capturam estruturas reais nos dados</p>
+            <p><strong>Baixa concordância:</strong> pode indicar que diferentes algoritmos capturam aspectos diferentes dos dados, ou que não há estrutura clara de clusters</p>
+        </div>
+    </div>
+
+    <!-- Passo 7 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">7</div>
+            <h2 class="step-title">Insights e Recomendações Finais</h2>
+        </div>
+        <div class="stats-badge">Síntese</div>
+        <p class="step-description">Sintetizar os resultados e fornecer recomendações sobre qual algoritmo usar em diferentes cenários.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Síntese Final dos Resultados</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Criar relatório final comparativo</span>
+print(<span class="syntax-string">"RELATÓRIO FINAL DE CLUSTERING MUSICAL"</span>)
+print(<span class="syntax-string">"=" * 60</span>)
+
+<span class="syntax-comment"># Resumo das métricas</span>
+print(<span class="syntax-string">"\n1. QUALIDADE DOS CLUSTERS (Silhouette Score):"</span>)
+best_silhouette = <span class="syntax-function">max</span>(metrics_comparison, key=<span class="syntax-keyword">lambda</span> x: metrics_comparison[x][<span class="syntax-string">'silhouette'</span>])
+for name, metrics in <span class="syntax-function">sorted</span>(metrics_comparison.items(), 
+                                key=<span class="syntax-keyword">lambda</span> x: x[<span class="syntax-number">1</span>][<span class="syntax-string">'silhouette'</span>], reverse=<span class="syntax-keyword">True</span>):
+    indicator = <span class="syntax-string">"👑"</span> if name == best_silhouette else <span class="syntax-string">"  "</span>
+    print(<span class="syntax-string">f"{indicator} {name}: {metrics['silhouette']:.3f}"</span>)
+
+<span class="syntax-comment"># Análise de características únicas de cada algoritmo</span>
+print(<span class="syntax-string">"\n2. CARACTERÍSTICAS ÚNICAS:"</span>)
+
+<span class="syntax-comment"># GMM: analisar incerteza</span>
+high_uncertainty_count = np.sum(df[<span class="syntax-string">'incerteza'</span>] > <span class="syntax-number">1.0</span>)
+print(<span class="syntax-string">f"📊 GMM identificou {high_uncertainty_count} músicas com características híbridas"</span>)
+
+<span class="syntax-comment"># Hierárquico: estabilidade hierárquica</span>
+print(<span class="syntax-string">f"🌳 Clustering Hierárquico oferece visão completa da hierarquia de gêneros"</span>)
+
+<span class="syntax-comment"># K-Means: simplicidade e velocidade</span>
+print(<span class="syntax-string">f"⚡ K-Means é o mais rápido e interpretável"</span>)
+
+<span class="syntax-comment"># Recomendações baseadas no contexto</span>
+print(<span class="syntax-string">"\n3. RECOMENDAÇÕES DE USO:"</span>)
+print(<span class="syntax-string">"""
+🎯 PARA APLICAÇÕES EM PRODUÇÃO (streaming music):
+   → Use K-Means para velocidade e simplicidade
+   
+🔍 PARA ANÁLISE EXPLORATÓRIA DE DADOS:
+   → Use Clustering Hierárquico para entender a estrutura dos dados
+   
+🎭 PARA SISTEMAS DE RECOMENDAÇÃO SOFISTICADOS:
+   → Use GMM para capturar nuances e características híbridas
+   
+📱 PARA APLICAÇÕES MÓVEIS/TEMPO REAL:
+   → Use K-Means pela eficiência computacional
+   
+📊 PARA PESQUISA MUSICOLÓGICA:
+   → Combine todos os três para análise abrangente
+"""</span>)
+
+<span class="syntax-comment"># Checkpoint 2 do Projeto</span>
+print(<span class="syntax-string">"\n4. CHECKPOINT 2 DO PROJETO:"</span>)
+print(<span class="syntax-string">"""
+✅ TAREFAS CONCLUÍDAS:
+   • Implementação de 3 algoritmos de clustering avançados
+   • Comparação quantitativa de performance
+   • Análise de concordância entre métodos
+   • Identificação de características híbridas nos dados
+   
+📋 PRÓXIMOS PASSOS PARA O PROJETO:
+   • Escolher o algoritmo mais adequado para seu caso específico
+   • Aplicar em seu dataset real do projeto
+   • Documentar as descobertas e insights
+   • Preparar visualizações para apresentação final
+"""</span>)
+
+<span class="syntax-comment"># Salvar resultados para uso posterior</span>
+results_summary = {
+    <span class="syntax-string">'silhouette_scores'</span>: {name: metrics[<span class="syntax-string">'silhouette'</span>] for name, metrics in metrics_comparison.items()},
+    <span class="syntax-string">'concordancias'</span>: concordancias,
+    <span class="syntax-string">'best_algorithm'</span>: best_silhouette,
+    <span class="syntax-string">'consistency_rate'</span>: consistency_rate,
+    <span class="syntax-string">'high_uncertainty_songs'</span>: high_uncertainty_count
+}
+
+print(<span class="syntax-string">f"\n📁 Resultados salvos na variável 'results_summary'"</span>)
+print(<span class="syntax-string">f"   Use para comparações futuras em seu projeto"</span>)</code></pre>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <h4>Pontos Importantes para o Projeto</h4>
+        <ul>
+            <li><strong>Não existe algoritmo "melhor" universal:</strong> a escolha depende do contexto e objetivos</li>
+            <li><strong>Validação é essencial:</strong> sempre compare resultados com conhecimento do domínio</li>
+            <li><strong>Interpretabilidade vs Complexidade:</strong> algoritmos mais sofisticados nem sempre são melhores</li>
+            <li><strong>Escalabilidade:</strong> considere o tamanho dos seus dados reais</li>
+            <li><strong>Combinação de métodos:</strong> use múltiplos algoritmos para análise robusta</li>
+        </ul>
+    </div>
+
+    <div class="highlight-box">
+        <h4>Parabéns! Você dominou clustering avançado</h4>
+        <p>Implementou com sucesso <strong>Expectation-Maximization</strong> e <strong>Clustering Hierárquico</strong>, comparou com K-Means, e desenvolveu critérios para escolher o algoritmo adequado para cada situação. Este conhecimento é fundamental para análise de dados não supervisionada!</p>
+    </div>
+
+    <div class="info-panel">
+        <h4>Checkpoint 2 do Projeto - Entregáveis</h4>
+        <p>Para o Checkpoint 2, prepare:</p>
+        <ul>
+            <li>Implementação dos 3 algoritmos no seu dataset do projeto</li>
+            <li>Comparação quantitativa (métricas de qualidade)</li>
+            <li>Justificativa da escolha do algoritmo para seu problema específico</li>
+            <li>Visualizações dos clusters descobertos</li>
+            <li>Insights sobre os padrões encontrados nos seus dados</li>
+        </ul>
+    </div>
+
+    <p class="subtitle" style="text-align:center;margin-top:30px">Atividade completa - Algoritmos avançados de clustering para descoberta de padrões musicais</p>
+</div>
+
+<script>
+// Copiar conteúdo dos blocos de código
+document.querySelectorAll('.code-block').forEach(block => {
+  const btn = block.querySelector('.copy-button');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const code = block.querySelector('pre').innerText;
+    try{
+      await navigator.clipboard.writeText(code);
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copy-success');
+      setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copy-success'); }, 1400);
+    }catch(e){
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = code; document.body.appendChild(textarea);
+      textarea.select(); document.execCommand('copy'); textarea.remove();
+      btn.textContent = 'Copiado!';
+      setTimeout(()=>{ btn.textContent = 'Copiar'; }, 1400);
+    }
+  });
+});
+</script>
+</body>
+</html>
