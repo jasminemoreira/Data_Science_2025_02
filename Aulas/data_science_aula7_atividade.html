@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Prático - Visualização de Dados e Painéis Gerenciais</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+            background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+            min-height:100vh;padding:20px
+        }
+        .container{
+            max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(20px);border-radius:24px;padding:40px;
+            box-shadow:0 20px 40px rgba(25,20,20,.2);border:1px solid rgba(255,255,255,.3);
+            animation:fadeInUp .8s cubic-bezier(.4,0,.2,1)
+        }
+        .header{text-align:center;margin-bottom:40px}
+        .badge{background:linear-gradient(135deg,#ff6b6b,#ff8e53);color:#fff;padding:10px 20px;border-radius:25px;font-size:14px;font-weight:600;display:inline-block;margin-bottom:20px;box-shadow:0 4px 15px rgba(255,107,107,.3)}
+        .stats-badge{background:linear-gradient(135deg,#4ecdc4,#44a08d);color:#fff;padding:6px 14px;border-radius:15px;font-size:12px;font-weight:600;display:inline-block;margin-bottom:15px;box-shadow:0 2px 8px rgba(78,205,196,.3)}
+        .title{font-size:2.5rem;font-weight:700;color:#1a1a1a;margin-bottom:12px;background:linear-gradient(135deg,#ff6b6b,#ff8e53);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .subtitle{font-size:1.2rem;color:#666;font-weight:400;margin-bottom:30px}
+        .step-container{background:rgba(255,255,255,.7);backdrop-filter:blur(10px);border-radius:16px;border-left:6px solid #ff6b6b;padding:30px;margin-bottom:30px;box-shadow:0 8px 25px rgba(255,107,107,.1);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+        .step-container:hover{transform:translateY(-5px)}
+        .step-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+        .step-number{background:linear-gradient(135deg,#ff6b6b,#ff8e53);color:#fff;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;box-shadow:0 4px 15px rgba(255,107,107,.3)}
+        .step-title{color:#ff6b6b;font-size:1.5rem;font-weight:600;margin:0}
+        .step-description{color:#444;line-height:1.7;font-size:1.1rem;margin-bottom:20px}
+        .theory-box{background:rgba(78,205,196,.1);border:2px solid rgba(78,205,196,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .theory-box h4{color:#4ecdc4;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .code-block{background:#1e1e1e;color:#d4d4d4;padding:25px;border-radius:12px;font-family:'Monaco','Menlo','Ubuntu Mono',monospace;font-size:14px;line-height:1.6;overflow-x:auto;margin:20px 0;border-left:4px solid #ff6b6b;position:relative}
+        .code-header{background:#2d2d2d;color:#fff;padding:10px 20px;margin:-25px -25px 15px -25px;border-radius:12px 12px 0 0;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+        .copy-button{background:#ff6b6b;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:background .3s,transform .2s}
+        .copy-button:hover{background:#ff8e53;transform:scale(1.05)}
+        .output-example{background:rgba(76,175,80,.1);border:2px solid rgba(76,175,80,.3);border-radius:12px;padding:20px;margin:15px 0;font-family:monospace;font-size:13px}
+        .output-header{color:#388e3c;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .highlight-box{background:linear-gradient(135deg,#ff6b6b,#ff8e53);color:#fff;padding:25px;border-radius:16px;margin:25px 0;backdrop-filter:blur(10px);box-shadow:0 8px 25px rgba(255,107,107,.3)}
+        .highlight-box h4{font-size:1.3rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .warning-box{background:rgba(255,193,7,.1);border:2px solid rgba(255,193,7,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .warning-box h4{color:#f57c00;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .info-panel{background:rgba(255,107,107,.1);border:2px solid rgba(255,107,107,.2);border-radius:16px;padding:20px;margin:20px 0}
+        .info-panel h4{color:#ff6b6b;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .explanation-box{background:rgba(255,255,255,.5);border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #ff6b6b}
+        .explanation-box h5{color:#ff6b6b;font-size:1.1rem;margin-bottom:10px;font-weight:600}
+        .explanation-box p{color:#555;line-height:1.6;font-size:.95rem}
+        .comparison-box{background:rgba(255,235,59,.1);border:2px solid rgba(255,235,59,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .comparison-box h4{color:#f9a825;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .visualization-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin:20px 0}
+        .viz-card{background:rgba(255,255,255,.8);border-radius:12px;padding:20px;border:2px solid rgba(78,205,196,.2);transition:transform .3s}
+        .viz-card:hover{transform:translateY(-3px)}
+        .viz-card h5{color:#4ecdc4;margin-bottom:10px}
+        .syntax-keyword{color:#569cd6}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-function{color:#dcdcaa}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @media (max-width:768px){.container{padding:25px;margin:10px}.title{font-size:2rem}.step-container{padding:20px}.code-block{padding:15px;font-size:12px}.step-header{flex-direction:column;align-items:flex-start;gap:10px}.step-number{width:35px;height:35px;font-size:16px}.step-title{font-size:1.3rem}.visualization-gallery{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="badge">Roteiro Prático - Aula 7</div>
+        <h1 class="title">Visualização de Dados e Painéis Gerenciais</h1>
+        <p class="subtitle">MatplotLib, PyPlot e Seaborn para insights estratégicos em análise musical</p>
+    </div>
+
+    <div class="highlight-box">
+        <h4>O que vamos aprender hoje</h4>
+        <p>Criaremos visualizações profissionais e painéis gerenciais usando <strong>MatplotLib</strong>, <strong>PyPlot</strong> e <strong>Seaborn</strong> para comunicar insights dos clusters musicais descobertos na aula anterior.</p>
+    </div>
+
+    <div class="info-panel">
+        <h4>Preparação</h4>
+        <p>Abra o Google Colab e crie o notebook <strong>Aula7_Data_Visualization</strong>. Utilizaremos os resultados de clustering da aula anterior para criar visualizações impactantes.</p>
+    </div>
+
+    <!-- Passo 1 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Preparação dos Dados e Configuração</h2>
+        </div>
+        <div class="stats-badge">Setup e Data Prep</div>
+        <p class="step-description">Configuraremos as bibliotecas de visualização e prepararemos os dados com clusters da aula anterior.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Configuração Completa de Visualização</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+<span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
+<span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
+<span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
+<span class="syntax-keyword">import</span> plotly.express <span class="syntax-keyword">as</span> px
+<span class="syntax-keyword">import</span> plotly.graph_objects <span class="syntax-keyword">as</span> go
+<span class="syntax-keyword">from</span> plotly.subplots <span class="syntax-keyword">import</span> make_subplots
+<span class="syntax-keyword">from</span> sklearn.preprocessing <span class="syntax-keyword">import</span> StandardScaler
+<span class="syntax-keyword">from</span> sklearn.decomposition <span class="syntax-keyword">import</span> PCA
+<span class="syntax-keyword">from</span> sklearn.cluster <span class="syntax-keyword">import</span> KMeans
+<span class="syntax-keyword">import</span> warnings
+warnings.filterwarnings(<span class="syntax-string">'ignore'</span>)
+
+<span class="syntax-comment"># Configuração de estilo profissional</span>
+plt.style.use(<span class="syntax-string">'seaborn-v0_8-darkgrid'</span>)
+sns.set_palette(<span class="syntax-string">"husl"</span>)
+
+<span class="syntax-comment"># Configurações globais de visualização</span>
+plt.rcParams[<span class="syntax-string">'figure.figsize'</span>] = [<span class="syntax-number">12</span>, <span class="syntax-number">8</span>]
+plt.rcParams[<span class="syntax-string">'font.size'</span>] = <span class="syntax-number">12</span>
+plt.rcParams[<span class="syntax-string">'axes.labelsize'</span>] = <span class="syntax-number">14</span>
+plt.rcParams[<span class="syntax-string">'axes.titlesize'</span>] = <span class="syntax-number">16</span>
+plt.rcParams[<span class="syntax-string">'xtick.labelsize'</span>] = <span class="syntax-number">12</span>
+plt.rcParams[<span class="syntax-string">'ytick.labelsize'</span>] = <span class="syntax-number">12</span>
+plt.rcParams[<span class="syntax-string">'legend.fontsize'</span>] = <span class="syntax-number">12</span>
+
+<span class="syntax-comment"># Cores profissionais para painéis gerenciais</span>
+cores_corporativas = [<span class="syntax-string">'#2E86AB'</span>, <span class="syntax-string">'#A23B72'</span>, <span class="syntax-string">'#F18F01'</span>, <span class="syntax-string">'#C73E1D'</span>, <span class="syntax-string">'#592E83'</span>]
+cores_analise = {
+    <span class="syntax-string">'primary'</span>: <span class="syntax-string">'#2E86AB'</span>,
+    <span class="syntax-string">'secondary'</span>: <span class="syntax-string">'#A23B72'</span>,
+    <span class="syntax-string">'accent'</span>: <span class="syntax-string">'#F18F01'</span>,
+    <span class="syntax-string">'warning'</span>: <span class="syntax-string">'#C73E1D'</span>,
+    <span class="syntax-string">'success'</span>: <span class="syntax-string">'#06A77D'</span>
+}
+
+np.random.seed(<span class="syntax-number">42</span>)
+
+print(<span class="syntax-string">"🎨 Configuração de visualização profissional carregada!"</span>)
+print(<span class="syntax-string">"📊 Pronto para criar painéis gerenciais impactantes"</span>)</code></pre>
+        </div>
+
+        <div class="theory-box">
+            <h4>Por que Visualização de Dados é Crucial?</h4>
+            <p><strong>Visualização de dados</strong> transforma números complexos em insights acionáveis:</p>
+            <ul>
+                <li><strong>Comunicação:</strong> facilita a compreensão de padrões complexos</li>
+                <li><strong>Tomada de decisão:</strong> permite insights rápidos para estratégias de negócio</li>
+                <li><strong>Detecção de anomalias:</strong> identifica outliers e padrões inesperados</li>
+                <li><strong>Storytelling:</strong> conta uma história com os dados</li>
+            </ul>
+            <p><strong>Para análise musical:</strong> visualizações ajudam a entender perfis de usuário, tendências de gêneros e otimizar recomendações.</p>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Recrear Dataset Musical com Clusters</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Recriar dataset musical da aula anterior</span>
+n_tracks = <span class="syntax-number">3000</span>
+generos = [<span class="syntax-string">'Pop'</span>, <span class="syntax-string">'Rock'</span>, <span class="syntax-string">'Hip Hop'</span>, <span class="syntax-string">'Eletrônica'</span>, <span class="syntax-string">'Indie'</span>, <span class="syntax-string">'R&B'</span>, <span class="syntax-string">'Jazz'</span>, <span class="syntax-string">'Country'</span>]
+
+dados = {
+    <span class="syntax-string">'energia'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, n_tracks),
+    <span class="syntax-string">'valencia'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, n_tracks),
+    <span class="syntax-string">'dancabilidade'</span>: np.random.beta(<span class="syntax-number">3</span>, <span class="syntax-number">2</span>, n_tracks),
+    <span class="syntax-string">'acousticness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">4</span>, n_tracks),
+    <span class="syntax-string">'liveness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">9</span>, n_tracks),
+    <span class="syntax-string">'instrumentalness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">5</span>, n_tracks),
+    <span class="syntax-string">'speechiness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">8</span>, n_tracks),
+    <span class="syntax-string">'tempo'</span>: np.random.normal(<span class="syntax-number">120</span>, <span class="syntax-number">30</span>, n_tracks),
+    <span class="syntax-string">'duracao_minutos'</span>: np.random.lognormal(mean=<span class="syntax-number">1.2</span>, sigma=<span class="syntax-number">0.3</span>, size=n_tracks),
+    <span class="syntax-string">'popularidade'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, n_tracks) * <span class="syntax-number">100</span>,
+    <span class="syntax-string">'streams_milhoes'</span>: np.random.lognormal(mean=<span class="syntax-number">2</span>, sigma=<span class="syntax-number">1.5</span>, size=n_tracks),
+    <span class="syntax-string">'genero'</span>: np.random.choice(generos, size=n_tracks)
+}
+
+df = pd.DataFrame(dados)
+df[<span class="syntax-string">'tempo'</span>] = np.clip(df[<span class="syntax-string">'tempo'</span>], <span class="syntax-number">60</span>, <span class="syntax-number">200</span>)
+
+<span class="syntax-comment"># Adicionar variáveis de negócio</span>
+df[<span class="syntax-string">'ano_lancamento'</span>] = np.random.choice(<span class="syntax-function">range</span>(<span class="syntax-number">1990</span>, <span class="syntax-number">2024</span>), n_tracks)
+df[<span class="syntax-string">'receita_estimada'</span>] = df[<span class="syntax-string">'streams_milhoes'</span>] * np.random.uniform(<span class="syntax-number">0.003</span>, <span class="syntax-number">0.007</span>, n_tracks)
+
+<span class="syntax-comment"># Aplicar clustering K-Means para visualizações</span>
+features_clustering = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'acousticness'</span>, 
+                      <span class="syntax-string">'liveness'</span>, <span class="syntax-string">'instrumentalness'</span>, <span class="syntax-string">'speechiness'</span>, <span class="syntax-string">'tempo'</span>]
+
+X = df[features_clustering].copy()
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+kmeans = KMeans(n_clusters=<span class="syntax-number">4</span>, random_state=<span class="syntax-number">42</span>)
+df[<span class="syntax-string">'cluster_perfil'</span>] = kmeans.fit_predict(X_scaled)
+
+<span class="syntax-comment"># Nomear clusters de forma intuitiva</span>
+cluster_names = {
+    <span class="syntax-number">0</span>: <span class="syntax-string">'Energético Dançante'</span>,
+    <span class="syntax-number">1</span>: <span class="syntax-string">'Reflexivo Calmo'</span>,
+    <span class="syntax-number">2</span>: <span class="syntax-string">'Acústico Intimista'</span>,
+    <span class="syntax-number">3</span>: <span class="syntax-string">'Dinâmico Moderno'</span>
+}
+df[<span class="syntax-string">'perfil_musical'</span>] = df[<span class="syntax-string">'cluster_perfil'</span>].map(cluster_names)
+
+print(<span class="syntax-string">f"Dataset preparado: {df.shape[0]:,} músicas"</span>)
+print(<span class="syntax-string">f"Perfis musicais identificados: {df['perfil_musical'].nunique()}"</span>)
+print(<span class="syntax-string">"\nDistribuição dos perfis:"</span>)
+print(df[<span class="syntax-string">'perfil_musical'</span>].value_counts())</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Fundamentos do MatplotLib e PyPlot</h2>
+        </div>
+        <div class="stats-badge">MatplotLib Básico</div>
+        <p class="step-description">Dominar os fundamentos do MatplotLib para criar visualizações profissionais e personalizadas.</p>
+
+        <div class="theory-box">
+            <h4>MatplotLib: A Base da Visualização Python</h4>
+            <p><strong>MatplotLib</strong> é a biblioteca fundamental para visualização em Python:</p>
+            <ul>
+                <li><strong>PyPlot (plt):</strong> interface simples estilo MATLAB</li>
+                <li><strong>Object-Oriented API:</strong> controle total sobre elementos</li>
+                <li><strong>Flexibilidade:</strong> personalização completa de gráficos</li>
+                <li><strong>Integração:</strong> base para Seaborn e outras bibliotecas</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>MatplotLib - Gráficos Básicos Profissionais</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># 1. Gráfico de dispersão com clusters</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">16</span>, <span class="syntax-number">12</span>))
+fig.suptitle(<span class="syntax-string">'Análise de Características Musicais por Perfil'</span>, fontsize=<span class="syntax-number">20</span>, y=<span class="syntax-number">0.98</span>)
+
+<span class="syntax-comment"># Energia vs Valencia</span>
+ax1 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>]
+for i, (cluster, cor) in <span class="syntax-function">enumerate</span>(<span class="syntax-function">zip</span>(cluster_names.values(), cores_corporativas)):
+    mask = df[<span class="syntax-string">'perfil_musical'</span>] == cluster
+    ax1.scatter(df[mask][<span class="syntax-string">'energia'</span>], df[mask][<span class="syntax-string">'valencia'</span>], 
+               c=cor, label=cluster, alpha=<span class="syntax-number">0.6</span>, s=<span class="syntax-number">50</span>)
+
+ax1.set_xlabel(<span class="syntax-string">'Energia'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax1.set_ylabel(<span class="syntax-string">'Valencia (Positividade)'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax1.set_title(<span class="syntax-string">'Energia vs Valencia'</span>)
+ax1.legend(bbox_to_anchor=(<span class="syntax-number">1.05</span>, <span class="syntax-number">1</span>), loc=<span class="syntax-string">'upper left'</span>)
+ax1.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Dançabilidade vs Acousticness</span>
+ax2 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+for i, (cluster, cor) in <span class="syntax-function">enumerate</span>(<span class="syntax-function">zip</span>(cluster_names.values(), cores_corporativas)):
+    mask = df[<span class="syntax-string">'perfil_musical'</span>] == cluster
+    ax2.scatter(df[mask][<span class="syntax-string">'dancabilidade'</span>], df[mask][<span class="syntax-string">'acousticness'</span>], 
+               c=cor, label=cluster, alpha=<span class="syntax-number">0.6</span>, s=<span class="syntax-number">50</span>)
+
+ax2.set_xlabel(<span class="syntax-string">'Dançabilidade'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax2.set_ylabel(<span class="syntax-string">'Acousticness'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax2.set_title(<span class="syntax-string">'Dançabilidade vs Características Acústicas'</span>)
+ax2.legend(bbox_to_anchor=(<span class="syntax-number">1.05</span>, <span class="syntax-number">1</span>), loc=<span class="syntax-string">'upper left'</span>)
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Histograma de Popularidade</span>
+ax3 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>]
+ax3.hist(df[<span class="syntax-string">'popularidade'</span>], bins=<span class="syntax-number">30</span>, color=cores_analise[<span class="syntax-string">'primary'</span>], 
+         alpha=<span class="syntax-number">0.7</span>, edgecolor=<span class="syntax-string">'black'</span>)
+ax3.axvline(df[<span class="syntax-string">'popularidade'</span>].mean(), color=cores_analise[<span class="syntax-string">'warning'</span>], 
+           linestyle=<span class="syntax-string">'--'</span>, linewidth=<span class="syntax-number">2</span>, label=<span class="syntax-string">f'Média: {df["popularidade"].mean():.1f}'</span>)
+ax3.set_xlabel(<span class="syntax-string">'Popularidade'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax3.set_ylabel(<span class="syntax-string">'Frequência'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax3.set_title(<span class="syntax-string">'Distribuição da Popularidade'</span>)
+ax3.legend()
+ax3.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Box plot de Streams por Perfil</span>
+ax4 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>]
+perfis = df[<span class="syntax-string">'perfil_musical'</span>].unique()
+streams_data = [df[df[<span class="syntax-string">'perfil_musical'</span>] == perfil][<span class="syntax-string">'streams_milhoes'</span>] for perfil in perfis]
+
+box_plot = ax4.boxplot(streams_data, labels=perfis, patch_artist=<span class="syntax-keyword">True</span>)
+for patch, cor in <span class="syntax-function">zip</span>(box_plot[<span class="syntax-string">'boxes'</span>], cores_corporativas):
+    patch.set_facecolor(cor)
+    patch.set_alpha(<span class="syntax-number">0.7</span>)
+
+ax4.set_xlabel(<span class="syntax-string">'Perfil Musical'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax4.set_ylabel(<span class="syntax-string">'Streams (Milhões)'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax4.set_title(<span class="syntax-string">'Distribuição de Streams por Perfil'</span>)
+ax4.tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">45</span>)
+ax4.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Análise quantitativa</span>
+print(<span class="syntax-string">"📈 INSIGHTS DOS GRÁFICOS BÁSICOS:"</span>)
+print(<span class="syntax-string">"=" * 50</span>)
+for perfil in df[<span class="syntax-string">'perfil_musical'</span>].unique():
+    subset = df[df[<span class="syntax-string">'perfil_musical'</span>] == perfil]
+    print(<span class="syntax-string">f"\n🎵 {perfil}:"</span>)
+    print(<span class="syntax-string">f"   Popularidade média: {subset['popularidade'].mean():.1f}"</span>)
+    print(<span class="syntax-string">f"   Streams médios: {subset['streams_milhoes'].mean():.1f}M"</span>)
+    print(<span class="syntax-string">f"   Energia média: {subset['energia'].mean():.2f}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Anatomia de um gráfico profissional</h5>
+            <ul>
+                <li><strong>Título claro:</strong> comunica o objetivo principal</li>
+                <li><strong>Legendas informativas:</strong> facilita interpretação</li>
+                <li><strong>Cores consistentes:</strong> paleta corporativa ou harmoniosa</li>
+                <li><strong>Grid sutil:</strong> ajuda na leitura sem poluir</li>
+                <li><strong>Anotações relevantes:</strong> destacam insights importantes</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Seaborn para Análises Estatísticas Avançadas</h2>
+        </div>
+        <div class="stats-badge">Seaborn Avançado</div>
+        <p class="step-description">Usar Seaborn para criar visualizações estatísticas sofisticadas e informativas.</p>
+
+        <div class="theory-box">
+            <h4>Seaborn: Visualizações Estatísticas Elegantes</h4>
+            <p><strong>Seaborn</strong> oferece gráficos estatísticos com design superior:</p>
+            <ul>
+                <li><strong>Built-in themes:</strong> estilos profissionais por padrão</li>
+                <li><strong>Gráficos estatísticos:</strong> correlações, distribuições, regressões</li>
+                <li><strong>Integração Pandas:</strong> trabalha diretamente com DataFrames</li>
+                <li><strong>Paletas inteligentes:</strong> cores automáticas e harmoniosas</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Seaborn - Análises Estatísticas</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># 1. Matriz de correlação profissional</span>
+plt.figure(figsize=(<span class="syntax-number">14</span>, <span class="syntax-number">10</span>))
+
+correlation_matrix = df[features_clustering + [<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'streams_milhoes'</span>]].corr()
+
+<span class="syntax-comment"># Heatmap com anotações</span>
+mask = np.triu(np.ones_like(correlation_matrix, dtype=bool))
+sns.heatmap(correlation_matrix, annot=<span class="syntax-keyword">True</span>, cmap=<span class="syntax-string">'RdBu_r'</span>, center=<span class="syntax-number">0</span>,
+            square=<span class="syntax-keyword">True</span>, linewidths=<span class="syntax-number">0.5</span>, cbar_kws={<span class="syntax-string">"shrink"</span>: <span class="syntax-number">0.8</span>}, mask=mask)
+
+plt.title(<span class="syntax-string">'Matriz de Correlação - Características Musicais'</span>, fontsize=<span class="syntax-number">16</span>, pad=<span class="syntax-number">20</span>)
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># 2. Pairplot para exploração multivariada</span>
+features_principais = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'popularidade'</span>]
+df_sample = df.sample(n=<span class="syntax-number">500</span>)  <span class="syntax-comment"># Amostra para performance</span>
+
+g = sns.pairplot(df_sample[features_principais + [<span class="syntax-string">'perfil_musical'</span>]], 
+                 hue=<span class="syntax-string">'perfil_musical'</span>, diag_kind=<span class="syntax-string">'kde'</span>, 
+                 palette=cores_corporativas[:4])
+g.fig.suptitle(<span class="syntax-string">'Análise Multivariada - Perfis Musicais'</span>, y=<span class="syntax-number">1.02</span>)
+plt.show()
+
+<span class="syntax-comment"># 3. Violin plots para distribuições detalhadas</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">16</span>, <span class="syntax-number">12</span>))
+fig.suptitle(<span class="syntax-string">'Distribuições Detalhadas por Perfil Musical'</span>, fontsize=<span class="syntax-number">18</span>)
+
+<span class="syntax-comment"># Energia</span>
+sns.violinplot(data=df, x=<span class="syntax-string">'perfil_musical'</span>, y=<span class="syntax-string">'energia'</span>, 
+               palette=cores_corporativas, ax=axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>])
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].set_title(<span class="syntax-string">'Distribuição de Energia'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>].tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># Valencia</span>
+sns.violinplot(data=df, x=<span class="syntax-string">'perfil_musical'</span>, y=<span class="syntax-string">'valencia'</span>, 
+               palette=cores_corporativas, ax=axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>])
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>].set_title(<span class="syntax-string">'Distribuição de Valencia'</span>)
+axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>].tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># Popularidade</span>
+sns.violinplot(data=df, x=<span class="syntax-string">'perfil_musical'</span>, y=<span class="syntax-string">'popularidade'</span>, 
+               palette=cores_corporativas, ax=axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>])
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].set_title(<span class="syntax-string">'Distribuição de Popularidade'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>].tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># Streams</span>
+sns.violinplot(data=df, x=<span class="syntax-string">'perfil_musical'</span>, y=<span class="syntax-string">'streams_milhoes'</span>, 
+               palette=cores_corporativas, ax=axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>])
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>].set_title(<span class="syntax-string">'Distribuição de Streams'</span>)
+axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>].tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">45</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># 4. Análise de gêneros por ano</span>
+plt.figure(figsize=(<span class="syntax-number">14</span>, <span class="syntax-number">8</span>))
+
+<span class="syntax-comment"># Criar dados agregados por ano e gênero</span>
+genre_year = df.groupby([<span class="syntax-string">'ano_lancamento'</span>, <span class="syntax-string">'genero'</span>]).size().reset_index(name=<span class="syntax-string">'count'</span>)
+genre_year_pivot = genre_year.pivot(index=<span class="syntax-string">'ano_lancamento'</span>, columns=<span class="syntax-string">'genero'</span>, values=<span class="syntax-string">'count'</span>).fillna(<span class="syntax-number">0</span>)
+
+<span class="syntax-comment"># Heatmap temporal</span>
+sns.heatmap(genre_year_pivot.T, cmap=<span class="syntax-string">'YlOrRd'</span>, cbar_kws={<span class="syntax-string">'label'</span>: <span class="syntax-string">'Número de Músicas'</span>})
+plt.title(<span class="syntax-string">'Evolução dos Gêneros Musicais ao Longo do Tempo'</span>, fontsize=<span class="syntax-number">16</span>)
+plt.xlabel(<span class="syntax-string">'Ano de Lançamento'</span>)
+plt.ylabel(<span class="syntax-string">'Gênero Musical'</span>)
+plt.tight_layout()
+plt.show()</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>Tipos de gráficos Seaborn e quando usar</h5>
+            <ul>
+                <li><strong>Heatmap:</strong> correlações, matrizes de confusão</li>
+                <li><strong>Pairplot:</strong> exploração de múltiplas variáveis</li>
+                <li><strong>Violinplot:</strong> distribuições detalhadas com densidade</li>
+                <li><strong>Boxplot:</strong> comparação de medianas e outliers</li>
+                <li><strong>Regplot:</strong> relações lineares e tendências</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Passo 4 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Painéis Gerenciais e Dashboards</h2>
+        </div>
+        <div class="stats-badge">Dashboard</div>
+        <p class="step-description">Criar painéis executivos que comunicam insights estratégicos de forma clara e acionável.</p>
+
+        <div class="theory-box">
+            <h4>Painéis Gerenciais Eficazes</h4>
+            <p><strong>Dashboards</strong> transformam dados em decisões estratégicas:</p>
+            <ul>
+                <li><strong>KPIs principais:</strong> métricas-chave em destaque</li>
+                <li><strong>Layout hierárquico:</strong> informação mais importante primeiro</li>
+                <li><strong>Interatividade:</strong> permite exploração dos dados</li>
+                <li><strong>Contexto temporal:</strong> tendências e comparações</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Dashboard Executivo de Música</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Criar dashboard executivo completo</span>
+fig = plt.figure(figsize=(<span class="syntax-number">20</span>, <span class="syntax-number">16</span>))
+fig.suptitle(<span class="syntax-string">'DASHBOARD EXECUTIVO - ANÁLISE MUSICAL ESTRATÉGICA'</span>, 
+             fontsize=<span class="syntax-number">24</span>, fontweight=<span class="syntax-string">'bold'</span>, y=<span class="syntax-number">0.98</span>)
+
+<span class="syntax-comment"># Layout do dashboard</span>
+gs = fig.add_gridspec(<span class="syntax-number">4</span>, <span class="syntax-number">4</span>, hspace=<span class="syntax-number">0.3</span>, wspace=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 1. KPIs principais (topo)</span>
+ax_kpi = fig.add_subplot(gs[<span class="syntax-number">0</span>, :])
+ax_kpi.axis(<span class="syntax-string">'off'</span>)
+
+kpis = {
+    <span class="syntax-string">'Total de Músicas'</span>: <span class="syntax-string">f"{len(df):,}"</span>,
+    <span class="syntax-string">'Receita Total'</span>: <span class="syntax-string">f"R$ {df['receita_estimada'].sum():.1f}M"</span>,
+    <span class="syntax-string">'Streams Totais'</span>: <span class="syntax-string">f"{df['streams_milhoes'].sum():.0f}M"</span>,
+    <span class="syntax-string">'Popularidade Média'</span>: <span class="syntax-string">f"{df['popularidade'].mean():.1f}%"</span>
+}
+
+x_pos = <span class="syntax-number">0.1</span>
+for i, (nome, valor) in <span class="syntax-function">enumerate</span>(kpis.items()):
+    <span class="syntax-comment"># Caixa do KPI</span>
+    bbox = <span class="syntax-function">dict</span>(boxstyle=<span class="syntax-string">"round,pad=0.3"</span>, facecolor=cores_corporativas[i], alpha=<span class="syntax-number">0.8</span>)
+    ax_kpi.text(x_pos, <span class="syntax-number">0.7</span>, valor, fontsize=<span class="syntax-number">18</span>, fontweight=<span class="syntax-string">'bold'</span>, 
+                ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'center'</span>, color=<span class="syntax-string">'white'</span>, bbox=bbox)
+    ax_kpi.text(x_pos, <span class="syntax-number">0.3</span>, nome, fontsize=<span class="syntax-number">12</span>, ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'center'</span>)
+    x_pos += <span class="syntax-number">0.2</span>
+
+<span class="syntax-comment"># 2. Receita por perfil (pizza)</span>
+ax1 = fig.add_subplot(gs[<span class="syntax-number">1</span>, :<span class="syntax-number">2</span>])
+receita_perfil = df.groupby(<span class="syntax-string">'perfil_musical'</span>)[<span class="syntax-string">'receita_estimada'</span>].sum()
+wedges, texts, autotexts = ax1.pie(receita_perfil.values, labels=receita_perfil.index, 
+                                  autopct=<span class="syntax-string">'%1.1f%%'</span>, colors=cores_corporativas,
+                                  startangle=<span class="syntax-number">90</span>, explode=(<span class="syntax-number">0.05</span>, <span class="syntax-number">0</span>, <span class="syntax-number">0</span>, <span class="syntax-number">0</span>))
+
+for autotext in autotexts:
+    autotext.set_color(<span class="syntax-string">'white'</span>)
+    autotext.set_fontweight(<span class="syntax-string">'bold'</span>)
+
+ax1.set_title(<span class="syntax-string">'Receita por Perfil Musical'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+<span class="syntax-comment"># 3. Tendência temporal de streams</span>
+ax2 = fig.add_subplot(gs[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>:])
+streams_ano = df.groupby(<span class="syntax-string">'ano_lancamento'</span>)[<span class="syntax-string">'streams_milhoes'</span>].mean()
+ax2.plot(streams_ano.index, streams_ano.values, linewidth=<span class="syntax-number">3</span>, 
+         color=cores_analise[<span class="syntax-string">'primary'</span>], marker=<span class="syntax-string">'o'</span>, markersize=<span class="syntax-number">6</span>)
+ax2.fill_between(streams_ano.index, streams_ano.values, alpha=<span class="syntax-number">0.3</span>, 
+                 color=cores_analise[<span class="syntax-string">'primary'</span>])
+ax2.set_title(<span class="syntax-string">'Evolução de Streams Médios'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax2.set_xlabel(<span class="syntax-string">'Ano'</span>)
+ax2.set_ylabel(<span class="syntax-string">'Streams Médios (M)'</span>)
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 4. Top gêneros por popularidade</span>
+ax3 = fig.add_subplot(gs[<span class="syntax-number">2</span>, :<span class="syntax-number">2</span>])
+pop_genero = df.groupby(<span class="syntax-string">'genero'</span>)[<span class="syntax-string">'popularidade'</span>].mean().sort_values(ascending=<span class="syntax-keyword">True</span>)
+bars = ax3.barh(pop_genero.index, pop_genero.values, 
+                color=[cores_corporativas[i % <span class="syntax-function">len</span>(cores_corporativas)] for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(pop_genero))])
+
+<span class="syntax-comment"># Adicionar valores nas barras</span>
+for i, (idx, valor) in <span class="syntax-function">enumerate</span>(pop_genero.items()):
+    ax3.text(valor + <span class="syntax-number">1</span>, i, <span class="syntax-string">f'{valor:.1f}'</span>, va=<span class="syntax-string">'center'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+ax3.set_title(<span class="syntax-string">'Popularidade Média por Gênero'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax3.set_xlabel(<span class="syntax-string">'Popularidade (%)'</span>)
+
+<span class="syntax-comment"># 5. Distribuição de energia vs popularidade</span>
+ax4 = fig.add_subplot(gs[<span class="syntax-number">2</span>, <span class="syntax-number">2</span>:])
+scatter = ax4.scatter(df[<span class="syntax-string">'energia'</span>], df[<span class="syntax-string">'popularidade'</span>], 
+                     c=df[<span class="syntax-string">'streams_milhoes'</span>], cmap=<span class="syntax-string">'viridis'</span>, 
+                     alpha=<span class="syntax-number">0.6</span>, s=<span class="syntax-number">50</span>)
+ax4.set_xlabel(<span class="syntax-string">'Energia'</span>)
+ax4.set_ylabel(<span class="syntax-string">'Popularidade'</span>)
+ax4.set_title(<span class="syntax-string">'Energia vs Popularidade\n(cor = streams)'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+plt.colorbar(scatter, ax=ax4, label=<span class="syntax-string">'Streams (M)'</span>)
+
+<span class="syntax-comment"># 6. Análise de performance por perfil</span>
+ax5 = fig.add_subplot(gs[<span class="syntax-number">3</span>, :])
+perf_data = df.groupby(<span class="syntax-string">'perfil_musical'</span>).agg({
+    <span class="syntax-string">'popularidade'</span>: <span class="syntax-string">'mean'</span>,
+    <span class="syntax-string">'streams_milhoes'</span>: <span class="syntax-string">'mean'</span>,
+    <span class="syntax-string">'receita_estimada'</span>: <span class="syntax-string">'mean'</span>
+}).round(<span class="syntax-number">2</span>)
+
+<span class="syntax-comment"># Normalizar dados para comparação</span>
+perf_normalized = perf_data.div(perf_data.max()) * <span class="syntax-number">100</span>
+
+x = np.arange(<span class="syntax-function">len</span>(perf_normalized.index))
+width = <span class="syntax-number">0.25</span>
+
+ax5.bar(x - width, perf_normalized[<span class="syntax-string">'popularidade'</span>], width, 
+        label=<span class="syntax-string">'Popularidade'</span>, color=cores_corporativas[<span class="syntax-number">0</span>], alpha=<span class="syntax-number">0.8</span>)
+ax5.bar(x, perf_normalized[<span class="syntax-string">'streams_milhoes'</span>], width, 
+        label=<span class="syntax-string">'Streams'</span>, color=cores_corporativas[<span class="syntax-number">1</span>], alpha=<span class="syntax-number">0.8</span>)
+ax5.bar(x + width, perf_normalized[<span class="syntax-string">'receita_estimada'</span>], width, 
+        label=<span class="syntax-string">'Receita'</span>, color=cores_corporativas[<span class="syntax-number">2</span>], alpha=<span class="syntax-number">0.8</span>)
+
+ax5.set_xlabel(<span class="syntax-string">'Perfil Musical'</span>)
+ax5.set_ylabel(<span class="syntax-string">'Performance Normalizada (%)'</span>)
+ax5.set_title(<span class="syntax-string">'Comparação de Performance por Perfil Musical'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax5.set_xticks(x)
+ax5.set_xticklabels(perf_normalized.index, rotation=<span class="syntax-number">45</span>)
+ax5.legend()
+ax5.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Gerar insights automáticos</span>
+print(<span class="syntax-string">"🎯 INSIGHTS ESTRATÉGICOS DO DASHBOARD:"</span>)
+print(<span class="syntax-string">"=" * 60</span>)
+
+melhor_perfil_receita = receita_perfil.idxmax()
+melhor_genero_pop = pop_genero.idxmax()
+
+print(<span class="syntax-string">f"💰 Perfil mais lucrativo: {melhor_perfil_receita}"</span>)
+print(<span class="syntax-string">f"🎵 Gênero mais popular: {melhor_genero_pop}"</span>)
+print(<span class="syntax-string">f"📊 Correlação energia-popularidade: {df['energia'].corr(df['popularidade']):.3f}"</span>)
+print(<span class="syntax-string">f"📈 Crescimento de streams 2020-2023: {((streams_ano[2023] - streams_ano[2020]) / streams_ano[2020] * 100):.1f}%"</span>)</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 5 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Visualizações Interativas com Plotly</h2>
+        </div>
+        <div class="stats-badge">Interatividade</div>
+        <p class="step-description">Criar visualizações interativas que permitem exploração dinâmica dos dados.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Plotly - Gráficos Interativos</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># 1. Scatter plot 3D interativo</span>
+fig_3d = px.scatter_3d(df.sample(n=<span class="syntax-number">1000</span>), 
+                      x=<span class="syntax-string">'energia'</span>, y=<span class="syntax-string">'valencia'</span>, z=<span class="syntax-string">'dancabilidade'</span>,
+                      color=<span class="syntax-string">'perfil_musical'</span>, size=<span class="syntax-string">'popularidade'</span>,
+                      hover_data=[<span class="syntax-string">'genero'</span>, <span class="syntax-string">'streams_milhoes'</span>],
+                      title=<span class="syntax-string">'Análise 3D: Energia vs Valencia vs Dançabilidade'</span>,
+                      color_discrete_sequence=cores_corporativas)
+
+fig_3d.update_layout(scene=<span class="syntax-function">dict</span>(
+    xaxis_title=<span class="syntax-string">'Energia'</span>,
+    yaxis_title=<span class="syntax-string">'Valencia (Positividade)'</span>,
+    zaxis_title=<span class="syntax-string">'Dançabilidade'</span>
+))
+
+fig_3d.show()
+
+<span class="syntax-comment"># 2. Dashboard interativo com subplots</span>
+fig_dashboard = make_subplots(
+    rows=<span class="syntax-number">2</span>, cols=<span class="syntax-number">2</span>,
+    subplot_titles=(<span class="syntax-string">'Streams por Perfil'</span>, <span class="syntax-string">'Evolução Temporal'</span>, 
+                   <span class="syntax-string">'Correlação Energia-Popularidade'</span>, <span class="syntax-string">'Distribuição de Gêneros'</span>),
+    specs=[[{<span class="syntax-string">'type'</span>: <span class="syntax-string">'bar'</span>}, {<span class="syntax-string">'type'</span>: <span class="syntax-string">'scatter'</span>}],
+           [{<span class="syntax-string">'type'</span>: <span class="syntax-string">'scatter'</span>}, {<span class="syntax-string">'type'</span>: <span class="syntax-string">'bar'</span>}]]
+)
+
+<span class="syntax-comment"># Gráfico 1: Box plot streams por perfil</span>
+for i, perfil in <span class="syntax-function">enumerate</span>(df[<span class="syntax-string">'perfil_musical'</span>].unique()):
+    subset = df[df[<span class="syntax-string">'perfil_musical'</span>] == perfil]
+    fig_dashboard.add_trace(
+        go.Box(y=subset[<span class="syntax-string">'streams_milhoes'</span>], name=perfil, 
+               marker_color=cores_corporativas[i]),
+        row=<span class="syntax-number">1</span>, col=<span class="syntax-number">1</span>
+    )
+
+<span class="syntax-comment"># Gráfico 2: Linha temporal</span>
+fig_dashboard.add_trace(
+    go.Scatter(x=streams_ano.index, y=streams_ano.values,
+               mode=<span class="syntax-string">'lines+markers'</span>, name=<span class="syntax-string">'Streams Médios'</span>,
+               line=<span class="syntax-function">dict</span>(color=cores_analise[<span class="syntax-string">'primary'</span>], width=<span class="syntax-number">3</span>)),
+    row=<span class="syntax-number">1</span>, col=<span class="syntax-number">2</span>
+)
+
+<span class="syntax-comment"># Gráfico 3: Scatter energia vs popularidade</span>
+fig_dashboard.add_trace(
+    go.Scatter(x=df[<span class="syntax-string">'energia'</span>], y=df[<span class="syntax-string">'popularidade'</span>],
+               mode=<span class="syntax-string">'markers'</span>, name=<span class="syntax-string">'Músicas'</span>,
+               marker=<span class="syntax-function">dict</span>(color=df[<span class="syntax-string">'streams_milhoes'</span>], 
+                          colorscale=<span class="syntax-string">'viridis'</span>, showscale=<span class="syntax-keyword">True</span>)),
+    row=<span class="syntax-number">2</span>, col=<span class="syntax-number">1</span>
+)
+
+<span class="syntax-comment"># Gráfico 4: Barras gêneros</span>
+genero_count = df[<span class="syntax-string">'genero'</span>].value_counts()
+fig_dashboard.add_trace(
+    go.Bar(x=genero_count.index, y=genero_count.values,
+           name=<span class="syntax-string">'Contagem'</span>, marker_color=cores_analise[<span class="syntax-string">'accent'</span>]),
+    row=<span class="syntax-number">2</span>, col=<span class="syntax-number">2</span>
+)
+
+fig_dashboard.update_layout(height=<span class="syntax-number">800</span>, showlegend=<span class="syntax-keyword">False</span>,
+                           title_text=<span class="syntax-string">"Dashboard Interativo - Análise Musical Completa"</span>)
+
+fig_dashboard.show()
+
+<span class="syntax-comment"># 3. Mapa de calor interativo</span>
+correlation_data = df[features_clustering + [<span class="syntax-string">'popularidade'</span>, <span class="syntax-string">'streams_milhoes'</span>]].corr()
+
+fig_heatmap = go.Figure(data=go.Heatmap(
+    z=correlation_data.values,
+    x=correlation_data.columns,
+    y=correlation_data.columns,
+    colorscale=<span class="syntax-string">'RdBu'</span>,
+    zmid=<span class="syntax-number">0</span>,
+    text=correlation_data.round(<span class="syntax-number">3</span>).values,
+    texttemplate=<span class="syntax-string">"%{text}"</span>,
+    textfont={<span class="syntax-string">"size"</span>: <span class="syntax-number">10</span>},
+    hoverongaps=<span class="syntax-keyword">False</span>
+))
+
+fig_heatmap.update_layout(
+    title=<span class="syntax-string">'Matriz de Correlação Interativa'</span>,
+    xaxis_title=<span class="syntax-string">'Características'</span>,
+    yaxis_title=<span class="syntax-string">'Características'</span>
+)
+
+fig_heatmap.show()
+
+print(<span class="syntax-string">"🔍 BENEFÍCIOS DAS VISUALIZAÇÕES INTERATIVAS:"</span>)
+print(<span class="syntax-string">"- Exploração dinâmica dos dados"</span>)
+print(<span class="syntax-string">"- Zoom e filtros em tempo real"</span>)
+print(<span class="syntax-string">"- Tooltips informativos"</span>)
+print(<span class="syntax-string">"- Maior engajamento do usuário"</span>)</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 6 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Melhores Práticas e Design Principles</h2>
+        </div>
+        <div class="stats-badge">Best Practices</div>
+        <p class="step-description">Implementar princípios de design visual e melhores práticas para comunicação eficaz de dados.</p>
+
+        <div class="comparison-box">
+            <h4>Princípios de Design Visual para Dados</h4>
+            <p><strong>1. Simplicidade:</strong> remova elementos desnecessários</p>
+            <p><strong>2. Hierarquia:</strong> direcione o olhar para o que é mais importante</p>
+            <p><strong>3. Consistência:</strong> use padrões de cores e estilos</p>
+            <p><strong>4. Acessibilidade:</strong> considere daltonismo e legibilidade</p>
+            <p><strong>5. Contexto:</strong> forneça referências e comparações</p>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Exemplos de Boas e Más Práticas</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># DEMONSTRAÇÃO: Boas vs Más Práticas</span>
+
+fig, (ax1, ax2) = plt.subplots(<span class="syntax-number">1</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">16</span>, <span class="syntax-number">6</span>))
+
+<span class="syntax-comment"># MÁ PRÁTICA: Gráfico confuso e sobrecarregado</span>
+genero_pop = df.groupby(<span class="syntax-string">'genero'</span>)[<span class="syntax-string">'popularidade'</span>].mean()
+
+<span class="syntax-comment"># Cores muito vibrantes e contrastantes</span>
+cores_ruins = [<span class="syntax-string">'#FF0000'</span>, <span class="syntax-string">'#00FF00'</span>, <span class="syntax-string">'#0000FF'</span>, <span class="syntax-string">'#FFFF00'</span>, 
+               <span class="syntax-string">'#FF00FF'</span>, <span class="syntax-string">'#00FFFF'</span>, <span class="syntax-string">'#FFA500'</span>, <span class="syntax-string">'#800080'</span>]
+
+bars1 = ax1.bar(genero_pop.index, genero_pop.values, color=cores_ruins)
+ax1.set_title(<span class="syntax-string">'POPULARIDADE DOS GENEROS MUSICAIS!!!'</span>, fontsize=<span class="syntax-number">16</span>)
+ax1.tick_params(axis=<span class="syntax-string">'x'</span>, rotation=<span class="syntax-number">90</span>, labelsize=<span class="syntax-number">8</span>)
+ax1.grid(<span class="syntax-keyword">True</span>, linewidth=<span class="syntax-number">2</span>, color=<span class="syntax-string">'red'</span>)
+
+<span class="syntax-comment"># Adicionar muitos elementos visuais desnecessários</span>
+for bar in bars1:
+    height = bar.get_height()
+    ax1.annotate(<span class="syntax-string">f'{height:.1f}!!!'</span>,
+                xy=(bar.get_x() + bar.get_width() / <span class="syntax-number">2</span>, height),
+                xytext=(<span class="syntax-number">0</span>, <span class="syntax-number">3</span>),  
+                textcoords=<span class="syntax-string">"offset points"</span>,
+                ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'bottom'</span>, fontsize=<span class="syntax-number">8</span>,
+                color=<span class="syntax-string">'red'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+<span class="syntax-comment"># BOA PRÁTICA: Gráfico limpo e focado</span>
+<span class="syntax-comment"># Ordenar dados para melhor insight</span>
+genero_pop_sorted = genero_pop.sort_values(ascending=<span class="syntax-keyword">False</span>)
+
+<span class="syntax-comment"># Cores harmoniosas e destacar o mais importante</span>
+cores_boas = [cores_analise[<span class="syntax-string">'primary'</span>] if i == <span class="syntax-number">0</span> else cores_analise[<span class="syntax-string">'secondary'</span>] 
+              for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(genero_pop_sorted))]
+
+bars2 = ax2.barh(genero_pop_sorted.index, genero_pop_sorted.values, color=cores_boas)
+ax2.set_title(<span class="syntax-string">'Popularidade por Gênero Musical'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+ax2.set_xlabel(<span class="syntax-string">'Popularidade Média'</span>)
+
+<span class="syntax-comment"># Adicionar apenas o valor mais importante</span>
+max_val = genero_pop_sorted.iloc[<span class="syntax-number">0</span>]
+ax2.text(max_val + <span class="syntax-number">1</span>, <span class="syntax-number">0</span>, <span class="syntax-string">f'{max_val:.1f}'</span>, 
+         va=<span class="syntax-string">'center'</span>, fontweight=<span class="syntax-string">'bold'</span>, color=cores_analise[<span class="syntax-string">'primary'</span>])
+
+<span class="syntax-comment"># Grid sutil</span>
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>, axis=<span class="syntax-string">'x'</span>)
+
+<span class="syntax-comment"># Remover spines desnecessários</span>
+ax2.spines[<span class="syntax-string">'top'</span>].set_visible(<span class="syntax-keyword">False</span>)
+ax2.spines[<span class="syntax-string">'right'</span>].set_visible(<span class="syntax-keyword">False</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># CHECKLIST DE QUALIDADE PARA VISUALIZAÇÕES</span>
+checklist = [
+    <span class="syntax-string">"✅ Título claro e informativo"</span>,
+    <span class="syntax-string">"✅ Eixos rotulados adequadamente"</span>,
+    <span class="syntax-string">"✅ Cores harmoniosas e consistentes"</span>,
+    <span class="syntax-string">"✅ Legenda necessária e posicionada corretamente"</span>,
+    <span class="syntax-string">"✅ Fonte legível em todos os elementos"</span>,
+    <span class="syntax-string">"✅ Grid sutil para auxiliar leitura"</span>,
+    <span class="syntax-string">"✅ Dados ordenados logicamente"</span>,
+    <span class="syntax-string">"✅ Destaques apenas no que é importante"</span>,
+    <span class="syntax-string">"✅ Proporções adequadas (evitar distorção)"</span>,
+    <span class="syntax-string">"✅ Contexto e referências quando necessário"</span>
+]
+
+print(<span class="syntax-string">"📋 CHECKLIST DE QUALIDADE VISUAL:"</span>)
+for item in checklist:
+    print(item)
+
+<span class="syntax-comment"># Função para auditoria de gráfico</span>
+<span class="syntax-keyword">def</span> <span class="syntax-function">auditar_grafico</span>(ax, titulo_presente=<span class="syntax-keyword">True</span>, eixos_rotulados=<span class="syntax-keyword">True</span>, 
+                   cores_adequadas=<span class="syntax-keyword">True</span>, legenda_necessaria=<span class="syntax-keyword">False</span>):
+    score = <span class="syntax-number">0</span>
+    max_score = <span class="syntax-number">4</span>
+    
+    if titulo_presente and ax.get_title():
+        score += <span class="syntax-number">1</span>
+        print(<span class="syntax-string">"✅ Título presente"</span>)
+    
+    if eixos_rotulados and ax.get_xlabel() and ax.get_ylabel():
+        score += <span class="syntax-number">1</span>
+        print(<span class="syntax-string">"✅ Eixos rotulados"</span>)
+    
+    if cores_adequadas:
+        score += <span class="syntax-number">1</span>
+        print(<span class="syntax-string">"✅ Cores adequadas"</span>)
+    
+    if not legenda_necessaria or ax.get_legend():
+        score += <span class="syntax-number">1</span>
+        print(<span class="syntax-string">"✅ Legenda apropriada"</span>)
+    
+    print(<span class="syntax-string">f"\n📊 Score de qualidade: {score}/{max_score} ({score/max_score*100:.0f}%)"</span>)
+    
+    return score / max_score
+
+<span class="syntax-comment"># Demonstrar auditoria</span>
+print(<span class="syntax-string">"\n🔍 AUDITORIA DO GRÁFICO (Boa Prática):"</span>)
+score = auditar_grafico(ax2)</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 7 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">7</div>
+            <h2 class="step-title">Checkpoint 3 do Projeto e Síntese</h2>
+        </div>
+        <div class="stats-badge">Projeto Final</div>
+        <p class="step-description">Consolidar aprendizados e preparar entregáveis do Checkpoint 3 com foco em visualização estratégica.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Template para Checkpoint 3</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># TEMPLATE PARA CHECKPOINT 3 - VISUALIZAÇÃO DE DADOS</span>
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">criar_relatorio_visual_completo</span>(dados, titulo_projeto):
+    <span class="syntax-string">"""
+    Cria um relatório visual completo para o Checkpoint 3
+    
+    Parameters:
+    dados: DataFrame com os dados do projeto
+    titulo_projeto: String com o título do projeto
+    """</span>
+    
+    print(<span class="syntax-string">f"📊 RELATÓRIO VISUAL - {titulo_projeto.upper()}"</span>)
+    print(<span class="syntax-string">"=" * 80</span>)
+    
+    <span class="syntax-comment"># 1. Dashboard Executivo</span>
+    print(<span class="syntax-string">"\n1. 📈 DASHBOARD EXECUTIVO"</span>)
+    fig_exec = plt.figure(figsize=(<span class="syntax-number">18</span>, <span class="syntax-number">12</span>))
+    fig_exec.suptitle(<span class="syntax-string">f'Dashboard Executivo - {titulo_projeto}'</span>, fontsize=<span class="syntax-number">20</span>)
+    
+    <span class="syntax-comment"># Seus gráficos específicos do projeto aqui</span>
+    <span class="syntax-comment"># ...</span>
+    
+    plt.tight_layout()
+    plt.show()
+    
+    <span class="syntax-comment"># 2. Análise Estatística Detalhada</span>
+    print(<span class="syntax-string">"\n2. 🔍 ANÁLISE ESTATÍSTICA DETALHADA"</span>)
+    
+    <span class="syntax-comment"># Seus gráficos Seaborn aqui</span>
+    <span class="syntax-comment"># ...</span>
+    
+    <span class="syntax-comment"># 3. Visualizações Interativas</span>
+    print(<span class="syntax-string">"\n3. 🎯 VISUALIZAÇÕES INTERATIVAS"</span>)
+    
+    <span class="syntax-comment"># Seus gráficos Plotly aqui</span>
+    <span class="syntax-comment"># ...</span>
+    
+    <span class="syntax-comment"># 4. Insights e Recomendações</span>
+    print(<span class="syntax-string">"\n4. 💡 INSIGHTS E RECOMENDAÇÕES ESTRATÉGICAS"</span>)
+    
+    <span class="syntax-comment"># Extrair insights automaticamente dos dados</span>
+    insights = extrair_insights_automaticos(dados)
+    
+    for i, insight in <span class="syntax-function">enumerate</span>(insights, <span class="syntax-number">1</span>):
+        print(<span class="syntax-string">f"   {i}. {insight}"</span>)
+    
+    return fig_exec
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">extrair_insights_automaticos</span>(df):
+    <span class="syntax-string">"""Extrai insights automáticos dos dados"""</span>
+    insights = []
+    
+    <span class="syntax-comment"># Correlações fortes</span>
+    correlations = df.select_dtypes(include=[np.number]).corr()
+    strong_corr = np.where(np.abs(correlations) > <span class="syntax-number">0.7</span>)
+    
+    for i, j in <span class="syntax-function">zip</span>(*strong_corr):
+        if i < j:  <span class="syntax-comment"># Evitar duplicatas</span>
+            var1, var2 = correlations.index[i], correlations.index[j]
+            corr_val = correlations.iloc[i, j]
+            insights.append(<span class="syntax-string">f"Correlação forte entre {var1} e {var2}: {corr_val:.3f}"</span>)
+    
+    return insights[:5]  <span class="syntax-comment"># Limitar a 5 insights principais</span>
+
+<span class="syntax-comment"># DEMONSTRAÇÃO com nossos dados musicais</span>
+relatorio = criar_relatorio_visual_completo(df, <span class="syntax-string">"Análise Musical Estratégica"</span>)
+
+<span class="syntax-comment"># GUIA DE ENTREGÁVEIS PARA O CHECKPOINT 3</span>
+print(<span class="syntax-string">"\n" + "="*60</span>)
+print(<span class="syntax-string">"🎯 GUIA DE ENTREGÁVEIS - CHECKPOINT 3"</span>)
+print(<span class="syntax-string">"="*60</span>)
+
+entregaveis = {
+    <span class="syntax-string">"1. Dashboard Executivo"</span>: [
+        <span class="syntax-string">"• Painel com KPIs principais do projeto"</span>,
+        <span class="syntax-string">"• 4-6 visualizações estratégicas"</span>,
+        <span class="syntax-string">"• Layout profissional e cores consistentes"</span>,
+        <span class="syntax-string">"• Insights destacados visualmente"</span>
+    ],
+    <span class="syntax-string">"2. Análises Estatísticas"</span>: [
+        <span class="syntax-string">"• Matriz de correlação com heatmap"</span>,
+        <span class="syntax-string">"• Distribuições usando violin/box plots"</span>,
+        <span class="syntax-string">"• Análise multivariada (pairplot)"</span>,
+        <span class="syntax-string">"• Testes estatísticos relevantes"</span>
+    ],
+    <span class="syntax-string">"3. Interatividade"</span>: [
+        <span class="syntax-string">"• Pelo menos 2 gráficos interativos (Plotly)"</span>,
+        <span class="syntax-string">"• Filtros e tooltips informativos"</span>,
+        <span class="syntax-string">"• Exploração 3D quando relevante"</span>,
+        <span class="syntax-string">"• Dashboard interativo completo"</span>
+    ],
+    <span class="syntax-string">"4. Documentação"</span>: [
+        <span class="syntax-string">"• Justificativa da escolha de cada gráfico"</span>,
+        <span class="syntax-string">"• Insights extraídos de cada visualização"</span>,
+        <span class="syntax-string">"• Recomendações estratégicas baseadas nos dados"</span>,
+        <span class="syntax-string">"• Código bem comentado e organizado"</span>
+    ]
+}
+
+for categoria, itens in entregaveis.items():
+    print(<span class="syntax-string">f"\n{categoria}:"</span>)
+    for item in itens:
+        print(<span class="syntax-string">f"  {item}"</span>)
+
+<span class="syntax-comment"># CRITÉRIOS DE AVALIAÇÃO</span>
+print(<span class="syntax-string">"\n📝 CRITÉRIOS DE AVALIAÇÃO:"</span>)
+criterios = [
+    <span class="syntax-string">"🎨 Qualidade Visual (25%): Design, cores, layout profissional"</span>,
+    <span class="syntax-string">"📊 Escolha Adequada de Gráficos (25%): Tipo certo para cada insight"</span>,
+    <span class="syntax-string">"💡 Insights e Interpretação (25%): Descobertas relevantes"</span>,
+    <span class="syntax-string">"🔧 Implementação Técnica (25%): Código limpo e funcional"</span>
+]
+
+for criterio in criterios:
+    print(f"  {criterio}")
+
+print(<span class="syntax-string">"\n🚀 BOA SORTE NO SEU CHECKPOINT 3!"</span>)</code></pre>
+        </div>
+
+        <div class="highlight-box">
+            <h4>Parabéns! Você dominou visualização de dados profissional</h4>
+            <p>Implementou com sucesso <strong>MatplotLib</strong>, <strong>Seaborn</strong> e <strong>Plotly</strong>, criou dashboards executivos e aplicou princípios de design visual. Este conhecimento é fundamental para comunicar insights de dados de forma impactante!</p>
+        </div>
+
+        <div class="info-panel">
+            <h4>Checkpoint 3 do Projeto - Foco em Visualização</h4>
+            <p>Para o Checkpoint 3, demonstre:</p>
+            <ul>
+                <li>Dashboard executivo com KPIs do seu projeto</li>
+                <li>Análises estatísticas usando Seaborn</li>
+                <li>Visualizações interativas com Plotly</li>
+                <li>Aplicação de princípios de design visual</li>
+                <li>Insights estratégicos extraídos das visualizações</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <h4>Dicas Importantes para o Projeto</h4>
+        <ul>
+            <li><strong>Público-alvo:</strong> adapte visualizações para quem vai usar</li>
+            <li><strong>História dos dados:</strong> crie narrativa coerente</li>
+            <li><strong>Simplicidade:</strong> não sobrecarregue com informações</li>
+            <li><strong>Teste com usuários:</strong> valide se as visualizações comunicam bem</li>
+            <li><strong>Performance:</strong> otimize para grandes volumes de dados</li>
+        </ul>
+    </div>
+
+    <p class="subtitle" style="text-align:center;margin-top:30px">Atividade completa - Visualização profissional de dados para tomada de decisão estratégica</p>
+</div>
+
+<script>
+// Copiar conteúdo dos blocos de código
+document.querySelectorAll('.code-block').forEach(block => {
+  const btn = block.querySelector('.copy-button');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const code = block.querySelector('pre').innerText;
+    try{
+      await navigator.clipboard.writeText(code);
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copy-success');
+      setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copy-success'); }, 1400);
+    }catch(e){
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = code; document.body.appendChild(textarea);
+      textarea.select(); document.execCommand('copy'); textarea.remove();
+      btn.textContent = 'Copiado!';
+      setTimeout(()=>{ btn.textContent = 'Copiar'; }, 1400);
+    }
+  });
+});
+</script>
+</body>
+</html>
