@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiro Prático - Explicabilidade de Modelos e Gráficos de Probabilidades</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+            background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+            min-height:100vh;padding:20px
+        }
+        .container{
+            max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.95);
+            backdrop-filter:blur(20px);border-radius:24px;padding:40px;
+            box-shadow:0 20px 40px rgba(25,20,20,.2);border:1px solid rgba(255,255,255,.3);
+            animation:fadeInUp .8s cubic-bezier(.4,0,.2,1)
+        }
+        .header{text-align:center;margin-bottom:40px}
+        .badge{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:10px 20px;border-radius:25px;font-size:14px;font-weight:600;display:inline-block;margin-bottom:20px;box-shadow:0 4px 15px rgba(102,126,234,.3)}
+        .stats-badge{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;padding:6px 14px;border-radius:15px;font-size:12px;font-weight:600;display:inline-block;margin-bottom:15px;box-shadow:0 2px 8px rgba(240,147,251,.3)}
+        .title{font-size:2.5rem;font-weight:700;color:#1a1a1a;margin-bottom:12px;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .subtitle{font-size:1.2rem;color:#666;font-weight:400;margin-bottom:30px}
+        .step-container{background:rgba(255,255,255,.7);backdrop-filter:blur(10px);border-radius:16px;border-left:6px solid #667eea;padding:30px;margin-bottom:30px;box-shadow:0 8px 25px rgba(102,126,234,.1);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+        .step-container:hover{transform:translateY(-5px)}
+        .step-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+        .step-number{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0;box-shadow:0 4px 15px rgba(102,126,234,.3)}
+        .step-title{color:#667eea;font-size:1.5rem;font-weight:600;margin:0}
+        .step-description{color:#444;line-height:1.7;font-size:1.1rem;margin-bottom:20px}
+        .theory-box{background:rgba(102,126,234,.1);border:2px solid rgba(102,126,234,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .theory-box h4{color:#667eea;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .code-block{background:#1e1e1e;color:#d4d4d4;padding:25px;border-radius:12px;font-family:'Monaco','Menlo','Ubuntu Mono',monospace;font-size:14px;line-height:1.6;overflow-x:auto;margin:20px 0;border-left:4px solid #667eea;position:relative}
+        .code-header{background:#2d2d2d;color:#fff;padding:10px 20px;margin:-25px -25px 15px -25px;border-radius:12px 12px 0 0;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+        .copy-button{background:#667eea;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:background .3s,transform .2s}
+        .copy-button:hover{background:#764ba2;transform:scale(1.05)}
+        .output-example{background:rgba(76,175,80,.1);border:2px solid rgba(76,175,80,.3);border-radius:12px;padding:20px;margin:15px 0;font-family:monospace;font-size:13px}
+        .output-header{color:#388e3c;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+        .highlight-box{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:25px;border-radius:16px;margin:25px 0;backdrop-filter:blur(10px);box-shadow:0 8px 25px rgba(102,126,234,.3)}
+        .highlight-box h4{font-size:1.3rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .warning-box{background:rgba(255,193,7,.1);border:2px solid rgba(255,193,7,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .warning-box h4{color:#f57c00;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .info-panel{background:rgba(102,126,234,.1);border:2px solid rgba(102,126,234,.2);border-radius:16px;padding:20px;margin:20px 0}
+        .info-panel h4{color:#667eea;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .explanation-box{background:rgba(255,255,255,.5);border-radius:12px;padding:20px;margin:15px 0;border-left:4px solid #667eea}
+        .explanation-box h5{color:#667eea;font-size:1.1rem;margin-bottom:10px;font-weight:600}
+        .explanation-box p{color:#555;line-height:1.6;font-size:.95rem}
+        .comparison-box{background:rgba(240,147,251,.1);border:2px solid rgba(240,147,251,.3);border-radius:16px;padding:20px;margin:20px 0}
+        .comparison-box h4{color:#f093fb;font-size:1.2rem;margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:10px}
+        .syntax-keyword{color:#569cd6}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-function{color:#dcdcaa}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+        @media (max-width:768px){.container{padding:25px;margin:10px}.title{font-size:2rem}.step-container{padding:20px}.code-block{padding:15px;font-size:12px}.step-header{flex-direction:column;align-items:flex-start;gap:10px}.step-number{width:35px;height:35px;font-size:16px}.step-title{font-size:1.3rem}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="badge">Roteiro Prático - Aula 8</div>
+        <h1 class="title">Explicabilidade de Modelos e Gráficos de Probabilidades</h1>
+        <p class="subtitle">SHAP, interpretação de modelos ML e visualização de probabilidades</p>
+    </div>
+
+    <div class="highlight-box">
+        <h4>🎯 O que vamos aprender hoje</h4>
+        <p>Exploraremos <strong>SHAP (SHapley Additive exPlanations)</strong> para explicar decisões de modelos de machine learning e criaremos <strong>gráficos de probabilidades</strong> para interpretar resultados e incertezas dos modelos.</p>
+    </div>
+
+    <div class="info-panel">
+        <h4>📋 Preparação</h4>
+        <p>Abra o Google Colab e crie o notebook <strong>Aula8_SHAP_Probabilidades</strong>. Utilizaremos os dados musicais das aulas anteriores para treinar modelos e explicar suas decisões.</p>
+    </div>
+
+    <!-- Passo 1 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Configuração e Preparação dos Dados</h2>
+        </div>
+        <div class="stats-badge">Setup & Data Prep</div>
+        <p class="step-description">Configurar ambiente com SHAP e preparar dados para treinamento de modelos explicáveis.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Instalação e Configuração Completa</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Instalação das bibliotecas necessárias</span>
+!pip install shap
+
+<span class="syntax-keyword">import</span> pandas <span class="syntax-keyword">as</span> pd
+<span class="syntax-keyword">import</span> numpy <span class="syntax-keyword">as</span> np
+<span class="syntax-keyword">import</span> matplotlib.pyplot <span class="syntax-keyword">as</span> plt
+<span class="syntax-keyword">import</span> seaborn <span class="syntax-keyword">as</span> sns
+<span class="syntax-keyword">import</span> shap
+<span class="syntax-keyword">import</span> warnings
+warnings.filterwarnings(<span class="syntax-string">'ignore'</span>)
+
+<span class="syntax-comment"># Machine Learning</span>
+<span class="syntax-keyword">from</span> sklearn.model_selection <span class="syntax-keyword">import</span> train_test_split, cross_val_score
+<span class="syntax-keyword">from</span> sklearn.ensemble <span class="syntax-keyword">import</span> RandomForestClassifier, RandomForestRegressor
+<span class="syntax-keyword">from</span> sklearn.linear_model <span class="syntax-keyword">import</span> LogisticRegression
+<span class="syntax-keyword">from</span> sklearn.preprocessing <span class="syntax-keyword">import</span> StandardScaler, LabelEncoder
+<span class="syntax-keyword">from</span> sklearn.metrics <span class="syntax-keyword">import</span> accuracy_score, classification_report, confusion_matrix
+<span class="syntax-keyword">from</span> sklearn.metrics <span class="syntax-keyword">import</span> roc_curve, auc, precision_recall_curve
+<span class="syntax-keyword">from</span> sklearn.calibration <span class="syntax-keyword">import</span> calibration_curve
+
+<span class="syntax-comment"># Configurações de visualização</span>
+plt.style.use(<span class="syntax-string">'seaborn-v0_8-whitegrid'</span>)
+sns.set_palette(<span class="syntax-string">"Set2"</span>)
+
+<span class="syntax-comment"># Cores para SHAP e probabilidades</span>
+cores_shap = {
+    <span class="syntax-string">'positive'</span>: <span class="syntax-string">'#ff6b6b'</span>,  <span class="syntax-comment"># Impacto positivo</span>
+    <span class="syntax-string">'negative'</span>: <span class="syntax-string">'#4ecdc4'</span>,  <span class="syntax-comment"># Impacto negativo</span>
+    <span class="syntax-string">'neutral'</span>: <span class="syntax-string">'#95a5a6'</span>,   <span class="syntax-comment"># Neutro</span>
+    <span class="syntax-string">'probability'</span>: <span class="syntax-string">'#667eea'</span> <span class="syntax-comment"># Gráficos de probabilidade</span>
+}
+
+<span class="syntax-comment"># Configurar SHAP</span>
+shap.initjs()
+
+np.random.seed(<span class="syntax-number">42</span>)
+
+print(<span class="syntax-string">"🔍 Ambiente SHAP configurado com sucesso!"</span>)
+print(<span class="syntax-string">"📊 Pronto para explicar modelos de machine learning"</span>)</code></pre>
+        </div>
+
+        <div class="theory-box">
+            <h4>🧠 Por que Explicabilidade de Modelos é Crucial?</h4>
+            <p><strong>Explicabilidade</strong> (XAI - Explainable AI) é essencial para:</p>
+            <ul>
+                <li><strong>Confiança:</strong> entender como o modelo toma decisões</li>
+                <li><strong>Compliance:</strong> atender regulamentações (LGPD, GDPR)</li>
+                <li><strong>Debugging:</strong> identificar vieses e problemas no modelo</li>
+                <li><strong>Business insights:</strong> descobrir padrões para estratégia</li>
+                <li><strong>Accountability:</strong> responsabilização por decisões automatizadas</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Criação do Dataset Musical Expandido</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Recriar dataset musical com variáveis adicionais</span>
+n_tracks = <span class="syntax-number">5000</span>
+generos = [<span class="syntax-string">'Pop'</span>, <span class="syntax-string">'Rock'</span>, <span class="syntax-string">'Hip Hop'</span>, <span class="syntax-string">'Eletrônica'</span>, <span class="syntax-string">'Indie'</span>, <span class="syntax-string">'R&B'</span>, <span class="syntax-string">'Jazz'</span>, <span class="syntax-string">'Country'</span>]
+gravadoras = [<span class="syntax-string">'Universal'</span>, <span class="syntax-string">'Sony'</span>, <span class="syntax-string">'Warner'</span>, <span class="syntax-string">'Independente'</span>, <span class="syntax-string">'EMI'</span>]
+
+<span class="syntax-comment"># Features musicais</span>
+dados = {
+    <span class="syntax-string">'energia'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, n_tracks),
+    <span class="syntax-string">'valencia'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, n_tracks),
+    <span class="syntax-string">'dancabilidade'</span>: np.random.beta(<span class="syntax-number">3</span>, <span class="syntax-number">2</span>, n_tracks),
+    <span class="syntax-string">'acousticness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">4</span>, n_tracks),
+    <span class="syntax-string">'liveness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">9</span>, n_tracks),
+    <span class="syntax-string">'instrumentalness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">5</span>, n_tracks),
+    <span class="syntax-string">'speechiness'</span>: np.random.beta(<span class="syntax-number">1</span>, <span class="syntax-number">8</span>, n_tracks),
+    <span class="syntax-string">'tempo'</span>: np.random.normal(<span class="syntax-number">120</span>, <span class="syntax-number">30</span>, n_tracks),
+    <span class="syntax-string">'duracao_minutos'</span>: np.random.lognormal(mean=<span class="syntax-number">1.2</span>, sigma=<span class="syntax-number">0.3</span>, size=n_tracks),
+    <span class="syntax-string">'popularidade'</span>: np.random.beta(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, n_tracks) * <span class="syntax-number">100</span>,
+    <span class="syntax-string">'streams_milhoes'</span>: np.random.lognormal(mean=<span class="syntax-number">2</span>, sigma=<span class="syntax-number">1.5</span>, size=n_tracks),
+    <span class="syntax-string">'genero'</span>: np.random.choice(generos, size=n_tracks),
+    <span class="syntax-string">'gravadora'</span>: np.random.choice(gravadoras, size=n_tracks),
+    <span class="syntax-string">'ano_lancamento'</span>: np.random.choice(<span class="syntax-function">range</span>(<span class="syntax-number">1990</span>, <span class="syntax-number">2024</span>), n_tracks)
+}
+
+df = pd.DataFrame(dados)
+df[<span class="syntax-string">'tempo'</span>] = np.clip(df[<span class="syntax-string">'tempo'</span>], <span class="syntax-number">60</span>, <span class="syntax-number">200</span>)
+
+<span class="syntax-comment"># Criar variáveis derivadas de negócio</span>
+df[<span class="syntax-string">'receita_estimada'</span>] = df[<span class="syntax-string">'streams_milhoes'</span>] * np.random.uniform(<span class="syntax-number">0.003</span>, <span class="syntax-number">0.007</span>, n_tracks)
+df[<span class="syntax-string">'idade_musica'</span>] = <span class="syntax-number">2024</span> - df[<span class="syntax-string">'ano_lancamento'</span>]
+
+<span class="syntax-comment"># Target variables para diferentes tipos de problema</span>
+<span class="syntax-comment"># 1. Classificação: Hit ou não (popularidade > 70)</span>
+df[<span class="syntax-string">'hit'</span>] = (df[<span class="syntax-string">'popularidade'</span>] > <span class="syntax-number">70</span>).astype(int)
+
+<span class="syntax-comment"># 2. Classificação multiclasse: Categoria de sucesso</span>
+<span class="syntax-keyword">def</span> <span class="syntax-function">categorizar_sucesso</span>(pop):
+    if pop >= <span class="syntax-number">80</span>: return <span class="syntax-string">'Mega Hit'</span>
+    elif pop >= <span class="syntax-number">60</span>: return <span class="syntax-string">'Hit'</span>
+    elif pop >= <span class="syntax-number">40</span>: return <span class="syntax-string">'Moderado'</span>
+    else: return <span class="syntax-string">'Baixo'</span>
+
+df[<span class="syntax-string">'categoria_sucesso'</span>] = df[<span class="syntax-string">'popularidade'</span>].apply(categorizar_sucesso)
+
+<span class="syntax-comment"># 3. Regressão: Predizer streams</span>
+<span class="syntax-comment"># (streams_milhoes já existe como target de regressão)</span>
+
+<span class="syntax-comment"># Encoding de variáveis categóricas</span>
+le_genero = LabelEncoder()
+le_gravadora = LabelEncoder()
+df[<span class="syntax-string">'genero_encoded'</span>] = le_genero.fit_transform(df[<span class="syntax-string">'genero'</span>])
+df[<span class="syntax-string">'gravadora_encoded'</span>] = le_gravadora.fit_transform(df[<span class="syntax-string">'gravadora'</span>])
+
+print(<span class="syntax-string">f"📊 Dataset criado: {df.shape[0]:,} músicas com {df.shape[1]} features"</span>)
+print(<span class="syntax-string">f"🎯 Hits identificados: {df['hit'].sum():,} ({df['hit'].mean()*100:.1f}%)"</span>)
+print(<span class="syntax-string">f"📈 Distribuição de categorias de sucesso:"</span>)
+print(df[<span class="syntax-string">'categoria_sucesso'</span>].value_counts())</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 2 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h2 class="step-title">Introdução ao SHAP (SHapley Additive exPlanations)</h2>
+        </div>
+        <div class="stats-badge">SHAP Fundamentals</div>
+        <p class="step-description">Compreender os fundamentos do SHAP e como ele explica contribuições de features para predições.</p>
+
+        <div class="theory-box">
+            <h4>🎲 O que é SHAP?</h4>
+            <p><strong>SHAP</strong> é baseado na Teoria dos Jogos (Shapley Values):</p>
+            <ul>
+                <li><strong>Aditivo:</strong> soma das contribuições = predição - baseline</li>
+                <li><strong>Simétrico:</strong> features com igual contribuição têm igual valor</li>
+                <li><strong>Dummy:</strong> features irrelevantes têm valor zero</li>
+                <li><strong>Eficiência:</strong> soma total preserva diferença da baseline</li>
+            </ul>
+            <p><strong>Tipos de explainers:</strong> TreeExplainer, LinearExplainer, KernelExplainer, DeepExplainer</p>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Treinamento de Modelos para Explicação</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># Preparar features para modelagem</span>
+feature_cols = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>, <span class="syntax-string">'acousticness'</span>,
+                <span class="syntax-string">'liveness'</span>, <span class="syntax-string">'instrumentalness'</span>, <span class="syntax-string">'speechiness'</span>, <span class="syntax-string">'tempo'</span>,
+                <span class="syntax-string">'duracao_minutos'</span>, <span class="syntax-string">'genero_encoded'</span>, <span class="syntax-string">'gravadora_encoded'</span>, <span class="syntax-string">'idade_musica'</span>]
+
+X = df[feature_cols].copy()
+y_class = df[<span class="syntax-string">'hit'</span>]  <span class="syntax-comment"># Classificação binária</span>
+y_reg = df[<span class="syntax-string">'streams_milhoes'</span>]  <span class="syntax-comment"># Regressão</span>
+
+<span class="syntax-comment"># Split dos dados</span>
+X_train, X_test, y_train_class, y_test_class = train_test_split(
+    X, y_class, test_size=<span class="syntax-number">0.2</span>, random_state=<span class="syntax-number">42</span>, stratify=y_class
+)
+
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
+    X, y_reg, test_size=<span class="syntax-number">0.2</span>, random_state=<span class="syntax-number">42</span>
+)
+
+<span class="syntax-comment"># Modelo 1: Random Forest para Classificação (Hit/Não Hit)</span>
+print(<span class="syntax-string">"🌳 Treinando Random Forest para predição de Hits..."</span>)
+rf_classifier = RandomForestClassifier(
+    n_estimators=<span class="syntax-number">100</span>, 
+    max_depth=<span class="syntax-number">10</span>, 
+    random_state=<span class="syntax-number">42</span>,
+    class_weight=<span class="syntax-string">'balanced'</span>
+)
+rf_classifier.fit(X_train, y_train_class)
+
+<span class="syntax-comment"># Modelo 2: Random Forest para Regressão (Streams)</span>
+print(<span class="syntax-string">"📈 Treinando Random Forest para predição de Streams..."</span>)
+rf_regressor = RandomForestRegressor(
+    n_estimators=<span class="syntax-number">100</span>, 
+    max_depth=<span class="syntax-number">10</span>, 
+    random_state=<span class="syntax-number">42</span>
+)
+rf_regressor.fit(X_train_reg, y_train_reg)
+
+<span class="syntax-comment"># Avaliar modelos</span>
+y_pred_class = rf_classifier.predict(X_test)
+y_pred_reg = rf_regressor.predict(X_test_reg)
+
+accuracy = accuracy_score(y_test_class, y_pred_class)
+r2_score = rf_regressor.score(X_test_reg, y_test_reg)
+
+print(<span class="syntax-string">f"✅ Acurácia do classificador: {accuracy:.3f}"</span>)
+print(<span class="syntax-string">f"✅ R² do regressor: {r2_score:.3f}"</span>)
+
+<span class="syntax-comment"># Criar explainers SHAP</span>
+print(<span class="syntax-string">"\n🔍 Criando SHAP Explainers..."</span>)
+
+<span class="syntax-comment"># TreeExplainer para Random Forest</span>
+explainer_class = shap.TreeExplainer(rf_classifier)
+explainer_reg = shap.TreeExplainer(rf_regressor)
+
+<span class="syntax-comment"># Calcular SHAP values para uma amostra dos dados de teste</span>
+sample_size = <span class="syntax-number">100</span>  <span class="syntax-comment"># Reduzir para performance</span>
+X_test_sample = X_test.sample(n=sample_size, random_state=<span class="syntax-number">42</span>)
+X_test_reg_sample = X_test_reg.sample(n=sample_size, random_state=<span class="syntax-number">42</span>)
+
+print(<span class="syntax-string">"📊 Calculando SHAP values..."</span>)
+shap_values_class = explainer_class.shap_values(X_test_sample)
+shap_values_reg = explainer_reg.shap_values(X_test_reg_sample)
+
+<span class="syntax-comment"># Para classificação binária, pegar valores da classe positiva</span>
+if isinstance(shap_values_class, list):
+    shap_values_class = shap_values_class[<span class="syntax-number">1</span>]  <span class="syntax-comment"># Classe "Hit"</span>
+
+print(<span class="syntax-string">"✅ SHAP values calculados com sucesso!"</span>)
+print(<span class="syntax-string">f"📏 Shape dos SHAP values (classificação): {shap_values_class.shape}"</span>)
+print(<span class="syntax-string">f"📏 Shape dos SHAP values (regressão): {shap_values_reg.shape}"</span>)</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>💡 Interpretando SHAP Values</h5>
+            <p><strong>SHAP value positivo:</strong> a feature aumenta a probabilidade da predição</p>
+            <p><strong>SHAP value negativo:</strong> a feature diminui a probabilidade da predição</p>
+            <p><strong>Magnitude:</strong> quanto maior o valor absoluto, maior a importância</p>
+            <p><strong>Baseline:</strong> predição média do modelo sem nenhuma feature</p>
+        </div>
+    </div>
+
+    <!-- Passo 3 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h2 class="step-title">Visualizações SHAP - Global e Local</h2>
+        </div>
+        <div class="stats-badge">SHAP Visualizations</div>
+        <p class="step-description">Criar visualizações SHAP para explicações globais e locais dos modelos.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>SHAP Summary Plots e Feature Importance</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># 1. SUMMARY PLOT - Visão geral das importâncias</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">18</span>, <span class="syntax-number">14</span>))
+fig.suptitle(<span class="syntax-string">'SHAP Analysis - Explicabilidade dos Modelos Musicais'</span>, fontsize=<span class="syntax-number">16</span>, y=<span class="syntax-number">0.98</span>)
+
+<span class="syntax-comment"># Summary plot para classificação</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, <span class="syntax-number">1</span>)
+shap.summary_plot(shap_values_class, X_test_sample, 
+                  feature_names=feature_cols, show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">10</span>)
+plt.title(<span class="syntax-string">'SHAP Summary - Predição de Hits'</span>, fontsize=<span class="syntax-number">14</span>)
+
+<span class="syntax-comment"># Bar plot para classificação</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, <span class="syntax-number">2</span>)
+shap.summary_plot(shap_values_class, X_test_sample, 
+                  feature_names=feature_cols, plot_type=<span class="syntax-string">"bar"</span>, show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">10</span>)
+plt.title(<span class="syntax-string">'Importância das Features - Hits'</span>, fontsize=<span class="syntax-number">14</span>)
+
+<span class="syntax-comment"># Summary plot para regressão</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, <span class="syntax-number">3</span>)
+shap.summary_plot(shap_values_reg, X_test_reg_sample, 
+                  feature_names=feature_cols, show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">10</span>)
+plt.title(<span class="syntax-string">'SHAP Summary - Predição de Streams'</span>, fontsize=<span class="syntax-number">14</span>)
+
+<span class="syntax-comment"># Bar plot para regressão</span>
+plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, <span class="syntax-number">4</span>)
+shap.summary_plot(shap_values_reg, X_test_reg_sample, 
+                  feature_names=feature_cols, plot_type=<span class="syntax-string">"bar"</span>, show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">10</span>)
+plt.title(<span class="syntax-string">'Importância das Features - Streams'</span>, fontsize=<span class="syntax-number">14</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># 2. DEPENDENCE PLOTS - Como features específicas afetam predições</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">18</span>, <span class="syntax-number">12</span>))
+fig.suptitle(<span class="syntax-string">'SHAP Dependence Plots - Relações entre Features e Predições'</span>, fontsize=<span class="syntax-number">16</span>)
+
+<span class="syntax-comment"># Features mais importantes para analisar</span>
+important_features = [<span class="syntax-string">'energia'</span>, <span class="syntax-string">'valencia'</span>, <span class="syntax-string">'dancabilidade'</span>]
+
+for i, feature in <span class="syntax-function">enumerate</span>(important_features):
+    <span class="syntax-comment"># Dependence plot para classificação</span>
+    plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, i+<span class="syntax-number">1</span>)
+    feature_idx = feature_cols.index(feature)
+    shap.dependence_plot(feature_idx, shap_values_class, X_test_sample, 
+                        feature_names=feature_cols, show=<span class="syntax-keyword">False</span>)
+    plt.title(<span class="syntax-string">f'Dependência: {feature} (Hits)'</span>)
+    
+    <span class="syntax-comment"># Dependence plot para regressão</span>
+    plt.subplot(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, i+<span class="syntax-number">4</span>)
+    shap.dependence_plot(feature_idx, shap_values_reg, X_test_reg_sample, 
+                        feature_names=feature_cols, show=<span class="syntax-keyword">False</span>)
+    plt.title(<span class="syntax-string">f'Dependência: {feature} (Streams)'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># 3. EXPLICAÇÕES LOCAIS - Waterfall plots para instâncias específicas</span>
+print(<span class="syntax-string">"🔍 EXPLICAÇÕES LOCAIS - Exemplos de Predições Individuais"</span>)
+print(<span class="syntax-string">"="*60</span>)
+
+<span class="syntax-comment"># Selecionar algumas instâncias interessantes</span>
+idx_hit = X_test_sample.index[<span class="syntax-number">0</span>]  <span class="syntax-comment"># Primeira instância</span>
+idx_no_hit = X_test_sample.index[<span class="syntax-number">10</span>]  <span class="syntax-comment"># Décima instância</span>
+
+<span class="syntax-comment"># Predictions para contexto</span>
+prob_hit = rf_classifier.predict_proba(X_test_sample.loc[[idx_hit]])[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+prob_no_hit = rf_classifier.predict_proba(X_test_sample.loc[[idx_no_hit]])[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+
+print(<span class="syntax-string">f"Música 1 (ID: {idx_hit}) - Probabilidade de Hit: {prob_hit:.3f}"</span>)
+print(<span class="syntax-string">f"Música 2 (ID: {idx_no_hit}) - Probabilidade de Hit: {prob_no_hit:.3f}"</span>)
+
+<span class="syntax-comment"># Waterfall plots</span>
+fig, axes = plt.subplots(<span class="syntax-number">1</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">16</span>, <span class="syntax-number">8</span>))
+
+<span class="syntax-comment"># Explicação para primeira música</span>
+plt.subplot(<span class="syntax-number">1</span>, <span class="syntax-number">2</span>, <span class="syntax-number">1</span>)
+idx_in_sample = list(X_test_sample.index).index(idx_hit)
+shap.waterfall_plot(explainer_class.expected_value[<span class="syntax-number">1</span>], 
+                   shap_values_class[idx_in_sample], 
+                   X_test_sample.iloc[idx_in_sample], 
+                   feature_names=feature_cols, 
+                   show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">8</span>)
+plt.title(<span class="syntax-string">f'Explicação Local - Música {idx_hit}\nProb. Hit: {prob_hit:.3f}'</span>)
+
+<span class="syntax-comment"># Explicação para segunda música</span>
+plt.subplot(<span class="syntax-number">1</span>, <span class="syntax-number">2</span>, <span class="syntax-number">2</span>)
+idx_in_sample_2 = list(X_test_sample.index).index(idx_no_hit)
+shap.waterfall_plot(explainer_class.expected_value[<span class="syntax-number">1</span>], 
+                   shap_values_class[idx_in_sample_2], 
+                   X_test_sample.iloc[idx_in_sample_2], 
+                   feature_names=feature_cols, 
+                   show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">8</span>)
+plt.title(<span class="syntax-string">f'Explicação Local - Música {idx_no_hit}\nProb. Hit: {prob_no_hit:.3f}'</span>)
+
+plt.tight_layout()
+plt.show()</code></pre>
+        </div>
+
+        <div class="explanation-box">
+            <h5>📊 Interpretando as Visualizações SHAP</h5>
+            <ul>
+                <li><strong>Summary Plot:</strong> mostra distribuição de importâncias de todas as features</li>
+                <li><strong>Bar Plot:</strong> ranking simples de importâncias médias</li>
+                <li><strong>Dependence Plot:</strong> como valores da feature afetam predições</li>
+                <li><strong>Waterfall Plot:</strong> contribuição step-by-step para uma predição específica</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Passo 4 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">4</div>
+            <h2 class="step-title">Gráficos de Probabilidades e Calibração</h2>
+        </div>
+        <div class="stats-badge">Probability Plots</div>
+        <p class="step-description">Criar gráficos para análise de probabilidades, calibração e confiança dos modelos.</p>
+
+        <div class="theory-box">
+            <h4>📈 Gráficos de Probabilidades: Por que são importantes?</h4>
+            <p><strong>Análise de probabilidades</strong> permite:</p>
+            <ul>
+                <li><strong>Calibração:</strong> verificar se probabilidades estão bem calibradas</li>
+                <li><strong>Confiança:</strong> entender quando o modelo é mais/menos confiável</li>
+                <li><strong>Threshold optimization:</strong> escolher pontos de corte ideais</li>
+                <li><strong>Risk assessment:</strong> quantificar incerteza nas predições</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            <div class="code-header"><span>Gráficos de Probabilidades Avançados</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># 1. CURVAS ROC e PRECISION-RECALL</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">18</span>, <span class="syntax-number">12</span>))
+fig.suptitle(<span class="syntax-string">'Análise Completa de Probabilidades - Modelo de Hits Musicais'</span>, fontsize=<span class="syntax-number">16</span>)
+
+<span class="syntax-comment"># Calcular probabilidades</span>
+y_proba = rf_classifier.predict_proba(X_test)[:, <span class="syntax-number">1</span>]
+
+<span class="syntax-comment"># ROC Curve</span>
+fpr, tpr, thresholds_roc = roc_curve(y_test_class, y_proba)
+roc_auc = auc(fpr, tpr)
+
+ax1 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>]
+ax1.plot(fpr, tpr, color=cores_shap[<span class="syntax-string">'positive'</span>], lw=<span class="syntax-number">2</span>, 
+         label=<span class="syntax-string">f'ROC (AUC = {roc_auc:.3f})'</span>)
+ax1.plot([<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], [<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], <span class="syntax-string">'k--'</span>, lw=<span class="syntax-number">1</span>, label=<span class="syntax-string">'Random'</span>)
+ax1.set_xlabel(<span class="syntax-string">'Taxa de Falsos Positivos'</span>)
+ax1.set_ylabel(<span class="syntax-string">'Taxa de Verdadeiros Positivos'</span>)
+ax1.set_title(<span class="syntax-string">'Curva ROC'</span>)
+ax1.legend()
+ax1.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Precision-Recall Curve</span>
+precision, recall, thresholds_pr = precision_recall_curve(y_test_class, y_proba)
+pr_auc = auc(recall, precision)
+
+ax2 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+ax2.plot(recall, precision, color=cores_shap[<span class="syntax-string">'negative'</span>], lw=<span class="syntax-number">2</span>, 
+         label=<span class="syntax-string">f'PR (AUC = {pr_auc:.3f})'</span>)
+ax2.axhline(y=y_test_class.mean(), color=<span class="syntax-string">'k'</span>, linestyle=<span class="syntax-string">'--'</span>, 
+           label=<span class="syntax-string">f'Baseline ({y_test_class.mean():.3f})'</span>)
+ax2.set_xlabel(<span class="syntax-string">'Recall'</span>)
+ax2.set_ylabel(<span class="syntax-string">'Precision'</span>)
+ax2.set_title(<span class="syntax-string">'Curva Precision-Recall'</span>)
+ax2.legend()
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 2. CALIBRATION PLOT - Reliability Diagram</span>
+fraction_of_positives, mean_predicted_value = calibration_curve(
+    y_test_class, y_proba, n_bins=<span class="syntax-number">10</span>
+)
+
+ax3 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>]
+ax3.plot(mean_predicted_value, fraction_of_positives, <span class="syntax-string">"s-"</span>, 
+         linewidth=<span class="syntax-number">2</span>, color=cores_shap[<span class="syntax-string">'probability'</span>], label=<span class="syntax-string">'Modelo'</span>)
+ax3.plot([<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], [<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], <span class="syntax-string">"k:"</span>, label=<span class="syntax-string">"Perfeitamente calibrado"</span>)
+ax3.set_xlabel(<span class="syntax-string">'Probabilidade Predita'</span>)
+ax3.set_ylabel(<span class="syntax-string">'Fração de Positivos'</span>)
+ax3.set_title(<span class="syntax-string">'Calibração do Modelo'</span>)
+ax3.legend()
+ax3.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 3. DISTRIBUIÇÃO DE PROBABILIDADES</span>
+ax4 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>]
+
+<span class="syntax-comment"># Separar probabilidades por classe real</span>
+prob_hits = y_proba[y_test_class == <span class="syntax-number">1</span>]
+prob_no_hits = y_proba[y_test_class == <span class="syntax-number">0</span>]
+
+ax4.hist(prob_no_hits, bins=<span class="syntax-number">30</span>, alpha=<span class="syntax-number">0.7</span>, label=<span class="syntax-string">'Não Hits'</span>, 
+         color=cores_shap[<span class="syntax-string">'negative'</span>], density=<span class="syntax-keyword">True</span>)
+ax4.hist(prob_hits, bins=<span class="syntax-number">30</span>, alpha=<span class="syntax-number">0.7</span>, label=<span class="syntax-string">'Hits'</span>, 
+         color=cores_shap[<span class="syntax-string">'positive'</span>], density=<span class="syntax-keyword">True</span>)
+ax4.axvline(<span class="syntax-number">0.5</span>, color=<span class="syntax-string">'black'</span>, linestyle=<span class="syntax-string">'--'</span>, label=<span class="syntax-string">'Threshold 0.5'</span>)
+ax4.set_xlabel(<span class="syntax-string">'Probabilidade Predita'</span>)
+ax4.set_ylabel(<span class="syntax-string">'Densidade'</span>)
+ax4.set_title(<span class="syntax-string">'Distribuição de Probabilidades'</span>)
+ax4.legend()
+ax4.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 4. THRESHOLD ANALYSIS</span>
+ax5 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>]
+
+<span class="syntax-comment"># Calcular métricas para diferentes thresholds</span>
+thresholds = np.linspace(<span class="syntax-number">0.1</span>, <span class="syntax-number">0.9</span>, <span class="syntax-number">50</span>)
+precisions = []
+recalls = []
+f1_scores = []
+
+for threshold in thresholds:
+    y_pred_threshold = (y_proba >= threshold).astype(int)
+    
+    <span class="syntax-comment"># Calcular métricas</span>
+    tp = np.sum((y_pred_threshold == <span class="syntax-number">1</span>) & (y_test_class == <span class="syntax-number">1</span>))
+    fp = np.sum((y_pred_threshold == <span class="syntax-number">1</span>) & (y_test_class == <span class="syntax-number">0</span>))
+    fn = np.sum((y_pred_threshold == <span class="syntax-number">0</span>) & (y_test_class == <span class="syntax-number">1</span>))
+    
+    precision = tp / (tp + fp) if (tp + fp) > <span class="syntax-number">0</span> else <span class="syntax-number">0</span>
+    recall = tp / (tp + fn) if (tp + fn) > <span class="syntax-number">0</span> else <span class="syntax-number">0</span>
+    f1 = <span class="syntax-number">2</span> * (precision * recall) / (precision + recall) if (precision + recall) > <span class="syntax-number">0</span> else <span class="syntax-number">0</span>
+    
+    precisions.append(precision)
+    recalls.append(recall)
+    f1_scores.append(f1)
+
+ax5.plot(thresholds, precisions, label=<span class="syntax-string">'Precision'</span>, linewidth=<span class="syntax-number">2</span>, color=cores_shap[<span class="syntax-string">'positive'</span>])
+ax5.plot(thresholds, recalls, label=<span class="syntax-string">'Recall'</span>, linewidth=<span class="syntax-number">2</span>, color=cores_shap[<span class="syntax-string">'negative'</span>])
+ax5.plot(thresholds, f1_scores, label=<span class="syntax-string">'F1-Score'</span>, linewidth=<span class="syntax-number">2</span>, color=cores_shap[<span class="syntax-string">'probability'</span>])
+ax5.axvline(<span class="syntax-number">0.5</span>, color=<span class="syntax-string">'black'</span>, linestyle=<span class="syntax-string">'--'</span>, alpha=<span class="syntax-number">0.7</span>, label=<span class="syntax-string">'Default (0.5)'</span>)
+
+<span class="syntax-comment"># Encontrar melhor threshold para F1</span>
+best_f1_idx = np.argmax(f1_scores)
+best_threshold = thresholds[best_f1_idx]
+ax5.axvline(best_threshold, color=<span class="syntax-string">'red'</span>, linestyle=<span class="syntax-string">'-'</span>, 
+           label=<span class="syntax-string">f'Melhor F1 ({best_threshold:.2f})'</span>)
+
+ax5.set_xlabel(<span class="syntax-string">'Threshold'</span>)
+ax5.set_ylabel(<span class="syntax-string">'Métrica'</span>)
+ax5.set_title(<span class="syntax-string">'Otimização de Threshold'</span>)
+ax5.legend()
+ax5.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># 5. CONFIDENCE INTERVALS</span>
+ax6 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">2</span>]
+
+<span class="syntax-comment"># Criar bins de confiança</span>
+confidence_bins = [<span class="syntax-number">0.0</span>, <span class="syntax-number">0.1</span>, <span class="syntax-number">0.2</span>, <span class="syntax-number">0.3</span>, <span class="syntax-number">0.4</span>, <span class="syntax-number">0.6</span>, <span class="syntax-number">0.7</span>, <span class="syntax-number">0.8</span>, <span class="syntax-number">0.9</span>, <span class="syntax-number">1.0</span>]
+accuracy_by_confidence = []
+count_by_confidence = []
+
+for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(confidence_bins)-<span class="syntax-number">1</span>):
+    low, high = confidence_bins[i], confidence_bins[i+<span class="syntax-number">1</span>]
+    mask = (y_proba >= low) & (y_proba < high)
+    
+    if np.sum(mask) > <span class="syntax-number">0</span>:
+        <span class="syntax-comment"># Acurácia neste bin (usando threshold 0.5)</span>
+        y_pred_bin = (y_proba[mask] >= <span class="syntax-number">0.5</span>).astype(int)
+        accuracy = np.mean(y_pred_bin == y_test_class[mask])
+        accuracy_by_confidence.append(accuracy)
+        count_by_confidence.append(np.sum(mask))
+    else:
+        accuracy_by_confidence.append(<span class="syntax-number">0</span>)
+        count_by_confidence.append(<span class="syntax-number">0</span>)
+
+bin_centers = [(confidence_bins[i] + confidence_bins[i+<span class="syntax-number">1</span>]) / <span class="syntax-number">2</span> for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(confidence_bins)-<span class="syntax-number">1</span>)]
+
+<span class="syntax-comment"># Plot de barras com altura = acurácia e largura proporcional ao count</span>
+bars = ax6.bar(bin_centers, accuracy_by_confidence, 
+               width=[<span class="syntax-number">0.08</span>]*<span class="syntax-function">len</span>(bin_centers), 
+               color=cores_shap[<span class="syntax-string">'probability'</span>], alpha=<span class="syntax-number">0.7</span>, edgecolor=<span class="syntax-string">'black'</span>)
+
+<span class="syntax-comment"># Adicionar contagem no topo das barras</span>
+for i, (bar, count) in <span class="syntax-function">enumerate</span>(<span class="syntax-function">zip</span>(bars, count_by_confidence)):
+    if count > <span class="syntax-number">0</span>:
+        ax6.text(bar.get_x() + bar.get_width()/<span class="syntax-number">2</span>, bar.get_height() + <span class="syntax-number">0.02</span>, 
+                <span class="syntax-string">f'{count}'</span>, ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'bottom'</span>, fontsize=<span class="syntax-number">9</span>)
+
+ax6.set_xlabel(<span class="syntax-string">'Intervalo de Probabilidade'</span>)
+ax6.set_ylabel(<span class="syntax-string">'Acurácia'</span>)
+ax6.set_title(<span class="syntax-string">'Acurácia por Intervalo de Confiança'</span>)
+ax6.set_ylim(<span class="syntax-number">0</span>, <span class="syntax-number">1.1</span>)
+ax6.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Métricas de resumo</span>
+print(<span class="syntax-string">"📊 RESUMO DA ANÁLISE DE PROBABILIDADES:"</span>)
+print(<span class="syntax-string">"="*50</span>)
+print(<span class="syntax-string">f"🎯 AUC-ROC: {roc_auc:.3f}"</span>)
+print(<span class="syntax-string">f"🎯 AUC-PR: {pr_auc:.3f}"</span>)
+print(<span class="syntax-string">f"🎯 Melhor threshold (F1): {best_threshold:.3f}"</span>)
+print(<span class="syntax-string">f"🎯 F1-Score no melhor threshold: {max(f1_scores):.3f}"</span>)
+print(<span class="syntax-string">f"🎯 Baseline de hits: {y_test_class.mean():.3f}"</span>)</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 5 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">5</div>
+            <h2 class="step-title">Análise de Incerteza e Predições Ensemble</h2>
+        </div>
+        <div class="stats-badge">Uncertainty Analysis</div>
+        <p class="step-description">Explorar incerteza em predições e usar métodos ensemble para melhorar robustez.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Análise de Incerteza com Bootstrap e Ensemble</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># 1. BOOTSTRAP PARA INTERVALOS DE CONFIANÇA</span>
+<span class="syntax-keyword">from</span> sklearn.utils <span class="syntax-keyword">import</span> resample
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">bootstrap_prediction_intervals</span>(model, X_train, y_train, X_test, n_bootstrap=<span class="syntax-number">100</span>):
+    <span class="syntax-string">"""Calcular intervalos de confiança usando bootstrap"""</span>
+    predictions = []
+    
+    for i in <span class="syntax-function">range</span>(n_bootstrap):
+        <span class="syntax-comment"># Reamostragem com reposição</span>
+        X_boot, y_boot = resample(X_train, y_train, random_state=i)
+        
+        <span class="syntax-comment"># Treinar modelo na amostra bootstrap</span>
+        model_boot = RandomForestClassifier(
+            n_estimators=<span class="syntax-number">50</span>, max_depth=<span class="syntax-number">8</span>, random_state=i
+        )
+        model_boot.fit(X_boot, y_boot)
+        
+        <span class="syntax-comment"># Predições</span>
+        pred_proba = model_boot.predict_proba(X_test)[:, <span class="syntax-number">1</span>]
+        predictions.append(pred_proba)
+        
+        if (i + <span class="syntax-number">1</span>) % <span class="syntax-number">20</span> == <span class="syntax-number">0</span>:
+            print(<span class="syntax-string">f"Bootstrap {i+1}/{n_bootstrap} concluído"</span>)
+    
+    return np.array(predictions)
+
+print(<span class="syntax-string">"🔄 Executando análise de bootstrap..."</span>)
+bootstrap_preds = bootstrap_prediction_intervals(
+    rf_classifier, X_train, y_train_class, X_test.head(<span class="syntax-number">200</span>), n_bootstrap=<span class="syntax-number">50</span>
+)
+
+<span class="syntax-comment"># Calcular estatísticas de incerteza</span>
+mean_pred = np.mean(bootstrap_preds, axis=<span class="syntax-number">0</span>)
+std_pred = np.std(bootstrap_preds, axis=<span class="syntax-number">0</span>)
+lower_ci = np.percentile(bootstrap_preds, <span class="syntax-number">2.5</span>, axis=<span class="syntax-number">0</span>)
+upper_ci = np.percentile(bootstrap_preds, <span class="syntax-number">97.5</span>, axis=<span class="syntax-number">0</span>)
+
+<span class="syntax-comment"># 2. VISUALIZAÇÃO DE INCERTEZA</span>
+fig, axes = plt.subplots(<span class="syntax-number">2</span>, <span class="syntax-number">2</span>, figsize=(<span class="syntax-number">16</span>, <span class="syntax-number">12</span>))
+fig.suptitle(<span class="syntax-string">'Análise de Incerteza em Predições - Bootstrap Analysis'</span>, fontsize=<span class="syntax-number">16</span>)
+
+<span class="syntax-comment"># Plot 1: Predições com intervalos de confiança</span>
+ax1 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">0</span>]
+indices = np.arange(<span class="syntax-function">len</span>(mean_pred))
+
+<span class="syntax-comment"># Ordenar por predição média para melhor visualização</span>
+sort_idx = np.argsort(mean_pred)
+indices_sorted = indices[sort_idx]
+mean_sorted = mean_pred[sort_idx]
+lower_sorted = lower_ci[sort_idx]
+upper_sorted = upper_ci[sort_idx]
+
+ax1.plot(indices_sorted, mean_sorted, <span class="syntax-string">'b-'</span>, linewidth=<span class="syntax-number">2</span>, label=<span class="syntax-string">'Predição Média'</span>)
+ax1.fill_between(indices_sorted, lower_sorted, upper_sorted, 
+                alpha=<span class="syntax-number">0.3</span>, color=cores_shap[<span class="syntax-string">'probability'</span>], label=<span class="syntax-string">'IC 95%'</span>)
+
+ax1.set_xlabel(<span class="syntax-string">'Instância (ordenada por predição)'</span>)
+ax1.set_ylabel(<span class="syntax-string">'Probabilidade de Hit'</span>)
+ax1.set_title(<span class="syntax-string">'Predições com Intervalos de Confiança'</span>)
+ax1.legend()
+ax1.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Plot 2: Distribuição de incerteza</span>
+ax2 = axes[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+ax2.hist(std_pred, bins=<span class="syntax-number">30</span>, color=cores_shap[<span class="syntax-string">'negative'</span>], alpha=<span class="syntax-number">0.7</span>, edgecolor=<span class="syntax-string">'black'</span>)
+ax2.axvline(np.mean(std_pred), color=<span class="syntax-string">'red'</span>, linestyle=<span class="syntax-string">'--'</span>, 
+           label=<span class="syntax-string">f'Média: {np.mean(std_pred):.3f}'</span>)
+ax2.set_xlabel(<span class="syntax-string">'Desvio Padrão das Predições'</span>)
+ax2.set_ylabel(<span class="syntax-string">'Frequência'</span>)
+ax2.set_title(<span class="syntax-string">'Distribuição da Incerteza'</span>)
+ax2.legend()
+ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Plot 3: Incerteza vs Predição</span>
+ax3 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">0</span>]
+scatter = ax3.scatter(mean_pred, std_pred, c=mean_pred, cmap=<span class="syntax-string">'viridis'</span>, 
+                     alpha=<span class="syntax-number">0.6</span>, s=<span class="syntax-number">50</span>)
+ax3.set_xlabel(<span class="syntax-string">'Predição Média'</span>)
+ax3.set_ylabel(<span class="syntax-string">'Incerteza (Desvio Padrão)'</span>)
+ax3.set_title(<span class="syntax-string">'Relação: Predição vs Incerteza'</span>)
+plt.colorbar(scatter, ax=ax3, label=<span class="syntax-string">'Probabilidade'</span>)
+ax3.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+<span class="syntax-comment"># Plot 4: Largura do intervalo de confiança</span>
+ax4 = axes[<span class="syntax-number">1</span>, <span class="syntax-number">1</span>]
+interval_width = upper_ci - lower_ci
+
+<span class="syntax-comment"># Criar bins baseados na predição média</span>
+pred_bins = np.linspace(<span class="syntax-number">0</span>, <span class="syntax-number">1</span>, <span class="syntax-number">10</span>)
+bin_centers = []
+mean_widths = []
+
+for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(pred_bins)-<span class="syntax-number">1</span>):
+    mask = (mean_pred >= pred_bins[i]) & (mean_pred < pred_bins[i+<span class="syntax-number">1</span>])
+    if np.sum(mask) > <span class="syntax-number">0</span>:
+        bin_centers.append((pred_bins[i] + pred_bins[i+<span class="syntax-number">1</span>]) / <span class="syntax-number">2</span>)
+        mean_widths.append(np.mean(interval_width[mask]))
+
+ax4.bar(bin_centers, mean_widths, width=<span class="syntax-number">0.08</span>, 
+       color=cores_shap[<span class="syntax-string">'positive'</span>], alpha=<span class="syntax-number">0.7</span>, edgecolor=<span class="syntax-string">'black'</span>)
+ax4.set_xlabel(<span class="syntax-string">'Intervalo de Probabilidade'</span>)
+ax4.set_ylabel(<span class="syntax-string">'Largura Média do IC'</span>)
+ax4.set_title(<span class="syntax-string">'Largura do Intervalo de Confiança por Probabilidade'</span>)
+ax4.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># 3. ENSEMBLE COM MÚLTIPLOS ALGORITMOS</span>
+print(<span class="syntax-string">"\n🔀 Criando Ensemble de Modelos..."</span>)
+
+<span class="syntax-keyword">from</span> sklearn.svm <span class="syntax-keyword">import</span> SVC
+<span class="syntax-keyword">from</span> sklearn.naive_bayes <span class="syntax-keyword">import</span> GaussianNB
+<span class="syntax-keyword">from</span> sklearn.ensemble <span class="syntax-keyword">import</span> VotingClassifier
+
+<span class="syntax-comment"># Modelos individuais</span>
+rf_model = RandomForestClassifier(n_estimators=<span class="syntax-number">100</span>, random_state=<span class="syntax-number">42</span>)
+lr_model = LogisticRegression(random_state=<span class="syntax-number">42</span>, max_iter=<span class="syntax-number">1000</span>)
+svm_model = SVC(probability=<span class="syntax-keyword">True</span>, random_state=<span class="syntax-number">42</span>)
+
+<span class="syntax-comment"># Ensemble voting</span>
+ensemble = VotingClassifier(
+    estimators=[(<span class="syntax-string">'rf'</span>, rf_model), (<span class="syntax-string">'lr'</span>, lr_model), (<span class="syntax-string">'svm'</span>, svm_model)],
+    voting=<span class="syntax-string">'soft'</span>  <span class="syntax-comment"># Para obter probabilidades</span>
+)
+
+<span class="syntax-comment"># Treinar modelos</span>
+models = {
+    <span class="syntax-string">'Random Forest'</span>: rf_model,
+    <span class="syntax-string">'Logistic Regression'</span>: lr_model,
+    <span class="syntax-string">'SVM'</span>: svm_model,
+    <span class="syntax-string">'Ensemble'</span>: ensemble
+}
+
+model_probabilities = {}
+model_accuracies = {}
+
+for name, model in models.items():
+    print(<span class="syntax-string">f"Treinando {name}..."</span>)
+    model.fit(X_train, y_train_class)
+    
+    <span class="syntax-comment"># Predições</span>
+    y_pred = model.predict(X_test)
+    y_proba_model = model.predict_proba(X_test)[:, <span class="syntax-number">1</span>]
+    
+    <span class="syntax-comment"># Métricas</span>
+    accuracy = accuracy_score(y_test_class, y_pred)
+    
+    model_probabilities[name] = y_proba_model
+    model_accuracies[name] = accuracy
+    
+    print(<span class="syntax-string">f"  Acurácia: {accuracy:.3f}"</span>)
+
+<span class="syntax-comment"># 4. COMPARAÇÃO DE MODELOS</span>
+fig, axes = plt.subplots(<span class="syntax-number">1</span>, <span class="syntax-number">3</span>, figsize=(<span class="syntax-number">18</span>, <span class="syntax-number">6</span>))
+fig.suptitle(<span class="syntax-string">'Comparação de Modelos - Análise de Probabilidades'</span>, fontsize=<span class="syntax-number">16</span>)
+
+<span class="syntax-comment"># Acurácias</span>
+ax1 = axes[<span class="syntax-number">0</span>]
+names = list(model_accuracies.keys())
+accuracies = list(model_accuracies.values())
+
+bars = ax1.bar(names, accuracies, color=[cores_corporativas[i % <span class="syntax-function">len</span>(cores_corporativas)] 
+                                       for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(names))], alpha=<span class="syntax-number">0.8</span>)
+
+<span class="syntax-comment"># Adicionar valores nas barras</span>
+for bar, acc in <span class="syntax-function">zip</span>(bars, accuracies):
+    ax1.text(bar.get_x() + bar.get_width()/<span class="syntax-number">2</span>, bar.get_height() + <span class="syntax-number">0.005</span>, 
+            <span class="syntax-string">f'{acc:.3f}'</span>, ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'bottom'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+ax1.set_ylabel(<span class="syntax-string">'Acurácia'</span>)
+ax1.set_title(<span class="syntax-string">'Comparação de Acurácias'</span>)
+ax1.set_ylim(<span class="syntax-number">0</span>, max(accuracies) * <span class="syntax-number">1.1</span>)
+plt.setp(ax1.get_xticklabels(), rotation=<span class="syntax-number">45</span>)
+
+<span class="syntax-comment"># Correlação entre predições</span>
+ax2 = axes[<span class="syntax-number">1</span>]
+prob_df = pd.DataFrame(model_probabilities)
+correlation_matrix = prob_df.corr()
+
+im = ax2.imshow(correlation_matrix, cmap=<span class="syntax-string">'coolwarm'</span>, aspect=<span class="syntax-string">'auto'</span>)
+ax2.set_xticks(<span class="syntax-function">range</span>(<span class="syntax-function">len</span>(names)))
+ax2.set_yticks(<span class="syntax-function">range</span>(<span class="syntax-function">len</span>(names)))
+ax2.set_xticklabels(names, rotation=<span class="syntax-number">45</span>)
+ax2.set_yticklabels(names)
+ax2.set_title(<span class="syntax-string">'Correlação entre Predições'</span>)
+
+<span class="syntax-comment"># Adicionar valores na matriz</span>
+for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(names)):
+    for j in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(names)):
+        ax2.text(j, i, <span class="syntax-string">f'{correlation_matrix.iloc[i, j]:.2f}'</span>, 
+                ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'center'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+
+plt.colorbar(im, ax=ax2)
+
+<span class="syntax-comment"># Dispersão de probabilidades: RF vs Ensemble</span>
+ax3 = axes[<span class="syntax-number">2</span>]
+ax3.scatter(model_probabilities[<span class="syntax-string">'Random Forest'</span>], 
+           model_probabilities[<span class="syntax-string">'Ensemble'</span>], 
+           alpha=<span class="syntax-number">0.6</span>, c=y_test_class, cmap=<span class="syntax-string">'RdYlBu'</span>)
+ax3.plot([<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], [<span class="syntax-number">0</span>, <span class="syntax-number">1</span>], <span class="syntax-string">'k--'</span>, alpha=<span class="syntax-number">0.5</span>)
+ax3.set_xlabel(<span class="syntax-string">'Random Forest Prob.'</span>)
+ax3.set_ylabel(<span class="syntax-string">'Ensemble Prob.'</span>)
+ax3.set_title(<span class="syntax-string">'RF vs Ensemble Predictions'</span>)
+
+plt.tight_layout()
+plt.show()
+
+<span class="syntax-comment"># Resultados finais</span>
+print(<span class="syntax-string">"\n📊 RESULTADOS FINAIS - ANÁLISE DE INCERTEZA:"</span>)
+print(<span class="syntax-string">"="*55</span>)
+print(<span class="syntax-string">f"🎯 Melhor modelo individual: {max(model_accuracies.items(), key=lambda x: x[1])[0]}"</span>)
+print(<span class="syntax-string">f"🎯 Acurácia do Ensemble: {model_accuracies['Ensemble']:.3f}"</span>)
+print(<span class="syntax-string">f"🎯 Incerteza média (bootstrap): {np.mean(std_pred):.3f}"</span>)
+print(<span class="syntax-string">f"🎯 Largura média do IC 95%: {np.mean(interval_width):.3f}"</span>)</code></pre>
+        </div>
+    </div>
+
+    <!-- Passo 6 -->
+    <div class="step-container">
+        <div class="step-header">
+            <div class="step-number">6</div>
+            <h2 class="step-title">Aplicação Prática e Interpretação de Negócio</h2>
+        </div>
+        <div class="stats-badge">Business Application</div>
+        <p class="step-description">Aplicar SHAP e análise de probabilidades para insights de negócio no contexto musical.</p>
+
+        <div class="code-block">
+            <div class="code-header"><span>Dashboard de Explicabilidade para Negócios</span><button class="copy-button">Copiar</button></div>
+<pre><code><span class="syntax-comment"># DASHBOARD EXECUTIVO DE EXPLICABILIDADE</span>
+<span class="syntax-keyword">def</span> <span class="syntax-function">criar_dashboard_explicabilidade</span>(modelo, explainer, X_sample, shap_values, feature_names):
+    <span class="syntax-string">"""Criar dashboard completo para stakeholders de negócio"""</span>
+    
+    fig = plt.figure(figsize=(<span class="syntax-number">20</span>, <span class="syntax-number">16</span>))
+    fig.suptitle(<span class="syntax-string">'DASHBOARD DE EXPLICABILIDADE - PREDIÇÃO DE HITS MUSICAIS'</span>, 
+                 fontsize=<span class="syntax-number">20</span>, fontweight=<span class="syntax-string">'bold'</span>, y=<span class="syntax-number">0.98</span>)
+    
+    <span class="syntax-comment"># Layout do dashboard</span>
+    gs = fig.add_gridspec(<span class="syntax-number">3</span>, <span class="syntax-number">4</span>, hspace=<span class="syntax-number">0.3</span>, wspace=<span class="syntax-number">0.3</span>)
+    
+    <span class="syntax-comment"># 1. TOP FEATURES GLOBAIS</span>
+    ax1 = fig.add_subplot(gs[<span class="syntax-number">0</span>, :<span class="syntax-number">2</span>])
+    shap.summary_plot(shap_values, X_sample, feature_names=feature_names, 
+                     plot_type=<span class="syntax-string">"bar"</span>, show=<span class="syntax-keyword">False</span>, max_display=<span class="syntax-number">8</span>)
+    ax1.set_title(<span class="syntax-string">'🎯 FEATURES MAIS IMPORTANTES PARA HITS'</span>, fontsize=<span class="syntax-number">14</span>, fontweight=<span class="syntax-string">'bold'</span>)
+    
+    <span class="syntax-comment"># 2. DISTRIBUIÇÃO DE IMPORTÂNCIAS</span>
+    ax2 = fig.add_subplot(gs[<span class="syntax-number">0</span>, <span class="syntax-number">2</span>:])
+    feature_importance = np.abs(shap_values).mean(axis=<span class="syntax-number">0</span>)
+    top_features_idx = np.argsort(feature_importance)[-<span class="syntax-number">5</span>:]
+    
+    for i, idx in <span class="syntax-function">enumerate</span>(top_features_idx):
+        ax2.hist(shap_values[:, idx], bins=<span class="syntax-number">20</span>, alpha=<span class="syntax-number">0.7</span>, 
+                label=feature_names[idx], density=<span class="syntax-keyword">True</span>)
+    
+    ax2.set_xlabel(<span class="syntax-string">'SHAP Value'</span>)
+    ax2.set_ylabel(<span class="syntax-string">'Densidade'</span>)
+    ax2.set_title(<span class="syntax-string">'📊 DISTRIBUIÇÃO DE IMPACTOS (Top 5)'</span>, fontweight=<span class="syntax-string">'bold'</span>)
+    ax2.legend(bbox_to_anchor=(<span class="syntax-number">1.05</span>, <span class="syntax-number">1</span>), loc=<span class="syntax-string">'upper left'</span>)
+    ax2.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+    
+    <span class="syntax-comment"># 3. CENÁRIOS DE NEGÓCIO</span>
+    ax3 = fig.add_subplot(gs[<span class="syntax-number">1</span>, :])
+    
+    <span class="syntax-comment"># Simular diferentes cenários</span>
+    cenarios = {
+        <span class="syntax-string">'Alta Energia + Alta Valencia'</span>: {<span class="syntax-string">'energia'</span>: <span class="syntax-number">0.8</span>, <span class="syntax-string">'valencia'</span>: <span class="syntax-number">0.8</span>},
+        <span class="syntax-string">'Alta Dançabilidade'</span>: {<span class="syntax-string">'dancabilidade'</span>: <span class="syntax-number">0.9</span>},
+        <span class="syntax-string">'Muito Acústico'</span>: {<span class="syntax-string">'acousticness'</span>: <span class="syntax-number">0.9</span>},
+        <span class="syntax-string">'Pop Moderno'</span>: {<span class="syntax-string">'energia'</span>: <span class="syntax-number">0.7</span>, <span class="syntax-string">'valencia'</span>: <span class="syntax-number">0.6</span>, <span class="syntax-string">'dancabilidade'</span>: <span class="syntax-number">0.8</span>}
+    }
+    
+    cenario_probs = []
+    cenario_names = []
+    
+    <span class="syntax-comment"># Baseline: valores médios</span>
+    baseline_sample = X_sample.mean().values.reshape(<span class="syntax-number">1</span>, -<span class="syntax-number">1</span>)
+    baseline_prob = modelo.predict_proba(baseline_sample)[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+    
+    for nome, modificacoes in cenarios.items():
+        sample_modificado = X_sample.mean().copy()
+        
+        for feature, valor in modificacoes.items():
+            if feature in X_sample.columns:
+                sample_modificado[feature] = valor
+        
+        prob = modelo.predict_proba(sample_modificado.values.reshape(<span class="syntax-number">1</span>, -<span class="syntax-number">1</span>))[<span class="syntax-number">0</span>, <span class="syntax-number">1</span>]
+        cenario_probs.append(prob)
+        cenario_names.append(nome)
+    
+    <span class="syntax-comment"># Adicionar baseline</span>
+    cenario_names.insert(<span class="syntax-number">0</span>, <span class="syntax-string">'Baseline (Médio)'</span>)
+    cenario_probs.insert(<span class="syntax-number">0</span>, baseline_prob)
+    
+    colors = [cores_shap[<span class="syntax-string">'neutral'</span>]] + [cores_corporativas[i % <span class="syntax-function">len</span>(cores_corporativas)] 
+                                             for i in <span class="syntax-function">range</span>(<span class="syntax-function">len</span>(cenario_probs)-<span class="syntax-number">1</span>)]
+    
+    bars = ax3.bar(cenario_names, cenario_probs, color=colors, alpha=<span class="syntax-number">0.8</span>, edgecolor=<span class="syntax-string">'black'</span>)
+    
+    <span class="syntax-comment"># Linha de threshold</span>
+    ax3.axhline(y=<span class="syntax-number">0.5</span>, color=<span class="syntax-string">'red'</span>, linestyle=<span class="syntax-string">'--'</span>, linewidth=<span class="syntax-number">2</span>, 
+               label=<span class="syntax-string">'Threshold Hit (0.5)'</span>)
+    
+    <span class="syntax-comment"># Adicionar valores nas barras</span>
+    for bar, prob in <span class="syntax-function">zip</span>(bars, cenario_probs):
+        ax3.text(bar.get_x() + bar.get_width()/<span class="syntax-number">2</span>, bar.get_height() + <span class="syntax-number">0.02</span>, 
+                <span class="syntax-string">f'{prob:.3f}'</span>, ha=<span class="syntax-string">'center'</span>, va=<span class="syntax-string">'bottom'</span>, 
+                fontweight=<span class="syntax-string">'bold'</span>, fontsize=<span class="syntax-number">11</span>)
+    
+    ax3.set_ylabel(<span class="syntax-string">'Probabilidade de Hit'</span>)
+    ax3.set_title(<span class="syntax-string">'🎪 SIMULAÇÃO DE CENÁRIOS DE NEGÓCIO'</span>, fontweight=<span class="syntax-string">'bold'</span>, fontsize=<span class="syntax-number">14</span>)
+    ax3.legend()
+    ax3.grid(<span class="syntax-keyword">True</span>, alpha=<span class="syntax-number">0.3</span>)
+    plt.setp(ax3.get_xticklabels(), rotation=<span class="syntax-number">45</span>, ha=<span class="syntax-string">'right'</span>)
+    
+    <span class="syntax-comment"># 4. RECOMENDAÇÕES AUTOMÁTICAS</span>
+    ax4 = fig.add_subplot(gs[<span class="syntax-number">2</span>, :])
+    ax4.axis(<span class="syntax-string">'off'</span>)
+    
+    <span class="syntax-comment"># Gerar recomendações baseadas em SHAP</span>
+    top_3_features = np.argsort(feature_importance)[-<span class="syntax-number">3</span>:]
+    
+    recomendacoes = [
+        <span class="syntax-string">"🎯 INSIGHTS ESTRATÉGICOS BASEADOS EM IA:"</span>,
+        <span class="syntax-string">""</span>,
+        <span class="syntax-string">f"1. 🔥 A feature mais importante é '{feature_names[top_3_features[-1]]}'"</span>,
+        <span class="syntax-string">f"2. 🎵 Para maximizar hits, foque em '{feature_names[top_3_features[-2]]}'"</span>, 
+        <span class="syntax-string">f"3. 📊 '{feature_names[top_3_features[-3]]}' também tem impacto significativo"</span>,
+        <span class="syntax-string">""</span>,
+        <span class="syntax-string">f"💡 Cenário mais promissor: {cenario_names[np.argmax(cenario_probs[1:]) + 1]}"</span>,
+        <span class="syntax-string">f"   (Probabilidade: {max(cenario_probs[1:]):.1%})"</span>,
+        <span class="syntax-string">""</span>,
+        <span class="syntax-string">"⚠️  ATENÇÃO: Modelos de IA devem complementar, não substituir, expertise musical"</span>
+    ]
+    
+    y_pos = <span class="syntax-number">0.9</span>
+    for rec in recomendacoes:
+        if rec.startswith(<span class="syntax-string">"🎯"</span>):
+            ax4.text(<span class="syntax-number">0.05</span>, y_pos, rec, fontsize=<span class="syntax-number">16</span>, fontweight=<span class="syntax-string">'bold'</span>, 
+                    transform=ax4.transAxes, color=cores_shap[<span class="syntax-string">'positive'</span>])
+        elif rec.startswith((<span class="syntax-string">"1."</span>, <span class="syntax-string">"2."</span>, <span class="syntax-string">"3."</span>)):
+            ax4.text(<span class="syntax-number">0.05</span>, y_pos, rec, fontsize=<span class="syntax-number">13</span>, fontweight=<span class="syntax-string">'bold'</span>, 
+                    transform=ax4.transAxes, color=cores_shap[<span class="syntax-string">'probability'</span>])
+        elif rec.startswith(<span class="syntax-string">"💡"</span>):
+            ax4.text(<span class="syntax-number">0.05</span>, y_pos, rec, fontsize=<span class="syntax-number">13</span>, fontweight=<span class="syntax-string">'bold'</span>, 
+                    transform=ax4.transAxes, color=cores_shap[<span class="syntax-string">'negative'</span>])
+        elif rec.startswith(<span class="syntax-string">"⚠️"</span>):
+            ax4.text(<span class="syntax-number">0.05</span>, y_pos, rec, fontsize=<span class="syntax-number">11</span>, style=<span class="syntax-string">'italic'</span>, 
+                    transform=ax4.transAxes, color=<span class="syntax-string">'#e74c3c'</span>)
+        else:
+            ax4.text(<span class="syntax-number">0.05</span>, y_pos, rec, fontsize=<span class="syntax-number">12</span>, 
+                    transform=ax4.transAxes, color=<span class="syntax-string">'black'</span>)
+        y_pos -= <span class="syntax-number">0.12</span>
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return cenario_names, cenario_probs
+
+<span class="syntax-comment"># Executar dashboard</span>
+print(<span class="syntax-string">"📊 Criando Dashboard de Explicabilidade para Negócios..."</span>)
+cenarios, probabilidades = criar_dashboard_explicabilidade(
+    rf_classifier, explainer_class, X_test_sample, shap_values_class, feature_cols
+)
+
+<span class="syntax-comment"># RELATÓRIO EXECUTIVO FINAL</span>
+print(<span class="syntax-string">"\n" + "="*70</span>)
+print(<span class="syntax-string">"📋 RELATÓRIO EXECUTIVO - EXPLICABILIDADE DE MODELOS ML"</span>)
+print(<span class="syntax-string">"="*70</span>)
+
+<span class="syntax-comment"># Métricas-chave do modelo</span>
+y_pred_final = rf_classifier.predict(X_test)
+y_proba_final = rf_classifier.predict_proba(X_test)[:, <span class="syntax-number">1</span>]
+
+<span class="syntax-comment"># Calcular métricas de negócio</span>
+<span class="syntax-keyword">from</span> sklearn.metrics <span class="syntax-keyword">import</span> precision_score, recall_score, f1_score
+
+precision = precision_score(y_test_class, y_pred_final)
+recall = recall_score(y_test_class, y_pred_final)
+f1 = f1_score(y_test_class, y_pred_final)
+
+print(<span class="syntax-string">f"🎯 PERFORMANCE DO MODELO:"</span>)
+print(<span class="syntax-string">f"   • Acurácia: {accuracy_score(y_test_class, y_pred_final):.1%}"</span>)
+print(<span class="syntax-string">f"   • Precisão: {precision:.1%} (dos preditos como hit, quantos realmente são)"</span>)
+print(<span class="syntax-string">f"   • Recall: {recall:.1%} (dos hits reais, quantos conseguimos identificar)"</span>)
+print(<span class="syntax-string">f"   • F1-Score: {f1:.3f} (média harmônica precisão/recall)"</span>)
+
+print(<span class="syntax-string">f"\n🔍 EXPLICABILIDADE:"</span>)
+feature_importance_shap = np.abs(shap_values_class).mean(axis=<span class="syntax-number">0</span>)
+top_features_idx = np.argsort(feature_importance_shap)[-<span class="syntax-number">3</span>:]
+
+for i, idx in <span class="syntax-function">enumerate</span>(top_features_idx[::-<span class="syntax-number">1</span>], <span class="syntax-number">1</span>):
+    print(<span class="syntax-string">f"   {i}. {feature_cols[idx]}: {feature_importance_shap[idx]:.3f}"</span>)
+
+print(<span class="syntax-string">f"\n💼 IMPACTO NO NEGÓCIO:"</span>)
+print(<span class="syntax-string">f"   • Identificação correta de hits: {int(recall * y_test_class.sum())} de {y_test_class.sum()}"</span>)
+print(<span class="syntax-string">f"   • Redução de falsos positivos: {precision:.1%} de precisão"</span>)
+print(<span class="syntax-string">f"   • ROI estimado: Melhoria na seleção de música para promoção"</span>)
+
+print(<span class="syntax-string">f"\n🚀 PRÓXIMOS PASSOS:"</span>)
+print(<span class="syntax-string">f"   1. Implementar monitoramento contínuo do modelo"</span>)
+print(<span class="syntax-string">f"   2. Coletar feedback de A&R e ajustar features"</span>)
+print(<span class="syntax-string">f"   3. Testar novos algoritmos (XGBoost, Deep Learning)"</span>)
+print(<span class="syntax-string">f"   4. Integrar com sistemas de recomendação existentes"</span>)</code></pre>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🎉 Parabéns! Você dominou explicabilidade de modelos ML</h4>
+            <p>Implementou com sucesso <strong>SHAP</strong> para explicar predições, criou <strong>gráficos de probabilidades</strong> avançados e aplicou técnicas de <strong>análise de incerteza</strong>. Este conhecimento é fundamental para IA responsável e tomada de decisão baseada em evidências!</p>
+        </div>
+
+        <div class="info-panel">
+            <h4>📚 Para o próximo Checkpoint</h4>
+            <p>Use estes conceitos no seu projeto:</p>
+            <ul>
+                <li>Explique as decisões dos seus modelos com SHAP</li>
+                <li>Analise probabilidades e calibração</li>
+                <li>Quantifique incerteza nas predições</li>
+                <li>Crie dashboards executivos de explicabilidade</li>
+                <li>Traduza insights técnicos para recomendações de negócio</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <h4>⚠️ Considerações Éticas e Práticas</h4>
+        <ul>
+            <li><strong>Bias e Fairness:</strong> use SHAP para detectar vieses nos modelos</li>
+            <li><strong>Transparência:</strong> sempre explique limitações dos modelos</li>
+            <li><strong>LGPD Compliance:</strong> explicabilidade é requisito legal</li>
+            <li><strong>Validação contínua:</strong> monitore drift de modelo e features</li>
+            <li><strong>Interpretação humana:</strong> combine IA com expertise de domínio</li>
+        </ul>
+    </div>
+
+    <p class="subtitle" style="text-align:center;margin-top:30px">Atividade completa - Explicabilidade e análise de probabilidades para IA responsável</p>
+</div>
+
+<script>
+// Copiar conteúdo dos blocos de código
+document.querySelectorAll('.code-block').forEach(block => {
+  const btn = block.querySelector('.copy-button');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const code = block.querySelector('pre').innerText;
+    try{
+      await navigator.clipboard.writeText(code);
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      btn.classList.add('copy-success');
+      setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copy-success'); }, 1400);
+    }catch(e){
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = code; document.body.appendChild(textarea);
+      textarea.select(); document.execCommand('copy'); textarea.remove();
+      btn.textContent = 'Copiado!';
+      setTimeout(()=>{ btn.textContent = 'Copiar'; }, 1400);
+    }
+  });
+});
+</script>
+</body>
+</html>
