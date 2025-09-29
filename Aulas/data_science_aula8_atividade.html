@@ -265,6 +265,161 @@
             <p>Nesta aula vamos implementar soluções reais usando Python no Google Colab. Trabalharemos com bibliotecas modernas para análise de dados industriais, otimização de processos e aplicações de machine learning em problemas típicos da engenharia de produção.</p>
         </div>
 
+        <div class="section">
+            <h2>Sobre Esta Atividade</h2>
+            
+            <div class="concept-box">
+                <h4>Objetivo Geral</h4>
+                <p>Esta atividade prática ensina a implementar soluções computacionais para problemas reais da engenharia de produção usando Python e Google Colab. Ao invés de apenas usar ferramentas de IA comerciais prontas (como ChatGPT ou Claude), você aprenderá a <strong>programar suas próprias soluções</strong>, desenvolvendo scripts automatizados e modelos analíticos que podem ser customizados e integrados aos sistemas da empresa.</p>
+            </div>
+
+            <div class="concept-box">
+                <h4>O que é Google Colab?</h4>
+                <p><strong>Google Colaboratory (Colab)</strong> é um ambiente de programação Python gratuito que roda na nuvem. Funciona como um caderno digital onde você pode escrever código, executá-lo imediatamente e ver os resultados, incluindo gráficos e tabelas. Não precisa instalar nada no seu computador - basta um navegador e uma conta Google.</p>
+                <p><strong>Vantagens:</strong> Gratuito, não requer instalação, possui GPU grátis para processamento, permite compartilhamento fácil de projetos, e já vem com as principais bibliotecas instaladas.</p>
+            </div>
+
+            <h3 style="color: #1e3c72; margin-top: 30px; margin-bottom: 15px;">Glossário de Siglas e Termos</h3>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>OEE</h3>
+                    <p><strong>Overall Equipment Effectiveness (Eficácia Geral do Equipamento)</strong><br>
+                    Métrica que mede a eficiência da produção multiplicando três fatores: Disponibilidade (% tempo em operação) × Performance (% velocidade nominal) × Qualidade (% peças boas). Exemplo: 90% × 85% × 98% = 75% OEE.</p>
+                </div>
+
+                <div class="card">
+                    <h3>KPI</h3>
+                    <p><strong>Key Performance Indicator (Indicador-Chave de Performance)</strong><br>
+                    Métricas quantificáveis usadas para avaliar o sucesso de processos. Exemplos: produção diária, taxa de refugo, tempo de setup, entregas no prazo.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Setup</h3>
+                    <p><strong>Tempo de Preparação</strong><br>
+                    Tempo necessário para preparar uma máquina ou linha de produção ao trocar de um produto para outro. Inclui ajustes, trocas de ferramentas e testes. Quanto menor, mais eficiente a produção.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Refugo</h3>
+                    <p><strong>Scrap / Rejeito</strong><br>
+                    Produtos defeituosos que não atendem aos padrões de qualidade e precisam ser descartados ou reprocessados. Medido em porcentagem do total produzido.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Mix de Produção</h3>
+                    <p><strong>Product Mix</strong><br>
+                    Combinação ótima de diferentes produtos a serem fabricados considerando restrições de recursos (tempo, matéria-prima, mão de obra) para maximizar lucro ou minimizar custos.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Anomalia</h3>
+                    <p><strong>Outlier / Desvio</strong><br>
+                    Comportamento ou valor que se desvia significativamente do padrão esperado. Pode indicar problemas no processo, erros de medição ou eventos especiais que merecem investigação.</p>
+                </div>
+            </div>
+
+            <h3 style="color: #1e3c72; margin-top: 30px; margin-bottom: 15px;">Técnicas e Metodologias Utilizadas</h3>
+
+            <div class="tool-info">
+                <h4>1. Análise Exploratória de Dados (EDA)</h4>
+                <p><strong>O que é:</strong> Processo de investigação inicial dos dados para descobrir padrões, detectar anomalias e testar hipóteses usando estatísticas descritivas e visualizações.</p>
+                <p><strong>Como fazemos:</strong> Calculamos médias, medianas, desvios padrão; criamos histogramas, boxplots e gráficos de dispersão; identificamos correlações entre variáveis.</p>
+                <p><strong>Por que importa:</strong> Antes de criar modelos complexos, precisamos entender profundamente os dados. 80% do trabalho em ciência de dados é preparação e exploração.</p>
+            </div>
+
+            <div class="tool-info">
+                <h4>2. Programação Linear (Linear Programming)</h4>
+                <p><strong>O que é:</strong> Técnica matemática para encontrar a melhor solução (máximo ou mínimo) de um problema com múltiplas variáveis e restrições lineares.</p>
+                <p><strong>Como fazemos:</strong> Definimos uma função objetivo (ex: maximizar lucro), variáveis de decisão (quantidades a produzir) e restrições (limites de recursos). O algoritmo encontra a solução ótima.</p>
+                <p><strong>Aplicações:</strong> Otimização de mix de produtos, programação de produção, roteamento de veículos, alocação de recursos, planejamento de cortes.</p>
+            </div>
+
+            <div class="tool-info">
+                <h4>3. Séries Temporais (Time Series)</h4>
+                <p><strong>O que é:</strong> Conjunto de dados coletados em intervalos regulares ao longo do tempo. Permite analisar tendências, sazonalidade e fazer previsões.</p>
+                <p><strong>Como fazemos:</strong> Usamos o algoritmo Prophet que automaticamente detecta padrões diários, semanais e anuais, ajusta-se a feriados e anomalias, e projeta valores futuros com intervalos de confiança.</p>
+                <p><strong>Aplicações:</strong> Previsão de demanda, planejamento de produção, gestão de estoque, análise de vendas.</p>
+            </div>
+
+            <div class="tool-info">
+                <h4>4. Detecção de Anomalias</h4>
+                <p><strong>O que é:</strong> Identificação automática de observações que diferem significativamente do comportamento normal esperado.</p>
+                <p><strong>Métodos utilizados:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Z-Score:</strong> Mede quantos desvios padrão um valor está da média. Valores com |Z| > 3 são considerados anômalos.</li>
+                    <li><strong>IQR (Intervalo Interquartil):</strong> Usa a diferença entre o 3º e 1º quartis. Valores fora de 1.5×IQR são outliers.</li>
+                    <li><strong>Isolation Forest:</strong> Algoritmo de machine learning que isola anomalias construindo árvores de decisão aleatórias.</li>
+                </ul>
+                <p><strong>Aplicações:</strong> Detecção de falhas em equipamentos, identificação de fraudes, controle de qualidade, monitoramento de processos.</p>
+            </div>
+
+            <div class="tool-info">
+                <h4>5. Visualização de Dados</h4>
+                <p><strong>O que é:</strong> Representação gráfica de informações para facilitar compreensão, identificação de padrões e comunicação de insights.</p>
+                <p><strong>Bibliotecas usadas:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Matplotlib:</strong> Biblioteca fundamental para gráficos estáticos. Altamente customizável, ideal para publicações científicas.</li>
+                    <li><strong>Seaborn:</strong> Construída sobre Matplotlib, oferece estilos mais modernos e facilita gráficos estatísticos complexos.</li>
+                    <li><strong>Plotly:</strong> Cria gráficos interativos (zoom, hover, filtros). Ideal para dashboards e apresentações executivas.</li>
+                </ul>
+            </div>
+
+            <h3 style="color: #1e3c72; margin-top: 30px; margin-bottom: 15px;">Bibliotecas Python Utilizadas</h3>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Pandas</h3>
+                    <p>Biblioteca fundamental para manipulação de dados estruturados em formato de tabelas (DataFrames). Permite carregar, limpar, transformar e analisar dados de forma eficiente. Pense nela como uma planilha Excel turbinada com superpoderes de programação.</p>
+                </div>
+
+                <div class="card">
+                    <h3>NumPy</h3>
+                    <p>Base para computação numérica em Python. Fornece arrays multidimensionais e funções matemáticas otimizadas. É a fundação sobre a qual pandas, scikit-learn e outras bibliotecas científicas são construídas.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Scikit-learn</h3>
+                    <p>Principal biblioteca de machine learning em Python. Oferece algoritmos para classificação, regressão, clustering e pré-processamento de dados. Interface consistente e bem documentada, ideal para aprender ML.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Prophet</h3>
+                    <p>Desenvolvida pelo Facebook (Meta) especificamente para previsão de séries temporais de negócios. Lida automaticamente com tendências, sazonalidade múltipla, feriados e dados faltantes. Muito robusto para dados reais "bagunçados".</p>
+                </div>
+
+                <div class="card">
+                    <h3>PuLP</h3>
+                    <p>Framework para modelagem de problemas de programação linear. Permite definir problemas de otimização de forma intuitiva e resolve usando algoritmos industriais. Amplamente usado em pesquisa operacional.</p>
+                </div>
+
+                <div class="card">
+                    <h3>SciPy</h3>
+                    <p>Biblioteca para computação científica avançada. Inclui otimização, integração numérica, álgebra linear, estatística e processamento de sinais. Complementa NumPy com algoritmos mais especializados.</p>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h4>Competências Desenvolvidas</h4>
+                <p>Ao completar esta atividade, você será capaz de:</p>
+                <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                    <li><strong>Automatizar análises:</strong> Criar scripts que processam dados automaticamente ao invés de fazê-lo manualmente</li>
+                    <li><strong>Tomar decisões baseadas em dados:</strong> Usar estatística e visualização para fundamentar escolhas gerenciais</li>
+                    <li><strong>Otimizar processos:</strong> Aplicar técnicas matemáticas para encontrar soluções ótimas de produção</li>
+                    <li><strong>Prever comportamentos futuros:</strong> Usar séries temporais para planejar demanda e recursos</li>
+                    <li><strong>Detectar problemas precocemente:</strong> Identificar anomalias antes que causem grandes impactos</li>
+                    <li><strong>Comunicar resultados:</strong> Criar visualizações profissionais para apresentar insights</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>Diferença entre IA Comercial e Programação</h4>
+                <p><strong>Ferramentas Comerciais (ChatGPT, Claude):</strong> Rápidas para uso pontual, boas para análises exploratórias, requerem poucos conhecimentos técnicos, mas têm custo recorrente, dependência de serviços externos e limitações de customização.</p>
+                <p><strong>Programação Python:</strong> Controle total sobre a solução, possibilidade de integração com sistemas existentes, automação completa, sem custos de licença, mas requer conhecimento técnico e tempo de desenvolvimento inicial.</p>
+                <p><strong>Melhor abordagem:</strong> Usar ambas! IA comercial para exploração rápida e protótipos, programação Python para soluções definitivas e automatizadas.</p>
+            </div>
+        </div>
+
         <div class="checkpoint-box">
             <h3>Programa da Aula</h3>
             <p><strong>Parte 1:</strong> Setup do Ambiente e Bibliotecas Essenciais<br>
